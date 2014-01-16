@@ -10,7 +10,7 @@ using namespace esa;
 
 int main (void)
 {
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "zh_tw.UTF-8");
 
     vector<wstring> sequences;
     sequences.push_back(L"這是一隻可愛的小花貓");
