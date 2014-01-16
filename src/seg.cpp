@@ -81,6 +81,7 @@ std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence,
 Segmenter::SegResult Segmenter::segment(const Sequence::const_iterator &begin,
                                         const Sequence::const_iterator &end) const
 {
+    // TODO: need to be rewritten
     std::vector<size_t> fs;
     double fv = trie_.get_iv(begin, end);
     size_t seg = 1;
