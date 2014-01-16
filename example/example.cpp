@@ -3,7 +3,6 @@
 #include <string>
 #include <cstdlib>
 
-#include "str_conv.hpp"
 #include "seg.hpp"
 
 using namespace std;
@@ -11,12 +10,14 @@ using namespace esa;
 
 int main (void)
 {
+    setlocale(LC_ALL, "");
+
     vector<wstring> sequences;
-    sequences.push_back(s2ws("這是一隻可愛的小花貓"));
-    sequences.push_back(s2ws("一隻貓"));
-    sequences.push_back(s2ws("真可愛的貓"));
-    sequences.push_back(s2ws("這是一隻花貓"));
-    sequences.push_back(s2ws("小貓真可愛"));
+    sequences.push_back(L"這是一隻可愛的小花貓");
+    sequences.push_back(L"一隻貓");
+    sequences.push_back(L"真可愛的貓");
+    sequences.push_back(L"這是一隻花貓");
+    sequences.push_back(L"小貓真可愛");
 
     Segmenter segmenter(2.0, 10, 30, 3);
     segmenter.fit(sequences);
@@ -24,12 +25,7 @@ int main (void)
          it != sequences.end(); ++it)
     {
         vector<wstring> s = segmenter.segment(*it);
-        for (vector<wstring>::const_iterator sit = s.begin();
-             sit != s.end(); ++sit)
-        {
-            wcout << *sit << ' ';
-        }
-
+        copy(s.begin(), s.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
         wcout << endl;
     }
 
