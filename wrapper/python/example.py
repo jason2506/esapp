@@ -14,7 +14,7 @@ def main():
     segmenter.fit(sequences)
     for sequence in sequences:
         words = segmenter.segment(sequence)
-        print u' '.join(word for word in words).encode('utf-8')
+        print u' '.join(words).encode('utf-8')
 
 
 if __name__ == '__main__':
