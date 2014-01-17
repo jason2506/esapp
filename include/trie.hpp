@@ -13,7 +13,7 @@
     #include <sparsehash/sparse_hash_map>
 #endif
 
-namespace esa
+namespace esapp
 {
 
 /************************************************

@@ -6,7 +6,7 @@
 #include "seg.hpp"
 
 using namespace std;
-using namespace esa;
+using namespace esapp;
 
 int main (void)
 {

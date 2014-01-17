@@ -1,6 +1,6 @@
 #include "trie.hpp"
 
-namespace esa
+namespace esapp
 {
 
 /************************************************

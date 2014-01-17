@@ -1,4 +1,4 @@
-# ESA.cpp
+# ESA++
 
 An implementation of the ESA unsupervised word segmentation algorithm in C++.
 

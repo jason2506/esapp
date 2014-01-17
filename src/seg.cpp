@@ -1,6 +1,6 @@
 #include "seg.hpp"
 
-namespace esa
+namespace esapp
 {
 
 /************************************************

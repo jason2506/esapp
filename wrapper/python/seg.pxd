@@ -4,7 +4,7 @@ from wstring cimport wstring
 
 
 cdef extern from 'seg.hpp':
-    cdef cppclass _Segmenter 'esa::Segmenter':
+    cdef cppclass _Segmenter 'esapp::Segmenter':
         _Segmenter(double, size_t, size_t, double) nogil except +
 
         void fit(const vector[wstring]) nogil
