@@ -1,7 +1,5 @@
 #include "trie.hpp"
 
-#include <iostream>
-
 namespace esa
 {
 
