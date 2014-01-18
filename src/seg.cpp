@@ -13,6 +13,13 @@ Segmenter::Segmenter(double lrv_exp, size_t max_iters, size_t max_length, double
     // do nothing
 }
 
+std::vector<std::vector<Segmenter::Sequence> >
+Segmenter::fit_and_segment(const std::vector<Sequence> &sequences)
+{
+    fit(sequences);
+    return segment(sequences);
+}
+
 void Segmenter::fit(const std::vector<Sequence> &sequences)
 {
     trie_.clear();
@@ -51,6 +58,20 @@ void Segmenter::fit(const std::vector<Sequence> &sequences)
         prev_segs.swap(segs);
         trie_.update_iv();
     }
+}
+
+std::vector<std::vector<Segmenter::Sequence> >
+Segmenter::segment(const std::vector<Sequence> &sequences) const
+{
+    std::vector<std::vector<Segmenter::Sequence> > results;
+    for (std::vector<Sequence>::const_iterator it = sequences.begin();
+         it != sequences.end(); ++it)
+    {
+        SegResult result = segment(it->begin(), it->end());
+        results.push_back(segment(*it, result.second));
+    }
+
+    return results;
 }
 
 std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence) const

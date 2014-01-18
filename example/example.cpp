@@ -20,12 +20,23 @@ int main (void)
     sequences.push_back(L"小貓真可愛");
 
     Segmenter segmenter(2.0, 10, 30, 3);
+
+    /*
     segmenter.fit(sequences);
     for (vector<wstring>::const_iterator it = sequences.begin();
          it != sequences.end(); ++it)
     {
-        vector<wstring> s = segmenter.segment(*it);
-        copy(s.begin(), s.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
+        vector<wstring> words = segmenter.segment(*it);
+        copy(words.begin(), words.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
+        wcout << endl;
+    }
+    //*/
+
+    vector<vector<wstring> > words_list = segmenter.fit_and_segment(sequences);
+    for (vector<vector<wstring> >::const_iterator it = words_list.begin();
+         it != words_list.end(); ++it)
+    {
+        copy(it->begin(), it->end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
         wcout << endl;
     }
 
