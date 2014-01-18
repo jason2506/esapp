@@ -28,7 +28,10 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     FreqTrie(size_t max_depth = 30, double smooth = 0.0, Char boundary = '\0');
+    FreqTrie(const FreqTrie &trie);
     ~FreqTrie(void);
+
+    FreqTrie &operator=(const FreqTrie &node);
 
     void increase(const Sequence &sequence, bool include_self = true);
     void increase(const std::vector<Sequence> &sequences, bool include_self = true);
@@ -123,7 +126,10 @@ private: // Private Property(ies)
 struct FreqTrie::FreqTrieNode
 {
     FreqTrieNode(void);
+    FreqTrieNode(const FreqTrieNode &node);
     ~FreqTrieNode(void);
+
+    FreqTrieNode &operator=(const FreqTrieNode &node);
 
     FreqTrieNode const *get(Char key) const;
     FreqTrieNode *get(Char key, bool create=false);

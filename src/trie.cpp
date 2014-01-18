@@ -13,10 +13,38 @@ FreqTrie::FreqTrie(size_t max_depth, double smooth, Char boundary)
     root_ = new FreqTrieNode();
 }
 
+FreqTrie::FreqTrie(const FreqTrie &trie)
+    : freq_avg_(NULL), max_depth_(trie.max_depth_),
+      smooth_(trie.smooth_), boundary_(trie.boundary_)
+{
+    root_ = new FreqTrieNode(*(trie.root_));
+    if (trie.freq_avg_)
+    {
+        size_t trie_depth = trie.depth();
+        freq_avg_ = new double[trie_depth];
+        memcpy(freq_avg_, trie.freq_avg_, sizeof(double) * trie_depth);
+    }
+}
+
 FreqTrie::~FreqTrie(void)
 {
     clear_fm();
     delete root_;
+}
+
+FreqTrie &FreqTrie::operator=(const FreqTrie &trie)
+{
+    root_ = trie.root_;
+
+    clear_fm();
+    if (trie.freq_avg_)
+    {
+        size_t trie_depth = trie.depth();
+        freq_avg_ = new double[trie_depth];
+        memcpy(freq_avg_, trie.freq_avg_, sizeof(double) * trie_depth);
+    }
+
+    return *this;
 }
 
 void FreqTrie::increase(const Sequence &sequence, bool include_self)
@@ -376,9 +404,43 @@ FreqTrie::FreqTrieNode::FreqTrieNode(void) : f(0), hl(0), hr(0), iv(0)
     // do nothing
 }
 
+FreqTrie::FreqTrieNode::FreqTrieNode(const FreqTrie::FreqTrieNode &node)
+    : sp1l(node.sp1l), sp1r(node.sp1r), f(node.f), hl(node.hl), hr(node.hr), iv(node.iv)
+{
+    for (NodeCollection::const_iterator it = node.children.begin();
+         it != node.children.end(); ++it)
+    {
+        FreqTrieNode *node = new FreqTrieNode(*(it->second));
+        children[it->first] = node;
+    }
+}
+
 FreqTrie::FreqTrieNode::~FreqTrieNode(void)
 {
     clear();
+}
+
+FreqTrie::FreqTrieNode &FreqTrie::FreqTrieNode::operator=(const FreqTrie::FreqTrieNode &node)
+{
+    if (&node != this) { return *this; }
+
+    clear();
+
+    sp1l = node.sp1l;
+    sp1r = node.sp1r;
+    f = node.f;
+    hl = node.hl;
+    hr = node.hr;
+    iv = node.iv;
+
+    for (NodeCollection::const_iterator it = node.children.begin();
+         it != node.children.end(); ++it)
+    {
+        FreqTrieNode *node = new FreqTrieNode(*(it->second));
+        children[it->first] = node;
+    }
+
+    return *this;
 }
 
 FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Char key) const
