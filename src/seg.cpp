@@ -13,7 +13,7 @@ Segmenter::Segmenter(double lrv_exp, size_t max_iters, size_t max_length, double
     // do nothing
 }
 
-void Segmenter::fit(const std::vector<std::wstring> &sequences)
+void Segmenter::fit(const std::vector<Sequence> &sequences)
 {
     trie_.clear();
     trie_.increase(sequences);
@@ -21,7 +21,7 @@ void Segmenter::fit(const std::vector<std::wstring> &sequences)
     trie_.update_fm();
     trie_.update_iv();
 
-    std::vector<std::vector<size_t> > prev_segs, segs;
+    std::vector<Seg> prev_segs, segs;
     for (size_t i = 0; i < max_iters_; ++i)
     {
         segs.clear();
@@ -30,7 +30,7 @@ void Segmenter::fit(const std::vector<std::wstring> &sequences)
         {
             for (size_t j = 0; j < length; ++j)
             {
-                std::vector<std::wstring> words = segment(sequences[j], prev_segs[j]);
+                std::vector<Sequence> words = segment(sequences[j], prev_segs[j]);
                 trie_.increase(words, false);
             }
         }
@@ -38,9 +38,9 @@ void Segmenter::fit(const std::vector<std::wstring> &sequences)
         for (size_t j = 0; j < length; ++j)
         {
             SegResult result = segment(sequences[j].begin(), sequences[j].end());
-            const std::vector<size_t> &seg = result.second;
+            const Seg &seg = result.second;
 
-            std::vector<std::wstring> words = segment(sequences[j], seg);
+            std::vector<Sequence> words = segment(sequences[j], seg);
             trie_.decrease(words, false);
 
             segs.push_back(seg);
@@ -53,39 +53,39 @@ void Segmenter::fit(const std::vector<std::wstring> &sequences)
     }
 }
 
-std::vector<std::wstring> Segmenter::segment(const std::wstring &sequence) const
+std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence) const
 {
     SegResult result = segment(sequence.begin(), sequence.end());
     return segment(sequence, result.second);
 }
 
-std::vector<std::wstring> Segmenter::segment(const std::wstring &sequence,
-                                             const std::vector<size_t> &seg) const
+std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence,
+                                                    const Seg &seg) const
 {
-    std::vector<std::wstring> words;
+    std::vector<Sequence> words;
 
-    size_t start = 0;
-    for (std::vector<size_t>::const_iterator it = seg.begin();
+    Seg::value_type start = 0;
+    for (Seg::const_iterator it = seg.begin();
          it != seg.end(); start += *it, ++it)
     {
-        std::wstring word = sequence.substr(start, *it);
+        Sequence word = sequence.substr(start, *it);
         words.push_back(word);
     }
 
-    std::wstring word = sequence.substr(start);
+    Sequence word = sequence.substr(start);
     words.push_back(word);
 
     return words;
 }
 
-Segmenter::SegResult Segmenter::segment(const std::wstring::const_iterator &begin,
-                                        const std::wstring::const_iterator &end) const
+Segmenter::SegResult Segmenter::segment(const Sequence::const_iterator &begin,
+                                        const Sequence::const_iterator &end) const
 {
     // TODO: need to be rewritten
-    std::vector<size_t> fs;
+    Seg fs;
     double fv = trie_.get_iv(begin, end);
-    size_t seg = 1;
-    for (std::wstring::const_iterator it = begin + 1; it != end; ++it, ++seg)
+    Seg::value_type seg = 1;
+    for (Sequence::const_iterator it = begin + 1; it != end; ++it, ++seg)
     {
         SegResult left = segment(begin, it);
         SegResult right = segment(it, end);
@@ -95,8 +95,8 @@ Segmenter::SegResult Segmenter::segment(const std::wstring::const_iterator &begi
         double cv = left.first * right.first * lrv;
         if (cv > fv)
         {
-            size_t offset = 0;
-            for (std::vector<size_t>::const_iterator it = left.second.begin();
+            Seg::value_type offset = 0;
+            for (Seg::const_iterator it = left.second.begin();
                  it != left.second.end(); ++it)
             {
                 offset += *it;
