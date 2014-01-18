@@ -6,7 +6,7 @@ setup(
     cmdclass={'build_ext': build_ext},
     ext_modules=[
         Extension('esa',
-                  sources=['esa.pyx'],
+                  sources=['cython/esa.pyx'],
                   include_dirs=['../../include'],
                   library_dirs=['../../lib'],
                   libraries=['esa'],
