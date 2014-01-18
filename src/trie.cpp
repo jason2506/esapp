@@ -490,6 +490,7 @@ void FreqTrie::FreqTrieNode::clear(void)
         delete it->second;
     }
 
+    children.clear();
     f = hl = hr = iv = 0;
 }
 
