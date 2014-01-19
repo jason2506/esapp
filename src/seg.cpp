@@ -37,19 +37,16 @@ void Segmenter::fit(const std::vector<Sequence> &sequences)
         {
             for (size_t j = 0; j < length; ++j)
             {
-                std::vector<Sequence> words = segment(sequences[j], prev_segs[j]);
+                std::vector<Sequence> words = segment_sequence(sequences[j], prev_segs[j]);
                 trie_.increase(words, false);
             }
         }
 
         for (size_t j = 0; j < length; ++j)
         {
-            SegResult result = segment(sequences[j].begin(), sequences[j].end());
-            const Seg &seg = result.second;
-
-            std::vector<Sequence> words = segment(sequences[j], seg);
+            Seg seg = optimize_segment(sequences[j]);
+            std::vector<Sequence> words = segment_sequence(sequences[j], seg);
             trie_.decrease(words, false);
-
             segs.push_back(seg);
         }
 
@@ -67,8 +64,7 @@ Segmenter::segment(const std::vector<Sequence> &sequences) const
     for (std::vector<Sequence>::const_iterator it = sequences.begin();
          it != sequences.end(); ++it)
     {
-        SegResult result = segment(it->begin(), it->end());
-        results.push_back(segment(*it, result.second));
+        results.push_back(segment(*it));
     }
 
     return results;
@@ -76,20 +72,79 @@ Segmenter::segment(const std::vector<Sequence> &sequences) const
 
 std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence) const
 {
-    SegResult result = segment(sequence.begin(), sequence.end());
-    return segment(sequence, result.second);
+    return segment_sequence(sequence, optimize_segment(sequence));
 }
 
-std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence,
-                                                    const Seg &seg) const
+Segmenter::Seg Segmenter::optimize_segment(const Sequence &sequence) const
+{
+    size_t n = sequence.size();
+    size_t m = n * (1 + n) / 2;
+
+    size_t **fs = new size_t*[n];
+    double **fv = new double*[n];
+    fs[0] = new size_t[m];
+    fv[0] = new double[m];
+    for (size_t i = 1, offset = n; i < n; ++i, --offset)
+    {
+        fs[i] = fs[i - 1] + offset;
+        fv[i] = fv[i - 1] + offset;
+    }
+
+    Sequence::const_iterator it = sequence.begin();
+    for (size_t j = 0; j < n; ++j)
+    {
+        for (size_t i = 0; i + j < n; ++i)
+        {
+            Sequence::const_iterator begin = it + i;
+            Sequence::const_iterator end = it + i + j + 1;
+            fv[i][j] = trie_.get_iv(begin, end);
+            fs[i][j] = 0;
+            for (size_t k = 1; k <= j; ++k)
+            {
+                double hr = trie_.get_hr(begin, begin + k);
+                double hl = trie_.get_hl(begin + k, end);
+                double lrv = pow(hr * hl, lrv_exp_);
+                double cv = fv[i][k - 1] * fv[i + k][j - k] * lrv;
+                if (cv > fv[i][j])
+                {
+                    fv[i][j] = cv;
+                    fs[i][j] = k;
+                }
+            }
+        }
+    }
+
+    Seg seg;
+    generate_segment(seg, fs, 0, n - 1);
+
+    delete [] fs[0];
+    delete [] fv[0];
+    delete [] fs;
+    delete [] fv;
+
+    return seg;
+}
+
+void Segmenter::generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) const
+{
+    if (fs[i][j] == 0) { return; }
+
+    size_t k = fs[i][j];
+    generate_segment(seg, fs, i, k - 1);
+    seg.push_back(i + k);
+    generate_segment(seg, fs, i + k, j - k);
+}
+
+std::vector<Segmenter::Sequence> Segmenter::segment_sequence(
+    const Sequence &sequence, const Seg &seg) const
 {
     std::vector<Sequence> words;
 
     Seg::value_type start = 0;
     for (Seg::const_iterator it = seg.begin();
-         it != seg.end(); start += *it, ++it)
+         it != seg.end(); start = *it, ++it)
     {
-        Sequence word = sequence.substr(start, *it);
+        Sequence word = sequence.substr(start, *it - start);
         words.push_back(word);
     }
 
@@ -97,40 +152,6 @@ std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence,
     words.push_back(word);
 
     return words;
-}
-
-Segmenter::SegResult Segmenter::segment(const Sequence::const_iterator &begin,
-                                        const Sequence::const_iterator &end) const
-{
-    // TODO: need to be rewritten
-    Seg fs;
-    double fv = trie_.get_iv(begin, end);
-    Seg::value_type seg = 1;
-    for (Sequence::const_iterator it = begin + 1; it != end; ++it, ++seg)
-    {
-        SegResult left = segment(begin, it);
-        SegResult right = segment(it, end);
-        double hr = trie_.get_hr(begin, it);
-        double hl = trie_.get_hl(it, end);
-        double lrv = pow(hr * hl, lrv_exp_);
-        double cv = left.first * right.first * lrv;
-        if (cv > fv)
-        {
-            Seg::value_type offset = 0;
-            for (Seg::const_iterator it = left.second.begin();
-                 it != left.second.end(); ++it)
-            {
-                offset += *it;
-            }
-
-            fv = cv;
-            fs.swap(left.second);
-            fs.push_back(seg - offset);
-            fs.insert(fs.end(), right.second.begin(), right.second.end());
-        }
-    }
-
-    return make_pair(fv, fs);
 }
 
 } // namespace esa

@@ -30,13 +30,12 @@ public: // Public Method(s)
 
 private: // Private Type(s)
     typedef std::vector<size_t> Seg;
-    typedef std::pair<double, Seg> SegResult;
 
 private: // Private Method(s)
-    std::vector<Sequence> segment(const Sequence &sequence,
-                                  const Seg &seg) const;
-    SegResult segment(const Sequence::const_iterator &begin,
-                      const Sequence::const_iterator &end) const;
+    Seg optimize_segment(const Sequence &sequence) const;
+    void generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) const;
+    std::vector<Sequence> segment_sequence(const Sequence &sequence,
+                                           const Seg &seg) const;
 
 private: // Private Property(ies)
     FreqTrie trie_;
