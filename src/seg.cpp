@@ -86,8 +86,9 @@ std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence) co
 Segmenter::Seg Segmenter::optimize_segment(const Sequence &sequence) const
 {
     size_t n = sequence.size();
-    size_t m = n * (1 + n) / 2;
+    if (n == 0) { return Seg(); }
 
+    size_t m = n * (1 + n) / 2;
     size_t **fs = new size_t*[n];
     double **fv = new double*[n];
     fs[0] = new size_t[m];
@@ -147,6 +148,7 @@ std::vector<Segmenter::Sequence> Segmenter::segment_sequence(
     const Sequence &sequence, const Seg &seg) const
 {
     std::vector<Sequence> words;
+    if (sequence.empty()) { return words; }
 
     Seg::value_type start = 0;
     for (Seg::const_iterator it = seg.begin();
