@@ -1,3 +1,11 @@
+#################################################
+# sed.pxd
+# ESA++
+#
+# Copyright (c) 2014, Chi-En Wu
+# Distributed under The BSD 3-Clause License
+#################################################
+
 from libcpp.vector cimport vector
 
 from wstring cimport wstring

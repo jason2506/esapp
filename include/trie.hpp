@@ -1,3 +1,11 @@
+/************************************************
+ *  trie.hpp
+ *  ESA++
+ *
+ *  Copyright (c) 2014, Chi-En Wu
+ *  Distributed under The BSD 3-Clause License
+ ************************************************/
+
 #ifndef TRIE_HPP_INCLUDEED
 #define TRIE_HPP_INCLUDEED
 
