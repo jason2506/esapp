@@ -15,9 +15,9 @@ vpath %.hpp $(INC_PATH)
 vpath %.o $(OBJ_PATH)
 vpath %.a $(LIB_PATH)
 
-all: example
+all: $(TARGET) example
 
-example: $(TARGET) example.o
+example: example.o
 	$(CXX) example/$@.cpp -I$(INC_PATH) -L$(LIB_PATH) -l$(LIB) -o example/$@
 
 example.o: example/example.cpp
