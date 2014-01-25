@@ -16,7 +16,7 @@
 #include <vector>
 
 #ifndef USE_GOOGLE_HASH_MAP
-    #include <tr1/unordered_map>
+    #include <unordered_map>
 #else
     #include <sparsehash/sparse_hash_map>
 #endif
@@ -72,8 +72,8 @@ private: // Private Type(s)
     typedef FreqTrie::BaseIterator<const FreqTrie::FreqTrieNode> ConstIterator;
 
 #ifndef USE_GOOGLE_HASH_MAP
-    typedef std::tr1::unordered_map<Char, FreqTrie::FreqTrieNode *> NodeCollection;
-    typedef std::tr1::unordered_map<Char, size_t> CharCounts;
+    typedef std::unordered_map<Char, FreqTrie::FreqTrieNode *> NodeCollection;
+    typedef std::unordered_map<Char, size_t> CharCounts;
 #else
     typedef google::sparse_hash_map<Char, FreqTrie::FreqTrieNode *> NodeCollection;
     typedef google::sparse_hash_map<Char, size_t> CharCounts;
