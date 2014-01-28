@@ -290,14 +290,12 @@ FreqTrie::FreqTrieNode const *FreqTrie::find(
 
 double FreqTrie::entropy(CharCounts counts, size_t num_events)
 {
-    double n = 0;
+    double n = num_events * smooth_;
     for (CharCounts::const_iterator it = counts.begin();
          it != counts.end(); ++it)
     {
         n += it->second;
     }
-
-    n *= (1 + smooth_);
 
     double h = 0;
     for (CharCounts::const_iterator it = counts.begin();
