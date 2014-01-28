@@ -36,11 +36,11 @@ void Segmenter::fit(const std::vector<Sequence> &sequences)
     trie_.update_fm();
     trie_.update_iv();
 
+    size_t length = sequences.size();
     std::vector<Seg> prev_segs, segs;
     for (size_t i = 0; i < max_iters_; ++i)
     {
         segs.clear();
-        size_t length = sequences.size();
         if (!prev_segs.empty())
         {
             for (size_t j = 0; j < length; ++j)
