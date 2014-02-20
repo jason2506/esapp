@@ -375,13 +375,15 @@ FreqTrie::BaseIterator<T> FreqTrie::BaseIterator<T>::operator++(int)
 }
 
 template<typename T>
-std::pair<size_t, T *> const &FreqTrie::BaseIterator<T>::operator*(void) const
+typename FreqTrie::BaseIterator<T>::Value const &
+FreqTrie::BaseIterator<T>::operator*(void) const
 {
     return stack_.top();
 }
 
 template<typename T>
-std::pair<size_t, T *> const *FreqTrie::BaseIterator<T>::operator->(void) const
+typename FreqTrie::BaseIterator<T>::Value const *
+FreqTrie::BaseIterator<T>::operator->(void) const
 {
     return &(stack_.top());
 }
