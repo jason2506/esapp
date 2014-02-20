@@ -117,7 +117,7 @@ public: // Public Method(s)
     BaseIterator &operator++(void);
     BaseIterator operator++(int);
 
-    Value &operator*(void) const;
+    Value const &operator*(void) const;
     Value const *operator->(void) const;
 
     bool operator==(const BaseIterator &it) const;
