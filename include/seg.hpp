@@ -31,19 +31,19 @@ public: // Public Method(s)
     Segmenter(double lrv_exp, size_t max_iters = 10,
               size_t max_length = 30, double smooth = 0.0);
 
-    std::vector<std::vector<Sequence> > fit_and_segment(const std::vector<Sequence> &sequences);
-    void fit(const std::vector<Sequence> &sequences);
-    std::vector<std::vector<Sequence> > segment(const std::vector<Sequence> &sequences) const;
-    std::vector<Sequence> segment(const Sequence &sequence) const;
+    std::vector<std::vector<Sequence> > fit_and_segment(std::vector<Sequence> const &sequences);
+    void fit(std::vector<Sequence> const &sequences);
+    std::vector<std::vector<Sequence> > segment(std::vector<Sequence> const &sequences) const;
+    std::vector<Sequence> segment(Sequence const &sequence) const;
 
 private: // Private Type(s)
     typedef std::vector<size_t> Seg;
 
 private: // Private Method(s)
-    Seg optimize_segment(const Sequence &sequence) const;
+    Seg optimize_segment(Sequence const &sequence) const;
     void generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) const;
-    std::vector<Sequence> segment_sequence(const Sequence &sequence,
-                                           const Seg &seg) const;
+    std::vector<Sequence> segment_sequence(Sequence const &sequence,
+                                           Seg const &seg) const;
 
 private: // Private Property(ies)
     FreqTrie trie_;

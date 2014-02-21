@@ -21,7 +21,7 @@ FreqTrie::FreqTrie(size_t max_depth, double smooth, Char boundary)
     root_ = new FreqTrieNode();
 }
 
-FreqTrie::FreqTrie(const FreqTrie &trie)
+FreqTrie::FreqTrie(FreqTrie const &trie)
     : freq_avg_(NULL), max_depth_(trie.max_depth_),
       smooth_(trie.smooth_), boundary_(trie.boundary_)
 {
@@ -40,7 +40,7 @@ FreqTrie::~FreqTrie(void)
     delete root_;
 }
 
-FreqTrie &FreqTrie::operator=(const FreqTrie &trie)
+FreqTrie &FreqTrie::operator=(FreqTrie const &trie)
 {
     root_ = trie.root_;
 
@@ -55,7 +55,7 @@ FreqTrie &FreqTrie::operator=(const FreqTrie &trie)
     return *this;
 }
 
-void FreqTrie::increase(const Sequence &sequence, bool include_self)
+void FreqTrie::increase(Sequence const &sequence, bool include_self)
 {
     size_t n = sequence.size();
     for (size_t i = 0; i < n; ++i)
@@ -76,7 +76,7 @@ void FreqTrie::increase(const Sequence &sequence, bool include_self)
     }
 }
 
-void FreqTrie::increase(const std::vector<Sequence> &sequences, bool include_self)
+void FreqTrie::increase(std::vector<Sequence> const &sequences, bool include_self)
 {
     for (std::vector<Sequence>::const_iterator it = sequences.begin();
          it != sequences.end(); ++it)
@@ -85,7 +85,7 @@ void FreqTrie::increase(const std::vector<Sequence> &sequences, bool include_sel
     }
 }
 
-void FreqTrie::decrease(const Sequence &sequence, bool include_self)
+void FreqTrie::decrease(Sequence const &sequence, bool include_self)
 {
     size_t n = sequence.size();
     for (size_t i = 0; i < n; ++i)
@@ -101,7 +101,7 @@ void FreqTrie::decrease(const Sequence &sequence, bool include_self)
     }
 }
 
-void FreqTrie::decrease(const std::vector<Sequence> &sequences, bool include_self)
+void FreqTrie::decrease(std::vector<Sequence> const &sequences, bool include_self)
 {
     for (std::vector<Sequence>::const_iterator it = sequences.begin();
          it != sequences.end(); ++it)
@@ -196,13 +196,13 @@ void FreqTrie::update_iv(void)
     }
 }
 
-double FreqTrie::get_hl(const Sequence &sequence) const
+double FreqTrie::get_hl(Sequence const &sequence) const
 {
     return get_hl(sequence.begin(), sequence.end());
 }
 
-double FreqTrie::get_hl(const Sequence::const_iterator &begin,
-                        const Sequence::const_iterator &end) const
+double FreqTrie::get_hl(Sequence::const_iterator const &begin,
+                        Sequence::const_iterator const &end) const
 {
     FreqTrieNode const *node = find(begin, end);
     if (node == NULL) { return -1; }
@@ -210,13 +210,13 @@ double FreqTrie::get_hl(const Sequence::const_iterator &begin,
     return node->hl;
 }
 
-double FreqTrie::get_hr(const Sequence &sequence) const
+double FreqTrie::get_hr(Sequence const &sequence) const
 {
     return get_hr(sequence.begin(), sequence.end());
 }
 
-double FreqTrie::get_hr(const Sequence::const_iterator &begin,
-                        const Sequence::const_iterator &end) const
+double FreqTrie::get_hr(Sequence::const_iterator const &begin,
+                        Sequence::const_iterator const &end) const
 {
     FreqTrieNode const *node = find(begin, end);
     if (node == NULL) { return -1; }
@@ -224,13 +224,13 @@ double FreqTrie::get_hr(const Sequence::const_iterator &begin,
     return node->hr;
 }
 
-double FreqTrie::get_iv(const Sequence &sequence) const
+double FreqTrie::get_iv(Sequence const &sequence) const
 {
     return get_iv(sequence.begin(), sequence.end());
 }
 
-double FreqTrie::get_iv(const Sequence::const_iterator &begin,
-                        const Sequence::const_iterator &end) const
+double FreqTrie::get_iv(Sequence::const_iterator const &begin,
+                        Sequence::const_iterator const &end) const
 {
     FreqTrieNode const *node = find(begin, end);
     if (node == NULL) { return -1; }
@@ -268,14 +268,14 @@ FreqTrie::ConstIterator FreqTrie::end(void) const
     return ConstIterator();
 }
 
-FreqTrie::FreqTrieNode const *FreqTrie::find(const Sequence &sequence) const
+FreqTrie::FreqTrieNode const *FreqTrie::find(Sequence const &sequence) const
 {
     return find(sequence.begin(), sequence.end());
 }
 
 FreqTrie::FreqTrieNode const *FreqTrie::find(
-    const Sequence::const_iterator &begin,
-    const Sequence::const_iterator &end) const
+    Sequence::const_iterator const &begin,
+    Sequence::const_iterator const &end) const
 {
     NodeCollection::const_iterator result_it;
     FreqTrieNode *node = root_;
@@ -389,7 +389,7 @@ FreqTrie::BaseIterator<T>::operator->(void) const
 }
 
 template<typename T>
-bool FreqTrie::BaseIterator<T>::operator==(const BaseIterator &it) const
+bool FreqTrie::BaseIterator<T>::operator==(BaseIterator const &it) const
 {
     if (it.stack_.empty())      { return stack_.empty(); }
     else if (stack_.empty())    { return false; }
@@ -398,7 +398,7 @@ bool FreqTrie::BaseIterator<T>::operator==(const BaseIterator &it) const
 }
 
 template<typename T>
-bool FreqTrie::BaseIterator<T>::operator!=(const BaseIterator &it) const
+bool FreqTrie::BaseIterator<T>::operator!=(BaseIterator const &it) const
 {
     return !(*this == it);
 }
@@ -412,7 +412,7 @@ FreqTrie::FreqTrieNode::FreqTrieNode(void) : f(0), hl(0), hr(0), iv(0)
     // do nothing
 }
 
-FreqTrie::FreqTrieNode::FreqTrieNode(const FreqTrie::FreqTrieNode &node)
+FreqTrie::FreqTrieNode::FreqTrieNode(FreqTrie::FreqTrieNode const &node)
     : sp1l(node.sp1l), sp1r(node.sp1r), f(node.f), hl(node.hl), hr(node.hr), iv(node.iv)
 {
     for (NodeCollection::const_iterator it = node.children.begin();
@@ -428,7 +428,7 @@ FreqTrie::FreqTrieNode::~FreqTrieNode(void)
     clear();
 }
 
-FreqTrie::FreqTrieNode &FreqTrie::FreqTrieNode::operator=(const FreqTrie::FreqTrieNode &node)
+FreqTrie::FreqTrieNode &FreqTrie::FreqTrieNode::operator=(FreqTrie::FreqTrieNode const &node)
 {
     if (&node != this) { return *this; }
 

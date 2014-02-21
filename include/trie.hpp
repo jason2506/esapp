@@ -36,29 +36,29 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     FreqTrie(size_t max_depth = 30, double smooth = 0.0, Char boundary = '\0');
-    FreqTrie(const FreqTrie &trie);
+    FreqTrie(FreqTrie const &trie);
     ~FreqTrie(void);
 
-    FreqTrie &operator=(const FreqTrie &node);
+    FreqTrie &operator=(FreqTrie const &node);
 
-    void increase(const Sequence &sequence, bool include_self = true);
-    void increase(const std::vector<Sequence> &sequences, bool include_self = true);
-    void decrease(const Sequence &sequence, bool include_self = true);
-    void decrease(const std::vector<Sequence> &sequences, bool include_self = true);
+    void increase(Sequence const &sequence, bool include_self = true);
+    void increase(std::vector<Sequence> const &sequences, bool include_self = true);
+    void decrease(Sequence const &sequence, bool include_self = true);
+    void decrease(std::vector<Sequence> const &sequences, bool include_self = true);
 
     void update_hsp1(void);
     void update_fm(void);
     void update_iv(void);
 
-    double get_hl(const Sequence &sequence) const;
-    double get_hl(const Sequence::const_iterator &begin,
-                  const Sequence::const_iterator &end) const;
-    double get_hr(const Sequence &sequence) const;
-    double get_hr(const Sequence::const_iterator &begin,
-                  const Sequence::const_iterator &end) const;
-    double get_iv(const Sequence &sequence) const;
-    double get_iv(const Sequence::const_iterator &begin,
-                  const Sequence::const_iterator &end) const;
+    double get_hl(Sequence const &sequence) const;
+    double get_hl(Sequence::const_iterator const &begin,
+                  Sequence::const_iterator const &end) const;
+    double get_hr(Sequence const &sequence) const;
+    double get_hr(Sequence::const_iterator const &begin,
+                  Sequence::const_iterator const &end) const;
+    double get_iv(Sequence const &sequence) const;
+    double get_iv(Sequence::const_iterator const &begin,
+                  Sequence::const_iterator const &end) const;
 
     size_t depth(void) const;
     size_t max_depth(void) const;
@@ -69,7 +69,7 @@ private: // Private Type(s)
     template<typename T> class BaseIterator;
 
     typedef FreqTrie::BaseIterator<FreqTrie::FreqTrieNode> Iterator;
-    typedef FreqTrie::BaseIterator<const FreqTrie::FreqTrieNode> ConstIterator;
+    typedef FreqTrie::BaseIterator<FreqTrie::FreqTrieNode const> ConstIterator;
 
 #ifndef USE_GOOGLE_HASH_MAP
     typedef std::unordered_map<Char, FreqTrie::FreqTrieNode *> NodeCollection;
@@ -85,9 +85,9 @@ private: // Private Method(s)
     Iterator end(void);
     ConstIterator end(void) const;
 
-    FreqTrieNode const *find(const Sequence &sequence) const;
-    FreqTrieNode const *find(const Sequence::const_iterator &begin,
-                             const Sequence::const_iterator &end) const;
+    FreqTrieNode const *find(Sequence const &sequence) const;
+    FreqTrieNode const *find(Sequence::const_iterator const &begin,
+                             Sequence::const_iterator const &end) const;
 
     double entropy(CharCounts counts, size_t num_events);
     void clear_fm(void);
@@ -120,8 +120,8 @@ public: // Public Method(s)
     Value const &operator*(void) const;
     Value const *operator->(void) const;
 
-    bool operator==(const BaseIterator &it) const;
-    bool operator!=(const BaseIterator &it) const;
+    bool operator==(BaseIterator const &it) const;
+    bool operator!=(BaseIterator const &it) const;
 
 private: // Private Property(ies)
     std::stack<Value> stack_;
@@ -134,10 +134,10 @@ private: // Private Property(ies)
 struct FreqTrie::FreqTrieNode
 {
     FreqTrieNode(void);
-    FreqTrieNode(const FreqTrieNode &node);
+    FreqTrieNode(FreqTrieNode const &node);
     ~FreqTrieNode(void);
 
-    FreqTrieNode &operator=(const FreqTrieNode &node);
+    FreqTrieNode &operator=(FreqTrieNode const &node);
 
     FreqTrieNode const *get(Char key) const;
     FreqTrieNode *get(Char key, bool create=false);

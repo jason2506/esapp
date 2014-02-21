@@ -22,13 +22,13 @@ Segmenter::Segmenter(double lrv_exp, size_t max_iters, size_t max_length, double
 }
 
 std::vector<std::vector<Segmenter::Sequence> >
-Segmenter::fit_and_segment(const std::vector<Sequence> &sequences)
+Segmenter::fit_and_segment(std::vector<Sequence> const &sequences)
 {
     fit(sequences);
     return segment(sequences);
 }
 
-void Segmenter::fit(const std::vector<Sequence> &sequences)
+void Segmenter::fit(std::vector<Sequence> const &sequences)
 {
     trie_.clear();
     trie_.increase(sequences);
@@ -66,7 +66,7 @@ void Segmenter::fit(const std::vector<Sequence> &sequences)
 }
 
 std::vector<std::vector<Segmenter::Sequence> >
-Segmenter::segment(const std::vector<Sequence> &sequences) const
+Segmenter::segment(std::vector<Sequence> const &sequences) const
 {
     std::vector<std::vector<Segmenter::Sequence> > results;
     for (std::vector<Sequence>::const_iterator it = sequences.begin();
@@ -78,12 +78,12 @@ Segmenter::segment(const std::vector<Sequence> &sequences) const
     return results;
 }
 
-std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence) const
+std::vector<Segmenter::Sequence> Segmenter::segment(Sequence const &sequence) const
 {
     return segment_sequence(sequence, optimize_segment(sequence));
 }
 
-Segmenter::Seg Segmenter::optimize_segment(const Sequence &sequence) const
+Segmenter::Seg Segmenter::optimize_segment(Sequence const &sequence) const
 {
     size_t n = sequence.size();
     if (n == 0) { return Seg(); }
@@ -145,7 +145,7 @@ void Segmenter::generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) cons
 }
 
 std::vector<Segmenter::Sequence> Segmenter::segment_sequence(
-    const Sequence &sequence, const Seg &seg) const
+    Sequence const &sequence, Seg const &seg) const
 {
     std::vector<Sequence> words;
     if (sequence.empty()) { return words; }
