@@ -69,10 +69,9 @@ std::vector<std::vector<Segmenter::Sequence> >
 Segmenter::segment(const std::vector<Sequence> &sequences) const
 {
     std::vector<std::vector<Segmenter::Sequence> > results;
-    for (std::vector<Sequence>::const_iterator it = sequences.begin();
-         it != sequences.end(); ++it)
+    for (auto const &sequence : sequences)
     {
-        results.push_back(segment(*it));
+        results.push_back(segment(sequence));
     }
 
     return results;
@@ -151,11 +150,11 @@ std::vector<Segmenter::Sequence> Segmenter::segment_sequence(
     if (sequence.empty()) { return words; }
 
     Seg::value_type start = 0;
-    for (Seg::const_iterator it = seg.begin();
-         it != seg.end(); start = *it, ++it)
+    for (auto const &pos : seg)
     {
-        Sequence word = sequence.substr(start, *it - start);
+        Sequence word = sequence.substr(start, pos - start);
         words.push_back(word);
+        start = pos;
     }
 
     Sequence word = sequence.substr(start);

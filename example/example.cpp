@@ -31,20 +31,18 @@ int main (void)
 
     /*
     segmenter.fit(sequences);
-    for (vector<wstring>::const_iterator it = sequences.begin();
-         it != sequences.end(); ++it)
+    for (auto const &sequence : sequences)
     {
-        vector<wstring> words = segmenter.segment(*it);
+        vector<wstring> words = segmenter.segment(sequence);
         copy(words.begin(), words.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
         wcout << endl;
     }
     //*/
 
     vector<vector<wstring> > words_list = segmenter.fit_and_segment(sequences);
-    for (vector<vector<wstring> >::const_iterator it = words_list.begin();
-         it != words_list.end(); ++it)
+    for (auto const &words : words_list)
     {
-        copy(it->begin(), it->end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
+        copy(words.begin(), words.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
         wcout << endl;
     }
 

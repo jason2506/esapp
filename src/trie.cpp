@@ -78,10 +78,9 @@ void FreqTrie::increase(const Sequence &sequence, bool include_self)
 
 void FreqTrie::increase(const std::vector<Sequence> &sequences, bool include_self)
 {
-    for (std::vector<Sequence>::const_iterator it = sequences.begin();
-         it != sequences.end(); ++it)
+    for (auto const &sequence : sequences)
     {
-        increase(*it, include_self);
+        increase(sequence, include_self);
     }
 }
 
@@ -103,10 +102,9 @@ void FreqTrie::decrease(const Sequence &sequence, bool include_self)
 
 void FreqTrie::decrease(const std::vector<Sequence> &sequences, bool include_self)
 {
-    for (std::vector<Sequence>::const_iterator it = sequences.begin();
-         it != sequences.end(); ++it)
+    for (auto const &sequence : sequences)
     {
-        decrease(*it, include_self);
+        decrease(sequence, include_self);
     }
 }
 
@@ -123,15 +121,13 @@ void FreqTrie::update_hsp1(void)
     memset(hl_avg, 0, sizeof(double) * trie_depth);
     memset(hr_avg, 0, sizeof(double) * trie_depth);
 
-    for (Iterator it = begin(); it != end(); ++it)
+    for (auto const &node : *this)
     {
-        size_t node_depth = it->first - 1;
-        FreqTrieNode *node = it->second;
-
-        node->hl = entropy(node->sp1l, num_alphabets);
-        node->hr = entropy(node->sp1r, num_alphabets);
-        hl_avg[node_depth] += node->hl;
-        hr_avg[node_depth] += node->hr;
+        size_t node_depth = node.first - 1;
+        node.second->hl = entropy(node.second->sp1l, num_alphabets);
+        node.second->hr = entropy(node.second->sp1r, num_alphabets);
+        hl_avg[node_depth] += node.second->hl;
+        hr_avg[node_depth] += node.second->hr;
         nums[node_depth]++;
     }
 
@@ -141,13 +137,11 @@ void FreqTrie::update_hsp1(void)
         hr_avg[i] /= nums[i];
     }
 
-    for (Iterator it = begin(); it != end(); ++it)
+    for (auto const &node : *this)
     {
-        size_t node_depth = it->first - 1;
-        FreqTrieNode *node = it->second;
-
-        node->hl /= hl_avg[node_depth];
-        node->hr /= hr_avg[node_depth];
+        size_t node_depth = node.first - 1;
+        node.second->hl /= hl_avg[node_depth];
+        node.second->hr /= hr_avg[node_depth];
     }
 
     delete [] nums;
@@ -166,12 +160,10 @@ void FreqTrie::update_fm(void)
     memset(nums, 0, sizeof(size_t) * trie_depth);
     memset(freq_avg_, 0, sizeof(double) * trie_depth);
 
-    for (Iterator it = begin(); it != end(); ++it)
+    for (auto const &node : *this)
     {
-        size_t node_depth = it->first - 1;
-        FreqTrieNode *node = it->second;
-
-        freq_avg_[node_depth] += node->f;
+        size_t node_depth = node.first - 1;
+        freq_avg_[node_depth] += node.second->f;
         nums[node_depth]++;
     }
 
@@ -187,12 +179,10 @@ void FreqTrie::update_iv(void)
 {
     if (freq_avg_ == nullptr) { throw std::exception(); }
 
-    for (Iterator it = begin(); it != end(); ++it)
+    for (auto const &node : *this)
     {
-        size_t node_depth = it->first - 1;
-        FreqTrieNode *node = it->second;
-
-        node->iv = pow(node->f / freq_avg_[node_depth], node_depth + 1);
+        size_t node_depth = node.first - 1;
+        node.second->iv = pow(node.second->f / freq_avg_[node_depth], node_depth + 1);
     }
 }
 
@@ -291,17 +281,15 @@ FreqTrie::FreqTrieNode const *FreqTrie::find(
 double FreqTrie::entropy(CharCounts counts, size_t num_events)
 {
     double n = num_events * smooth_;
-    for (CharCounts::const_iterator it = counts.begin();
-         it != counts.end(); ++it)
+    for (auto const &count : counts)
     {
-        n += it->second;
+        n += count.second;
     }
 
     double h = 0;
-    for (CharCounts::const_iterator it = counts.begin();
-         it != counts.end(); ++it)
+    for (auto const &count : counts)
     {
-        double p = (it->second + smooth_) / n;
+        double p = (count.second + smooth_) / n;
         h -= p * log(p);
     }
 
@@ -357,10 +345,9 @@ FreqTrie::BaseIterator<T> &FreqTrie::BaseIterator<T>::operator++(void)
 
     size_t depth = top.first + 1;
     T *node = top.second;
-    for (NodeCollection::const_iterator it = node->children.begin();
-         it != node->children.end(); ++it)
+    for (auto const &child : node->children)
     {
-        stack_.push(std::make_pair(depth, it->second));
+        stack_.push(std::make_pair(depth, child.second));
     }
 
     return *this;
@@ -415,11 +402,10 @@ FreqTrie::FreqTrieNode::FreqTrieNode(void) : f(0), hl(0), hr(0), iv(0)
 FreqTrie::FreqTrieNode::FreqTrieNode(const FreqTrie::FreqTrieNode &node)
     : sp1l(node.sp1l), sp1r(node.sp1r), f(node.f), hl(node.hl), hr(node.hr), iv(node.iv)
 {
-    for (NodeCollection::const_iterator it = node.children.begin();
-         it != node.children.end(); ++it)
+    for (auto const &child : node.children)
     {
-        FreqTrieNode *node = new FreqTrieNode(*(it->second));
-        children[it->first] = node;
+        FreqTrieNode *node = new FreqTrieNode(*(child.second));
+        children[child.first] = node;
     }
 }
 
@@ -441,11 +427,10 @@ FreqTrie::FreqTrieNode &FreqTrie::FreqTrieNode::operator=(const FreqTrie::FreqTr
     hr = node.hr;
     iv = node.iv;
 
-    for (NodeCollection::const_iterator it = node.children.begin();
-         it != node.children.end(); ++it)
+    for (auto const &child : node.children)
     {
-        FreqTrieNode *node = new FreqTrieNode(*(it->second));
-        children[it->first] = node;
+        FreqTrieNode *node = new FreqTrieNode(*(child.second));
+        children[child.first] = node;
     }
 
     return *this;
@@ -477,10 +462,9 @@ size_t FreqTrie::FreqTrieNode::depth(void) const
     if (children.empty()) { return 0; }
 
     size_t max_depth = 0;
-    for (NodeCollection::const_iterator it = children.begin();
-         it != children.end(); ++it)
+    for (auto const &child : children)
     {
-        size_t depth = it->second->depth();
+        size_t depth = child.second->depth();
         if (depth > max_depth)
         {
             max_depth = depth;
@@ -492,10 +476,9 @@ size_t FreqTrie::FreqTrieNode::depth(void) const
 
 void FreqTrie::FreqTrieNode::clear(void)
 {
-    for (NodeCollection::const_iterator it = children.begin();
-         it != children.end(); ++it)
+    for (auto const &child : children)
     {
-        delete it->second;
+        delete child.second;
     }
 
     children.clear();
