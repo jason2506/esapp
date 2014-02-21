@@ -16,13 +16,13 @@ namespace esapp
  ************************************************/
 
 FreqTrie::FreqTrie(size_t max_depth, double smooth, Char boundary)
-    : freq_avg_(NULL), max_depth_(max_depth), smooth_(smooth), boundary_(boundary)
+    : freq_avg_(nullptr), max_depth_(max_depth), smooth_(smooth), boundary_(boundary)
 {
     root_ = new FreqTrieNode();
 }
 
 FreqTrie::FreqTrie(const FreqTrie &trie)
-    : freq_avg_(NULL), max_depth_(trie.max_depth_),
+    : freq_avg_(nullptr), max_depth_(trie.max_depth_),
       smooth_(trie.smooth_), boundary_(trie.boundary_)
 {
     root_ = new FreqTrieNode(*(trie.root_));
@@ -185,7 +185,7 @@ void FreqTrie::update_fm(void)
 
 void FreqTrie::update_iv(void)
 {
-    if (freq_avg_ == NULL) { throw std::exception(); }
+    if (freq_avg_ == nullptr) { throw std::exception(); }
 
     for (Iterator it = begin(); it != end(); ++it)
     {
@@ -205,7 +205,7 @@ double FreqTrie::get_hl(const Sequence::const_iterator &begin,
                         const Sequence::const_iterator &end) const
 {
     FreqTrieNode const *node = find(begin, end);
-    if (node == NULL) { return -1; }
+    if (node == nullptr) { return -1; }
 
     return node->hl;
 }
@@ -219,7 +219,7 @@ double FreqTrie::get_hr(const Sequence::const_iterator &begin,
                         const Sequence::const_iterator &end) const
 {
     FreqTrieNode const *node = find(begin, end);
-    if (node == NULL) { return -1; }
+    if (node == nullptr) { return -1; }
 
     return node->hr;
 }
@@ -233,7 +233,7 @@ double FreqTrie::get_iv(const Sequence::const_iterator &begin,
                         const Sequence::const_iterator &end) const
 {
     FreqTrieNode const *node = find(begin, end);
-    if (node == NULL) { return -1; }
+    if (node == nullptr) { return -1; }
 
     return node->iv;
 }
@@ -282,7 +282,7 @@ FreqTrie::FreqTrieNode const *FreqTrie::find(
     for (Sequence::const_iterator it = begin; it != end; ++it)
     {
         node = node->get(*it);
-        if (node == NULL) { break; }
+        if (node == nullptr) { break; }
     }
 
     return node;
@@ -317,12 +317,12 @@ double FreqTrie::entropy(CharCounts counts, size_t num_events)
 
 void FreqTrie::clear_fm(void)
 {
-    if (freq_avg_ != NULL)
+    if (freq_avg_ != nullptr)
     {
         delete [] freq_avg_;
     }
 
-    freq_avg_ = NULL;
+    freq_avg_ = nullptr;
 }
 
 void FreqTrie::clear(void)
@@ -459,14 +459,14 @@ FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Char key) const
         return it->second;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 FreqTrie::FreqTrieNode *FreqTrie::FreqTrieNode::get(Char key, bool create)
 {
     NodeCollection::iterator it = children.find(key);
     if (it != children.end())   { return it->second; }
-    else if (!create)           { return NULL; }
+    else if (!create)           { return nullptr; }
 
     children[key] = new FreqTrieNode();
     return children[key];
