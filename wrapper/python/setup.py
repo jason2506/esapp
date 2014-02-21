@@ -7,6 +7,7 @@ setup(
     ext_modules=[
         Extension('esa',
                   sources=['cython/esa.pyx'],
+                  extra_compile_args=['-std=c++11', '-stdlib=libc++'],
                   include_dirs=['../../include'],
                   library_dirs=['../../lib'],
                   libraries=['esa'],

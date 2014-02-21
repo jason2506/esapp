@@ -31,9 +31,9 @@ public: // Public Method(s)
     Segmenter(double lrv_exp, size_t max_iters = 10,
               size_t max_length = 30, double smooth = 0.0);
 
-    std::vector<std::vector<Sequence> > fit_and_segment(std::vector<Sequence> const &sequences);
+    std::vector<std::vector<Sequence>> fit_and_segment(std::vector<Sequence> const &sequences);
     void fit(std::vector<Sequence> const &sequences);
-    std::vector<std::vector<Sequence> > segment(std::vector<Sequence> const &sequences) const;
+    std::vector<std::vector<Sequence>> segment(std::vector<Sequence> const &sequences) const;
     std::vector<Sequence> segment(Sequence const &sequence) const;
 
 private: // Private Type(s)

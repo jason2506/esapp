@@ -20,31 +20,30 @@ int main (void)
 {
     wcout.imbue(locale("zh_tw.UTF-8"));
 
-    vector<wstring> sequences;
-    sequences.push_back(L"這是一隻可愛的小花貓");
-    sequences.push_back(L"一隻貓");
-    sequences.push_back(L"真可愛的貓");
-    sequences.push_back(L"這是一隻花貓");
-    sequences.push_back(L"小貓真可愛");
+    vector<wstring> sequences = {
+        L"這是一隻可愛的小花貓",
+        L"一隻貓",
+        L"真可愛的貓",
+        L"這是一隻花貓",
+        L"小貓真可愛"
+    };
 
     Segmenter segmenter(2.0, 10, 30, 3);
 
     /*
     segmenter.fit(sequences);
-    for (vector<wstring>::const_iterator it = sequences.begin();
-         it != sequences.end(); ++it)
+    for (auto const &sequence : sequences)
     {
-        vector<wstring> words = segmenter.segment(*it);
+        auto words = segmenter.segment(sequence);
         copy(words.begin(), words.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
         wcout << endl;
     }
     //*/
 
-    vector<vector<wstring> > words_list = segmenter.fit_and_segment(sequences);
-    for (vector<vector<wstring> >::const_iterator it = words_list.begin();
-         it != words_list.end(); ++it)
+    auto words_list = segmenter.fit_and_segment(sequences);
+    for (auto const &words : words_list)
     {
-        copy(it->begin(), it->end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
+        copy(words.begin(), words.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
         wcout << endl;
     }
 
