@@ -36,7 +36,7 @@ void Segmenter::fit(const std::vector<Sequence> &sequences)
     trie_.update_fm();
     trie_.update_iv();
 
-    size_t length = sequences.size();
+    auto length = sequences.size();
     std::vector<Seg> prev_segs, segs;
     for (size_t i = 0; i < max_iters_; ++i)
     {
@@ -45,15 +45,15 @@ void Segmenter::fit(const std::vector<Sequence> &sequences)
         {
             for (size_t j = 0; j < length; ++j)
             {
-                std::vector<Sequence> words = segment_sequence(sequences[j], prev_segs[j]);
+                auto words = segment_sequence(sequences[j], prev_segs[j]);
                 trie_.increase(words, false);
             }
         }
 
         for (size_t j = 0; j < length; ++j)
         {
-            Seg seg = optimize_segment(sequences[j]);
-            std::vector<Sequence> words = segment_sequence(sequences[j], seg);
+            auto seg = optimize_segment(sequences[j]);
+            auto words = segment_sequence(sequences[j], seg);
             trie_.decrease(words, false);
             segs.push_back(seg);
         }
@@ -84,12 +84,12 @@ std::vector<Segmenter::Sequence> Segmenter::segment(const Sequence &sequence) co
 
 Segmenter::Seg Segmenter::optimize_segment(const Sequence &sequence) const
 {
-    size_t n = sequence.size();
+    auto n = sequence.size();
     if (n == 0) { return Seg(); }
 
-    size_t m = n * (1 + n) / 2;
-    size_t **fs = new size_t*[n];
-    double **fv = new double*[n];
+    auto m = n * (1 + n) / 2;
+    auto **fs = new size_t*[n];
+    auto **fv = new double*[n];
     fs[0] = new size_t[m];
     fv[0] = new double[m];
     for (size_t i = 1, offset = n; i < n; ++i, --offset)
@@ -98,21 +98,21 @@ Segmenter::Seg Segmenter::optimize_segment(const Sequence &sequence) const
         fv[i] = fv[i - 1] + offset;
     }
 
-    Sequence::const_iterator it = sequence.begin();
+    auto it = sequence.begin();
     for (size_t j = 0; j < n; ++j)
     {
         for (size_t i = 0; i + j < n; ++i)
         {
-            Sequence::const_iterator begin = it + i;
-            Sequence::const_iterator end = it + i + j + 1;
+            auto begin = it + i;
+            auto end = it + i + j + 1;
             fv[i][j] = trie_.get_iv(begin, end);
             fs[i][j] = 0;
             for (size_t k = 1; k <= j; ++k)
             {
-                double hr = trie_.get_hr(begin, begin + k);
-                double hl = trie_.get_hl(begin + k, end);
-                double lrv = pow(hr * hl, lrv_exp_);
-                double cv = fv[i][k - 1] * fv[i + k][j - k] * lrv;
+                auto hr = trie_.get_hr(begin, begin + k);
+                auto hl = trie_.get_hl(begin + k, end);
+                auto lrv = pow(hr * hl, lrv_exp_);
+                auto cv = fv[i][k - 1] * fv[i + k][j - k] * lrv;
                 if (cv > fv[i][j])
                 {
                     fv[i][j] = cv;
@@ -137,7 +137,7 @@ void Segmenter::generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) cons
 {
     if (fs[i][j] == 0) { return; }
 
-    size_t k = fs[i][j];
+    auto k = fs[i][j];
     generate_segment(seg, fs, i, k - 1);
     seg.push_back(i + k);
     generate_segment(seg, fs, i + k, j - k);
@@ -152,12 +152,12 @@ std::vector<Segmenter::Sequence> Segmenter::segment_sequence(
     Seg::value_type start = 0;
     for (auto const &pos : seg)
     {
-        Sequence word = sequence.substr(start, pos - start);
+        auto word = sequence.substr(start, pos - start);
         words.push_back(word);
         start = pos;
     }
 
-    Sequence word = sequence.substr(start);
+    auto word = sequence.substr(start);
     words.push_back(word);
 
     return words;

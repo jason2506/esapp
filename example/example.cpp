@@ -33,13 +33,13 @@ int main (void)
     segmenter.fit(sequences);
     for (auto const &sequence : sequences)
     {
-        vector<wstring> words = segmenter.segment(sequence);
+        auto words = segmenter.segment(sequence);
         copy(words.begin(), words.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
         wcout << endl;
     }
     //*/
 
-    vector<vector<wstring> > words_list = segmenter.fit_and_segment(sequences);
+    auto words_list = segmenter.fit_and_segment(sequences);
     for (auto const &words : words_list)
     {
         copy(words.begin(), words.end(), ostream_iterator<wstring, wchar_t>(wcout, L" "));
