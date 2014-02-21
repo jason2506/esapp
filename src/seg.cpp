@@ -38,19 +38,19 @@ void Segmenter::fit(const std::vector<Sequence> &sequences)
 
     auto length = sequences.size();
     std::vector<Seg> prev_segs, segs;
-    for (size_t i = 0; i < max_iters_; ++i)
+    for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
     {
         segs.clear();
         if (!prev_segs.empty())
         {
-            for (size_t j = 0; j < length; ++j)
+            for (decltype(length) j = 0; j < length; ++j)
             {
                 auto words = segment_sequence(sequences[j], prev_segs[j]);
                 trie_.increase(words, false);
             }
         }
 
-        for (size_t j = 0; j < length; ++j)
+        for (decltype(length) j = 0; j < length; ++j)
         {
             auto seg = optimize_segment(sequences[j]);
             auto words = segment_sequence(sequences[j], seg);
@@ -68,7 +68,7 @@ void Segmenter::fit(const std::vector<Sequence> &sequences)
 std::vector<std::vector<Segmenter::Sequence>>
 Segmenter::segment(const std::vector<Sequence> &sequences) const
 {
-    std::vector<std::vector<Segmenter::Sequence>> results;
+    decltype(segment(sequences)) results;
     for (auto const &sequence : sequences)
     {
         results.push_back(segment(sequence));
@@ -92,22 +92,22 @@ Segmenter::Seg Segmenter::optimize_segment(const Sequence &sequence) const
     auto **fv = new double*[n];
     fs[0] = new size_t[m];
     fv[0] = new double[m];
-    for (size_t i = 1, offset = n; i < n; ++i, --offset)
+    for (decltype(n) i = 1, offset = n; i < n; ++i, --offset)
     {
         fs[i] = fs[i - 1] + offset;
         fv[i] = fv[i - 1] + offset;
     }
 
     auto it = sequence.begin();
-    for (size_t j = 0; j < n; ++j)
+    for (decltype(n) j = 0; j < n; ++j)
     {
-        for (size_t i = 0; i + j < n; ++i)
+        for (decltype(n) i = 0; i + j < n; ++i)
         {
             auto begin = it + i;
             auto end = it + i + j + 1;
             fv[i][j] = trie_.get_iv(begin, end);
             fs[i][j] = 0;
-            for (size_t k = 1; k <= j; ++k)
+            for (decltype(j) k = 1; k <= j; ++k)
             {
                 auto hr = trie_.get_hr(begin, begin + k);
                 auto hl = trie_.get_hl(begin + k, end);
@@ -146,7 +146,8 @@ void Segmenter::generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) cons
 std::vector<Segmenter::Sequence> Segmenter::segment_sequence(
     const Sequence &sequence, const Seg &seg) const
 {
-    std::vector<Sequence> words;
+    typedef decltype(segment_sequence(sequence, seg)) Words;
+    Words words;
     if (sequence.empty()) { return words; }
 
     Seg::value_type start = 0;

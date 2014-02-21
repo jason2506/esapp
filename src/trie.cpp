@@ -58,10 +58,10 @@ FreqTrie &FreqTrie::operator=(const FreqTrie &trie)
 void FreqTrie::increase(const Sequence &sequence, bool include_self)
 {
     auto n = sequence.size();
-    for (size_t i = 0; i < n; ++i)
+    for (decltype(n) i = 0; i < n; ++i)
     {
         auto *node = root_;
-        for (size_t j = i; j < n && j - i < max_depth_; ++j)
+        for (decltype(n) j = i; j < n && j - i < max_depth_; ++j)
         {
             if (!include_self && i == 0 && j == n - 1) { continue; }
 
@@ -87,10 +87,10 @@ void FreqTrie::increase(const std::vector<Sequence> &sequences, bool include_sel
 void FreqTrie::decrease(const Sequence &sequence, bool include_self)
 {
     auto n = sequence.size();
-    for (size_t i = 0; i < n; ++i)
+    for (decltype(n) i = 0; i < n; ++i)
     {
         auto *node = root_;
-        for (size_t j = i; j < n && j - i < max_depth_; ++j)
+        for (decltype(n) j = i; j < n && j - i < max_depth_; ++j)
         {
             if (!include_self && i == 0 && j == n - 1) { continue; }
 
@@ -131,7 +131,7 @@ void FreqTrie::update_hsp1(void)
         nums[node_depth]++;
     }
 
-    for (size_t i = 0; i < trie_depth; ++i)
+    for (decltype(trie_depth) i = 0; i < trie_depth; ++i)
     {
         hl_avg[i] /= nums[i];
         hr_avg[i] /= nums[i];
@@ -167,7 +167,7 @@ void FreqTrie::update_fm(void)
         nums[node_depth]++;
     }
 
-    for (size_t i = 0; i < trie_depth; ++i)
+    for (decltype(trie_depth) i = 0; i < trie_depth; ++i)
     {
         freq_avg_[i] /= nums[i];
     }
@@ -460,7 +460,7 @@ size_t FreqTrie::FreqTrieNode::depth(void) const
 {
     if (children.empty()) { return 0; }
 
-    size_t max_depth = 0;
+    decltype(depth()) max_depth = 0;
     for (auto const &child : children)
     {
         auto depth = child.second->depth();
