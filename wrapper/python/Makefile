@@ -1,7 +1,7 @@
 PY=python
 
 TARGET=esa.so
-SRCS=esa.pyx seg.pxd unicode.pxd wstring.pxd
+SRCS=esa.pyx seg.pxd
 
 vpath %.pyx cython
 vpath %.pxd cython
