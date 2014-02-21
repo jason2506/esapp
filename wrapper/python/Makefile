@@ -14,4 +14,5 @@ $(TARGET): $(SRCS)
 .PHONY: clean
 clean:
 	$(RM) -r build
+	$(RM) cython/esa.cpp
 	$(RM) $(TARGET)
