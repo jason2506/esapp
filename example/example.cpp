@@ -20,12 +20,13 @@ int main (void)
 {
     wcout.imbue(locale("zh_tw.UTF-8"));
 
-    vector<wstring> sequences;
-    sequences.push_back(L"這是一隻可愛的小花貓");
-    sequences.push_back(L"一隻貓");
-    sequences.push_back(L"真可愛的貓");
-    sequences.push_back(L"這是一隻花貓");
-    sequences.push_back(L"小貓真可愛");
+    vector<wstring> sequences = {
+        L"這是一隻可愛的小花貓",
+        L"一隻貓",
+        L"真可愛的貓",
+        L"這是一隻花貓",
+        L"小貓真可愛"
+    };
 
     Segmenter segmenter(2.0, 10, 30, 3);
 
