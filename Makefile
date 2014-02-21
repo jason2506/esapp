@@ -6,7 +6,7 @@ INC_PATH=./include
 OBJ_PATH=./obj
 LIB_PATH=./lib
 
-OBJS=trie.o seg.o
+OBJS=conv.o trie.o seg.o
 LIB=esa
 TARGET=lib$(LIB).a
 
