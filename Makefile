@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-Wall -O3
+CXXFLAGS=-Wall -O3 -std=c++11
 
 SRC_PATH=./src
 INC_PATH=./include
@@ -18,7 +18,7 @@ vpath %.a $(LIB_PATH)
 all: $(TARGET) example
 
 example: example.o
-	$(CXX) example/$@.cpp -I$(INC_PATH) -L$(LIB_PATH) -l$(LIB) -o example/$@
+	$(CXX) example/$@.cpp -I$(INC_PATH) -L$(LIB_PATH) -l$(LIB) -o example/$@ -std=c++11
 
 example.o: example/example.cpp
 	@mkdir -p $(OBJ_PATH)
