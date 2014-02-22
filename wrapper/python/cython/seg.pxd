@@ -14,7 +14,7 @@ cdef extern from 'seg.hpp':
     cdef cppclass _Segmenter 'esapp::Segmenter':
         _Segmenter(double, size_t, size_t, double) nogil except +
 
-        vector[vector[string]] fit_and_segment(const vector[string]) nogil
-        void fit(const vector[string]) nogil
-        vector[string] segment(const string) nogil
-        vector[vector[string]] segment(const vector[string]) nogil
+        vector[vector[string]] fit_and_segment(const vector[string] &) nogil
+        void fit(const vector[string] &) nogil
+        vector[string] segment(const string &) nogil
+        vector[vector[string]] segment(const vector[string] &) nogil

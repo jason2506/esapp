@@ -19,7 +19,7 @@ cdef vector[string] to_string_vector(list objs):
     return [obj.encode('utf-8') for obj in objs]
 
 
-cdef list from_string_vector(vector[string] str_vector):
+cdef list from_string_vector(vector[string] &str_vector):
     cdef string str
     return [str.decode('utf-8') for str in str_vector]
 
