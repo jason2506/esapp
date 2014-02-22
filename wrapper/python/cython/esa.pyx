@@ -14,7 +14,7 @@ from libcpp.string cimport string
 from seg cimport _Segmenter
 
 
-cdef vector[string] to_string_vector(list objs):
+cdef vector[string] to_string_vector(objs):
     cdef unicode obj
     return [obj.encode('utf-8') for obj in objs]
 
@@ -33,16 +33,16 @@ cdef class Segmenter(object):
     def __dealloc__(self):
         del self._segmenter
 
-    cpdef list fit_and_segment(self, list sequences):
+    cpdef list fit_and_segment(self, sequences):
         cdef vector[vector[string]] words_list
         cdef vector[string] words
         words_list = self._segmenter.fit_and_segment(to_string_vector(sequences))
         return [from_string_vector(words) for words in words_list]
 
-    cpdef fit(self, list sequences):
+    cpdef fit(self, sequences):
         self._segmenter.fit(to_string_vector(sequences))
 
-    cpdef list segment_all(self, list sequences):
+    cpdef list segment_all(self, sequences):
         cdef vector[vector[string]] words_list
         cdef vector[string] words
         words_list = self._segmenter.segment(to_string_vector(sequences))
