@@ -42,7 +42,7 @@ FreqTrie::~FreqTrie(void)
 
 FreqTrie &FreqTrie::operator=(FreqTrie const &trie)
 {
-    root_ = trie.root_;
+    *root_ = *(trie.root_);
 
     clear_fm();
     if (trie.freq_avg_)
@@ -94,7 +94,7 @@ void FreqTrie::decrease(Sequence const &sequence, bool include_self)
         {
             if (!include_self && i == 0 && j == n - 1) { continue; }
 
-            node = node->children[sequence[j]];
+            node = &(node->children[sequence[j]]);
             node->f--;
         }
     }
@@ -346,7 +346,8 @@ FreqTrie::BaseIterator<T> &FreqTrie::BaseIterator<T>::operator++(void)
     auto const *node = top.second;
     for (auto const &child : node->children)
     {
-        stack_.push(std::make_pair(depth, child.second));
+        auto node_ptr = const_cast<T *>(&(child.second));
+        stack_.push(std::make_pair(depth, node_ptr));
     }
 
     return *this;
@@ -398,41 +399,9 @@ FreqTrie::FreqTrieNode::FreqTrieNode(void) : f(0), hl(0), hr(0), iv(0)
     // do nothing
 }
 
-FreqTrie::FreqTrieNode::FreqTrieNode(FreqTrie::FreqTrieNode const &node)
-    : sp1l(node.sp1l), sp1r(node.sp1r), f(node.f), hl(node.hl), hr(node.hr), iv(node.iv)
-{
-    for (auto const &child : node.children)
-    {
-        auto *node = new FreqTrieNode(*(child.second));
-        children[child.first] = node;
-    }
-}
-
 FreqTrie::FreqTrieNode::~FreqTrieNode(void)
 {
     clear();
-}
-
-FreqTrie::FreqTrieNode &FreqTrie::FreqTrieNode::operator=(FreqTrie::FreqTrieNode const &node)
-{
-    if (&node != this) { return *this; }
-
-    clear();
-
-    sp1l = node.sp1l;
-    sp1r = node.sp1r;
-    f = node.f;
-    hl = node.hl;
-    hr = node.hr;
-    iv = node.iv;
-
-    for (auto const &child : node.children)
-    {
-        auto *node = new FreqTrieNode(*(child.second));
-        children[child.first] = node;
-    }
-
-    return *this;
 }
 
 FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Char key) const
@@ -440,7 +409,7 @@ FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Char key) const
     auto it = children.find(key);
     if (it != children.end())
     {
-        return it->second;
+        return &(it->second);
     }
 
     return nullptr;
@@ -449,11 +418,11 @@ FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Char key) const
 FreqTrie::FreqTrieNode *FreqTrie::FreqTrieNode::get(Char key, bool create)
 {
     auto it = children.find(key);
-    if (it != children.end())   { return it->second; }
+    if (it != children.end())   { return &(it->second); }
     else if (!create)           { return nullptr; }
 
-    children[key] = new FreqTrieNode();
-    return children[key];
+    children.emplace(key);
+    return &(children[key]);
 }
 
 size_t FreqTrie::FreqTrieNode::depth(void) const
@@ -463,7 +432,7 @@ size_t FreqTrie::FreqTrieNode::depth(void) const
     decltype(depth()) max_depth = 0;
     for (auto const &child : children)
     {
-        auto depth = child.second->depth();
+        auto depth = child.second.depth();
         if (depth > max_depth)
         {
             max_depth = depth;
@@ -475,11 +444,6 @@ size_t FreqTrie::FreqTrieNode::depth(void) const
 
 void FreqTrie::FreqTrieNode::clear(void)
 {
-    for (auto const &child : children)
-    {
-        delete child.second;
-    }
-
     children.clear();
     f = hl = hr = iv = 0;
 }

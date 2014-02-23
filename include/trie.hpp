@@ -72,10 +72,10 @@ private: // Private Type(s)
     typedef FreqTrie::BaseIterator<FreqTrie::FreqTrieNode const> ConstIterator;
 
 #ifndef USE_GOOGLE_HASH_MAP
-    typedef std::unordered_map<Char, FreqTrie::FreqTrieNode *> NodeCollection;
+    typedef std::unordered_map<Char, FreqTrie::FreqTrieNode> NodeCollection;
     typedef std::unordered_map<Char, size_t> CharCounts;
 #else
-    typedef google::sparse_hash_map<Char, FreqTrie::FreqTrieNode *> NodeCollection;
+    typedef google::sparse_hash_map<Char, FreqTrie::FreqTrieNode> NodeCollection;
     typedef google::sparse_hash_map<Char, size_t> CharCounts;
 #endif
 
@@ -134,10 +134,7 @@ private: // Private Property(ies)
 struct FreqTrie::FreqTrieNode
 {
     FreqTrieNode(void);
-    FreqTrieNode(FreqTrieNode const &node);
     ~FreqTrieNode(void);
-
-    FreqTrieNode &operator=(FreqTrieNode const &node);
 
     FreqTrieNode const *get(Char key) const;
     FreqTrieNode *get(Char key, bool create=false);
