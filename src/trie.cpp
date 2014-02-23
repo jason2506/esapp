@@ -268,7 +268,7 @@ FreqTrie::FreqTrieNode const *FreqTrie::find(
     Sequence::const_iterator const &end) const
 {
     auto *node = root_;
-    for (Sequence::const_iterator it = begin; it != end; ++it)
+    for (auto it = begin; it != end; ++it)
     {
         node = node->get(*it);
         if (node == nullptr) { break; }
@@ -356,7 +356,7 @@ FreqTrie::BaseIterator<T> &FreqTrie::BaseIterator<T>::operator++(void)
 template<typename T>
 FreqTrie::BaseIterator<T> FreqTrie::BaseIterator<T>::operator++(int)
 {
-    BaseIterator it(this);
+    decltype((*this)++) it(*this);
     ++(*this);
     return it;
 }

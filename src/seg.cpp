@@ -24,7 +24,7 @@ Segmenter::Segmenter(double lrv_exp, size_t max_iters, size_t max_length, double
 std::vector<std::vector<std::string>>
 Segmenter::fit_and_segment(std::vector<std::string> const &sequences)
 {
-    std::vector<std::wstring> ws_sequences = vec_s2ws(sequences);
+    auto ws_sequences = vec_s2ws(sequences);
     auto ws_words_list = fit_and_segment(ws_sequences);
 
     decltype(fit_and_segment(sequences)) words_list(ws_words_list.size());
@@ -42,7 +42,7 @@ Segmenter::fit_and_segment(std::vector<std::wstring> const &sequences)
 
 void Segmenter::fit(std::vector<std::string> const &sequences)
 {
-    std::vector<std::wstring> ws_sequences = vec_s2ws(sequences);
+    auto ws_sequences = vec_s2ws(sequences);
     fit(ws_sequences);
 }
 
