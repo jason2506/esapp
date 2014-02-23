@@ -6,17 +6,18 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include <iostream>
-#include <vector>
-#include <string>
 #include <cstdlib>
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include "seg.hpp"
 
 using namespace std;
 using namespace esapp;
 
-int main (void)
+int main(void)
 {
     cout.imbue(locale("zh_tw.UTF-8"));
 

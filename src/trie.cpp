@@ -16,7 +16,8 @@ namespace esapp
  ************************************************/
 
 FreqTrie::FreqTrie(size_t max_depth, double smooth, Char boundary)
-    : freq_avg_(nullptr), max_depth_(max_depth), smooth_(smooth), boundary_(boundary)
+    : freq_avg_(nullptr), max_depth_(max_depth),
+      smooth_(smooth), boundary_(boundary)
 {
     root_ = new FreqTrieNode();
 }
@@ -76,7 +77,8 @@ void FreqTrie::increase(Sequence const &sequence, bool include_self)
     }
 }
 
-void FreqTrie::increase(std::vector<Sequence> const &sequences, bool include_self)
+void FreqTrie::increase(std::vector<Sequence> const &sequences,
+                        bool include_self)
 {
     for (auto const &sequence : sequences)
     {
@@ -100,7 +102,8 @@ void FreqTrie::decrease(Sequence const &sequence, bool include_self)
     }
 }
 
-void FreqTrie::decrease(std::vector<Sequence> const &sequences, bool include_self)
+void FreqTrie::decrease(std::vector<Sequence> const &sequences,
+                        bool include_self)
 {
     for (auto const &sequence : sequences)
     {
@@ -182,7 +185,8 @@ void FreqTrie::update_iv(void)
     for (auto const &node : *this)
     {
         auto node_depth = node.first - 1;
-        node.second->iv = pow(node.second->f / freq_avg_[node_depth], node_depth + 1);
+        node.second->iv = pow(node.second->f / freq_avg_[node_depth],
+                              node_depth + 1);
     }
 }
 

@@ -15,7 +15,8 @@ namespace esapp
  * Implementation: class Segmenter
  ************************************************/
 
-Segmenter::Segmenter(double lrv_exp, size_t max_iters, size_t max_length, double smooth)
+Segmenter::Segmenter(double lrv_exp, size_t max_iters,
+                     size_t max_length, double smooth)
     : trie_(max_length, smooth), lrv_exp_(lrv_exp), max_iters_(max_iters)
 {
     // do nothing
@@ -28,7 +29,8 @@ Segmenter::fit_and_segment(std::vector<std::string> const &sequences)
     auto ws_words_list = fit_and_segment(ws_sequences);
 
     decltype(fit_and_segment(sequences)) words_list(ws_words_list.size());
-    std::transform(ws_words_list.begin(), ws_words_list.end(), words_list.begin(), &vec_ws2s);
+    std::transform(ws_words_list.begin(), ws_words_list.end(),
+                   words_list.begin(), &vec_ws2s);
 
     return words_list;
 }
@@ -174,7 +176,8 @@ Segmenter::Seg Segmenter::optimize_segment(std::wstring const &sequence) const
     return seg;
 }
 
-void Segmenter::generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) const
+void Segmenter::generate_segment(Seg &seg, size_t **fs,
+                                 size_t i, size_t j) const
 {
     if (fs[i][j] == 0) { return; }
 

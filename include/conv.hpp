@@ -6,12 +6,12 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef CONV_HPP_INCLUDEED
-#define CONV_HPP_INCLUDEED
+#ifndef ESAPP_CONV_HPP_
+#define ESAPP_CONV_HPP_
 
-#include <algorithm>
 #include <codecvt>
 #include <locale>
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -25,4 +25,4 @@ std::string ws2s(std::wstring const &wstr);
 
 } // namespace esa
 
-#endif // CONV_HPP_INCLUDEED
+#endif // ESAPP_CONV_HPP_

@@ -6,13 +6,13 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef TRIE_HPP_INCLUDEED
-#define TRIE_HPP_INCLUDEED
+#ifndef ESAPP_TRIE_HPP_
+#define ESAPP_TRIE_HPP_
 
+#include <unordered_map>
 #include <algorithm>
 #include <stack>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -37,9 +37,11 @@ public: // Public Method(s)
     FreqTrie &operator=(FreqTrie const &node);
 
     void increase(Sequence const &sequence, bool include_self = true);
-    void increase(std::vector<Sequence> const &sequences, bool include_self = true);
+    void increase(std::vector<Sequence> const &sequences,
+                  bool include_self = true);
     void decrease(Sequence const &sequence, bool include_self = true);
-    void decrease(std::vector<Sequence> const &sequences, bool include_self = true);
+    void decrease(std::vector<Sequence> const &sequences,
+                  bool include_self = true);
 
     void update_hsp1(void);
     void update_fm(void);
@@ -115,7 +117,7 @@ public: // Public Method(s)
 
 private: // Private Property(ies)
     std::stack<Value> stack_;
-};
+}; // class FreqTrie::BaseIterator
 
 /************************************************
  * Declaration: struct FreqTrie::FreqTrieNode
@@ -127,7 +129,7 @@ struct FreqTrie::FreqTrieNode
     ~FreqTrieNode(void);
 
     FreqTrieNode const *get(Char key) const;
-    FreqTrieNode *get(Char key, bool create=false);
+    FreqTrieNode *get(Char key, bool create = false);
     size_t depth(void) const;
     void clear(void);
 
@@ -140,4 +142,4 @@ struct FreqTrie::FreqTrieNode
 
 } // namespace esa
 
-#endif // TRIE_HPP_INCLUDEED
+#endif // ESAPP_TRIE_HPP_
