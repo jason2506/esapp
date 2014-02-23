@@ -12,14 +12,9 @@
 #include <algorithm>
 #include <stack>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
-
-#ifndef USE_GOOGLE_HASH_MAP
-    #include <unordered_map>
-#else
-    #include <sparsehash/sparse_hash_map>
-#endif
 
 namespace esapp
 {
@@ -71,13 +66,8 @@ private: // Private Type(s)
     typedef FreqTrie::BaseIterator<FreqTrie::FreqTrieNode> Iterator;
     typedef FreqTrie::BaseIterator<FreqTrie::FreqTrieNode const> ConstIterator;
 
-#ifndef USE_GOOGLE_HASH_MAP
     typedef std::unordered_map<Char, FreqTrie::FreqTrieNode> NodeCollection;
     typedef std::unordered_map<Char, size_t> CharCounts;
-#else
-    typedef google::sparse_hash_map<Char, FreqTrie::FreqTrieNode> NodeCollection;
-    typedef google::sparse_hash_map<Char, size_t> CharCounts;
-#endif
 
 private: // Private Method(s)
     Iterator begin(void);
