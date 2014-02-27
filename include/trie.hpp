@@ -11,6 +11,7 @@
 
 #include <unordered_map>
 #include <algorithm>
+#include <iterator>
 #include <stack>
 #include <string>
 #include <utility>
@@ -100,7 +101,11 @@ template<typename T>
 class FreqTrie::BaseIterator
 {
 public: // Public Type(s)
-    typedef std::pair<size_t, T *> Value;
+    typedef std::input_iterator_tag iterator_category;
+    typedef std::pair<size_t, T *> value_type;
+    typedef ptrdiff_t difference_type;
+    typedef value_type *pointer;
+    typedef value_type &reference;
 
 public: // Public Method(s)
     BaseIterator(void);
@@ -109,14 +114,14 @@ public: // Public Method(s)
     BaseIterator &operator++(void);
     BaseIterator operator++(int);
 
-    Value const &operator*(void) const;
-    Value const *operator->(void) const;
+    value_type const &operator*(void) const;
+    value_type const *operator->(void) const;
 
     bool operator==(BaseIterator const &it) const;
     bool operator!=(BaseIterator const &it) const;
 
 private: // Private Property(ies)
-    std::stack<Value> stack_;
+    std::stack<value_type> stack_;
 }; // class FreqTrie::BaseIterator
 
 /************************************************
