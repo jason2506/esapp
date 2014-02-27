@@ -66,10 +66,10 @@ private: // Private Type(s)
     struct FreqTrieNode;
     template<typename T> class BaseIterator;
 
-    typedef FreqTrie::BaseIterator<FreqTrie::FreqTrieNode> Iterator;
-    typedef FreqTrie::BaseIterator<FreqTrie::FreqTrieNode const> ConstIterator;
+    typedef BaseIterator<FreqTrieNode> Iterator;
+    typedef BaseIterator<FreqTrieNode const> ConstIterator;
 
-    typedef std::unordered_map<Char, FreqTrie::FreqTrieNode> NodeCollection;
+    typedef std::unordered_map<Char, FreqTrieNode> NodeCollection;
     typedef std::unordered_map<Char, size_t> CharCounts;
 
 private: // Private Method(s)
