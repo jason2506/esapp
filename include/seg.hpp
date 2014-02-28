@@ -51,6 +51,10 @@ private: // Private Type(s)
     typedef std::vector<size_t> Seg;
 
 private: // Private Method(s)
+    void perform_fit(std::vector<std::wstring> const &sequences);
+    void perform_segment(std::vector<std::wstring> &words,
+                         std::wstring const &sequence) const;
+
     Seg optimize_segment(std::wstring const &sequence) const;
     void generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) const;
     void segment_sequence(std::vector<std::wstring> &words,

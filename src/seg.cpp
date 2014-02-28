@@ -62,39 +62,7 @@ void Segmenter::fit(std::vector<std::wstring> const &sequences)
         }
     }
 
-    trie_.clear();
-    trie_.increase(tokens);
-    trie_.update_hsp1();
-    trie_.update_fm();
-    trie_.update_iv();
-
-    std::vector<Seg> prev_segs, segs;
-    for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
-    {
-        segs.clear();
-
-        auto it = tokens.begin();
-        for (auto const &seg : prev_segs)
-        {
-            auto words = segment_sequence(*it, seg);
-            trie_.increase(words, false);
-
-            ++it;
-        }
-
-        for (auto const &token : tokens)
-        {
-            auto seg = optimize_segment(token);
-            auto words = segment_sequence(token, seg);
-            trie_.decrease(words, false);
-            segs.push_back(seg);
-        }
-
-        if (prev_segs == segs) { break; }
-
-        prev_segs.swap(segs);
-        trie_.update_iv();
-    }
+    perform_fit(tokens);
 }
 
 std::vector<std::vector<std::string>>
@@ -137,17 +105,54 @@ std::vector<std::wstring> Segmenter::segment(std::wstring const &sequence) const
     decltype(segment(sequence)) words;
     for (TokenIterator it(sequence); !it.at_end(); ++it)
     {
-        if (ischs((*it)[0]))
-        {
-            segment_sequence(words, *it, optimize_segment(*it));
-        }
-        else
-        {
-            words.push_back(*it);
-        }
+        if (ischs((*it)[0]))    { perform_segment(words, *it); }
+        else                    { words.push_back(*it); }
     }
 
     return words;
+}
+
+void Segmenter::perform_fit(std::vector<std::wstring> const &sequences)
+{
+    trie_.clear();
+    trie_.increase(sequences);
+    trie_.update_hsp1();
+    trie_.update_fm();
+    trie_.update_iv();
+
+    std::vector<Seg> prev_segs, segs;
+    for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
+    {
+        segs.clear();
+
+        auto it = sequences.begin();
+        for (auto const &seg : prev_segs)
+        {
+            auto words = segment_sequence(*it, seg);
+            trie_.increase(words, false);
+
+            ++it;
+        }
+
+        for (auto const &sequence : sequences)
+        {
+            auto seg = optimize_segment(sequence);
+            auto words = segment_sequence(sequence, seg);
+            trie_.decrease(words, false);
+            segs.push_back(seg);
+        }
+
+        if (prev_segs == segs) { break; }
+
+        prev_segs.swap(segs);
+        trie_.update_iv();
+    }
+}
+
+void Segmenter::perform_segment(std::vector<std::wstring> &words,
+                                std::wstring const &sequence) const
+{
+    segment_sequence(words, sequence, optimize_segment(sequence));
 }
 
 Segmenter::Seg Segmenter::optimize_segment(std::wstring const &sequence) const
