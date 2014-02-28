@@ -22,32 +22,6 @@ Segmenter::Segmenter(double lrv_exp, size_t max_iters,
     // do nothing
 }
 
-std::vector<std::vector<std::string>>
-Segmenter::fit_and_segment(std::vector<std::string> const &sequences)
-{
-    auto ws_sequences = vec_s2ws(sequences);
-    auto ws_words_list = fit_and_segment(ws_sequences);
-
-    decltype(fit_and_segment(sequences)) words_list(ws_words_list.size());
-    std::transform(ws_words_list.begin(), ws_words_list.end(),
-                   words_list.begin(), &vec_ws2s);
-
-    return words_list;
-}
-
-std::vector<std::vector<std::wstring>>
-Segmenter::fit_and_segment(std::vector<std::wstring> const &sequences)
-{
-    fit(sequences);
-    return segment(sequences);
-}
-
-void Segmenter::fit(std::vector<std::string> const &sequences)
-{
-    auto ws_sequences = vec_s2ws(sequences);
-    fit(ws_sequences);
-}
-
 void Segmenter::fit(std::vector<std::wstring> const &sequences)
 {
     std::vector<std::wstring> tokens;
@@ -63,80 +37,28 @@ void Segmenter::fit(std::vector<std::wstring> const &sequences)
         }
     }
 
-    perform_fit(tokens);
-}
-
-std::vector<std::vector<std::string>>
-Segmenter::segment(std::vector<std::string> const &sequences) const
-{
-    decltype(segment(sequences)) results;
-    for (auto const &sequence : sequences)
-    {
-        results.push_back(segment(sequence));
-    }
-
-    return results;
-}
-
-std::vector<std::vector<std::wstring>>
-Segmenter::segment(std::vector<std::wstring> const &sequences) const
-{
-    decltype(segment(sequences)) results;
-    for (auto const &sequence : sequences)
-    {
-        results.push_back(segment(sequence));
-    }
-
-    return results;
-}
-
-std::vector<std::string> Segmenter::segment(std::string const &sequence) const
-{
-    return vec_ws2s(segment(s2ws(sequence)));
-}
-
-std::vector<std::wstring> Segmenter::segment(std::wstring const &sequence) const
-{
-    decltype(segment(sequence)) words;
-    Tokenizer tokenizer(sequence);
-    while (tokenizer.has_next())
-    {
-        auto token = tokenizer.next();
-        if (ischs(token[0]))    { perform_segment(words, token); }
-        else                    { words.push_back(token); }
-    }
-
-    return words;
-}
-
-void Segmenter::perform_fit(std::vector<std::wstring> const &sequences)
-{
     trie_.clear();
-    trie_.increase(sequences);
+    trie_.increase(tokens);
     trie_.update_hsp1();
     trie_.update_fm();
     trie_.update_iv();
 
-    std::vector<Seg> prev_segs, segs;
+    std::vector<Seg> prev_segs, segs(tokens.size());
     for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
     {
-        segs.clear();
-
-        auto it = sequences.begin();
+        auto it = tokens.begin();
         for (auto const &seg : prev_segs)
         {
-            auto words = segment_sequence(*it, seg);
-            trie_.increase(words, false);
-
+            trie_.increase(segment_sequence(*it, seg), false);
             ++it;
         }
 
-        for (auto const &sequence : sequences)
+        it = tokens.begin();
+        for (auto &seg : segs)
         {
-            auto seg = optimize_segment(sequence);
-            auto words = segment_sequence(sequence, seg);
-            trie_.decrease(words, false);
-            segs.push_back(seg);
+            seg = optimize_segment(*it);
+            trie_.decrease(segment_sequence(*it, seg), false);
+            ++it;
         }
 
         if (prev_segs == segs) { break; }
@@ -146,10 +68,76 @@ void Segmenter::perform_fit(std::vector<std::wstring> const &sequences)
     }
 }
 
-void Segmenter::perform_segment(std::vector<std::wstring> &words,
-                                std::wstring const &sequence) const
+void Segmenter::fit(std::vector<std::string> const &sequences)
 {
-    segment_sequence(words, sequence, optimize_segment(sequence));
+    auto ws_sequences = vec_s2ws(sequences);
+    fit(ws_sequences);
+}
+
+std::vector<std::wstring> Segmenter::segment(std::wstring const &sequence) const
+{
+    decltype(segment(sequence)) words;
+    Tokenizer tokenizer(sequence);
+    while (tokenizer.has_next())
+    {
+        auto token = tokenizer.next();
+        if (ischs(token[0]))    { segment_sequence(words, token,
+                                                   optimize_segment(token)); }
+        else                    { words.push_back(token); }
+    }
+
+    return words;
+}
+
+std::vector<std::string> Segmenter::segment(std::string const &sequence) const
+{
+    return vec_ws2s(segment(s2ws(sequence)));
+}
+
+std::vector<std::vector<std::wstring>> Segmenter::segment(
+    std::vector<std::wstring> const &sequences) const
+{
+    decltype(segment(sequences)) words_list;
+    for (auto const &sequence : sequences)
+    {
+        words_list.push_back(segment(sequence));
+    }
+
+    return words_list;
+}
+
+std::vector<std::vector<std::string>> Segmenter::segment(
+    std::vector<std::string> const &sequences) const
+{
+    decltype(segment(sequences)) words_list;
+    for (auto const &sequence : sequences)
+    {
+        words_list.push_back(segment(sequence));
+    }
+
+    return words_list;
+}
+
+std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
+    std::vector<std::wstring> const &sequences)
+{
+    fit(sequences);
+    return segment(sequences);
+}
+
+std::vector<std::vector<std::string>> Segmenter::fit_and_segment(
+    std::vector<std::string> const &sequences)
+{
+    auto ws_sequences = vec_s2ws(sequences);
+    fit(ws_sequences);
+
+    decltype(fit_and_segment(sequences)) words_list;
+    for (auto const &sequence : ws_sequences)
+    {
+        words_list.push_back(vec_ws2s(segment(sequence)));
+    }
+
+    return words_list;
 }
 
 Segmenter::Seg Segmenter::optimize_segment(std::wstring const &sequence) const
