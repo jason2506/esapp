@@ -1,10 +1,7 @@
 PY=python
 
 TARGET=esa.so
-SRCS=esa.pyx seg.pxd
-
-vpath %.pyx cython
-vpath %.pxd cython
+SRCS=cython/esa.pyx cython/seg.pxd
 
 all: $(TARGET)
 
