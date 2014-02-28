@@ -53,12 +53,13 @@ void Segmenter::fit(std::vector<std::wstring> const &sequences)
     std::vector<std::wstring> tokens;
     for (auto const &sequence : sequences)
     {
-        TokenIterator tok_it(sequence);
-        for (TokenIterator it(sequence); !it.at_end(); ++it)
+        Tokenizer tokenizer(sequence);
+        while (tokenizer.has_next())
         {
-            if (!ischs((*it)[0])) { continue; }
+            auto token = tokenizer.next();
+            if (!ischs(token[0])) { continue; }
 
-            tokens.push_back(*it);
+            tokens.push_back(token);
         }
     }
 
@@ -103,10 +104,12 @@ std::vector<std::string> Segmenter::segment(std::string const &sequence) const
 std::vector<std::wstring> Segmenter::segment(std::wstring const &sequence) const
 {
     decltype(segment(sequence)) words;
-    for (TokenIterator it(sequence); !it.at_end(); ++it)
+    Tokenizer tokenizer(sequence);
+    while (tokenizer.has_next())
     {
-        if (ischs((*it)[0]))    { perform_segment(words, *it); }
-        else                    { words.push_back(*it); }
+        auto token = tokenizer.next();
+        if (ischs(token[0]))    { perform_segment(words, token); }
+        else                    { words.push_back(token); }
     }
 
     return words;

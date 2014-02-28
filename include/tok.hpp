@@ -25,135 +25,74 @@ inline bool ischs(int c)
 }
 
 /************************************************
- * Declaration: class TokenIterator
+ * Declaration: class Tokenizer
  ************************************************/
 
-class TokenIterator
+class Tokenizer
 {
 public: // Public Type(s)
     typedef std::wstring Sequence;
-    typedef Sequence::const_iterator Iterator;
-
-    typedef std::input_iterator_tag iterator_category;
-    typedef Sequence value_type;
-    typedef ptrdiff_t difference_type;
-    typedef value_type const *pointer;
-    typedef value_type const &reference;
 
 public: // Public Method(s)
-    TokenIterator(Sequence const &sequence);
-    TokenIterator(Iterator const &begin, Iterator const &end);
+    Tokenizer(Sequence const &sequence);
 
-    TokenIterator end(void) const;
-    bool at_end(void) const;
-
-    TokenIterator &operator++(void);
-    TokenIterator operator++(int);
-
-    reference operator*(void) const;
-    pointer operator->(void) const;
-
-    bool operator==(TokenIterator const &it) const;
-    bool operator!=(TokenIterator const &it) const;
+    Sequence next(void);
+    bool has_next(void) const;
 
 private: // Private Method(s)
     template <typename Predicate>
     void skip(Predicate pred);
 
     template <typename Predicate>
-    bool scan(Predicate pred);
+    bool scan(Sequence &token, Predicate pred);
 
 private: // Private Property(ies)
-    Iterator begin_;
-    Iterator end_;
-    Sequence token_;
-    bool at_end_;
-}; // class TokenIterator
+    Sequence const &sequence_;
+    Sequence::const_iterator it_;
+}; // class Tokenizer
 
 /************************************************
- * Implementation: class TokenIterator
+ * Implementation: class Tokenizer
  ************************************************/
 
-inline TokenIterator::TokenIterator(Sequence const &sequence)
-    : TokenIterator(sequence.begin(), sequence.end())
-{
-    // do nothing
-}
-
-inline TokenIterator::TokenIterator(Iterator const &begin, Iterator const &end)
-    : begin_(begin), end_(end), at_end_(begin_ == end_)
-{
-    if (!at_end_) { ++(*this); }
-}
-
-inline TokenIterator TokenIterator::end(void) const
-{
-    return TokenIterator(end_, end_);
-}
-
-inline bool TokenIterator::at_end(void) const
-{
-    return at_end_;
-}
-
-inline TokenIterator &TokenIterator::operator++(void)
+inline Tokenizer::Tokenizer(Sequence const &sequence)
+    : sequence_(sequence), it_(sequence.begin())
 {
     skip(&isspace);
-    if (begin_ == end_)
+}
+
+inline Tokenizer::Sequence Tokenizer::next(void)
+{
+    decltype(next()) token;
+    if (!scan(token, &ischs) && !scan(token, &isalnum))
     {
-        at_end_ = true;
-        token_.clear();
-    }
-    else if (!scan(&ischs) && !scan(&isalnum))
-    {
-        token_.assign(1, *begin_);
-        ++begin_;
+        token.assign(1, *it_);
+        ++it_;
     }
 
-    return *this;
+    skip(&isspace);
+    return token;
 }
 
-inline TokenIterator TokenIterator::operator++(int)
+inline bool Tokenizer::has_next(void) const
 {
-    decltype((*this)++) it(*this);
-    ++(*this);
-    return it;
-}
-
-inline TokenIterator::reference TokenIterator::operator*(void) const
-{
-    return token_;
-}
-
-inline TokenIterator::pointer TokenIterator::operator->(void) const
-{
-    return &token_;
-}
-
-inline bool TokenIterator::operator==(TokenIterator const &it) const
-{
-    return begin_ == it.begin_ && at_end_ == it.at_end_;
-}
-
-inline bool TokenIterator::operator!=(TokenIterator const &it) const
-{
-    return !(*this == it);
+    return it_ != sequence_.end();
 }
 
 template <typename Predicate>
-inline void TokenIterator::skip(Predicate pred)
+inline void Tokenizer::skip(Predicate pred)
 {
-    for ( ; begin_ != end_ && pred(*begin_); ++begin_) { /* do nothing */ }
+    for ( ; has_next() && pred(*it_); ++it_) { /* do nothing */ }
 }
 
 template <typename Predicate>
-inline bool TokenIterator::scan(Predicate pred)
+inline bool Tokenizer::scan(Sequence &token, Predicate pred)
 {
-    auto begin = begin_;
+    auto begin = it_;
     skip(pred);
 
-    bool scanned = begin != begin_;
-    if (scanned) { token_.assign(begin, begin_); }
+    bool scanned = begin != it_;
+    if (scanned) { token.assign(begin, it_); }
 
     return scanned;
 }
