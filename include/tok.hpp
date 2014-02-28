@@ -10,7 +10,6 @@
 #define ESAPP_TOK_HPP_
 
 #include <cctype>
-#include <array>
 #include <string>
 
 namespace esapp
