@@ -92,13 +92,7 @@ Segmenter::segment(std::vector<std::wstring> const &sequences) const
 
 std::vector<std::string> Segmenter::segment(std::string const &sequence) const
 {
-    auto ws_sequences = s2ws(sequence);
-    auto ws_words = segment(ws_sequences);
-
-    decltype(segment(sequence)) words(ws_words.size());
-    std::transform(ws_words.begin(), ws_words.end(), words.begin(), &ws2s);
-
-    return words;
+    return vec_ws2s(segment(s2ws(sequence)));
 }
 
 std::vector<std::wstring> Segmenter::segment(std::wstring const &sequence) const
