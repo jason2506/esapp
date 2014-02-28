@@ -19,8 +19,6 @@ using namespace esapp;
 
 int main(void)
 {
-    cout.imbue(locale("zh_tw.UTF-8"));
-
     vector<string> sequences = {
         u8"這是一隻可愛的小花貓",
         u8"一隻貓",
