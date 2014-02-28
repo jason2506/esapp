@@ -366,14 +366,14 @@ FreqTrie::BaseIterator<T> FreqTrie::BaseIterator<T>::operator++(int)
 }
 
 template<typename T>
-typename FreqTrie::BaseIterator<T>::value_type const &
+typename FreqTrie::BaseIterator<T>::reference
 FreqTrie::BaseIterator<T>::operator*(void) const
 {
     return stack_.top();
 }
 
 template<typename T>
-typename FreqTrie::BaseIterator<T>::value_type const *
+typename FreqTrie::BaseIterator<T>::pointer
 FreqTrie::BaseIterator<T>::operator->(void) const
 {
     return &(stack_.top());

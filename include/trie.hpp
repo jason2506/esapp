@@ -104,8 +104,8 @@ public: // Public Type(s)
     typedef std::input_iterator_tag iterator_category;
     typedef std::pair<size_t, T *> value_type;
     typedef ptrdiff_t difference_type;
-    typedef value_type *pointer;
-    typedef value_type &reference;
+    typedef value_type const *pointer;
+    typedef value_type const &reference;
 
 public: // Public Method(s)
     BaseIterator(void);
@@ -114,8 +114,8 @@ public: // Public Method(s)
     BaseIterator &operator++(void);
     BaseIterator operator++(int);
 
-    value_type const &operator*(void) const;
-    value_type const *operator->(void) const;
+    reference operator*(void) const;
+    pointer operator->(void) const;
 
     bool operator==(BaseIterator const &it) const;
     bool operator!=(BaseIterator const &it) const;
