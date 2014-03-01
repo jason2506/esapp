@@ -131,7 +131,6 @@ private: // Private Property(ies)
 struct FreqTrie::FreqTrieNode
 {
     FreqTrieNode(void);
-    ~FreqTrieNode(void);
 
     FreqTrieNode const *get(Char key) const;
     FreqTrieNode *get(Char key, bool create = false);

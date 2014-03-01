@@ -403,11 +403,6 @@ FreqTrie::FreqTrieNode::FreqTrieNode(void) : f(0), hl(0), hr(0), iv(0)
     // do nothing
 }
 
-FreqTrie::FreqTrieNode::~FreqTrieNode(void)
-{
-    clear();
-}
-
 FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Char key) const
 {
     auto it = children.find(key);
