@@ -9,7 +9,7 @@
 #ifndef ESAPP_TOK_HPP_
 #define ESAPP_TOK_HPP_
 
-#include <cctype>
+#include <cwctype>
 #include <string>
 
 namespace esapp
@@ -19,9 +19,16 @@ namespace esapp
  * Inline Helper Function(s)
  ************************************************/
 
-inline bool ischs(int c)
+inline int ischs(std::wint_t c)
 {
     return c >= u'\u4E00' && c <= u'\u9FFF';
+}
+
+inline int isfwalnum(std::wint_t c)
+{
+    return (c >= u'Ａ' && c <= u'Ｚ') ||
+           (c >= u'ａ' && c <= u'ｚ') ||
+           (c >= u'０' && c <= u'９');
 }
 
 /************************************************
@@ -58,19 +65,21 @@ private: // Private Property(ies)
 inline Tokenizer::Tokenizer(Sequence const &sequence)
     : sequence_(sequence), it_(sequence.begin())
 {
-    skip(&isspace);
+    skip(&std::iswspace);
 }
 
 inline Tokenizer::Sequence Tokenizer::next(void)
 {
     decltype(next()) token;
-    if (!scan(token, &ischs) && !scan(token, &isalnum))
+    if (!scan(token, &ischs) &&
+        !scan(token, &isfwalnum) &&
+        !scan(token, &std::iswalnum))
     {
         token.assign(1, *it_);
         ++it_;
     }
 
-    skip(&isspace);
+    skip(&std::iswspace);
     return token;
 }
 
