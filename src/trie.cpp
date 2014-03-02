@@ -16,42 +16,30 @@ namespace esapp
  ************************************************/
 
 FreqTrie::FreqTrie(size_t max_depth, double smooth, Char boundary)
-    : freq_avg_(nullptr), max_depth_(max_depth),
-      smooth_(smooth), boundary_(boundary)
+    : max_depth_(max_depth), smooth_(smooth), boundary_(boundary)
 {
     root_ = new FreqTrieNode();
 }
 
 FreqTrie::FreqTrie(FreqTrie const &trie)
-    : freq_avg_(nullptr), max_depth_(trie.max_depth_),
+    : freq_avg_(trie.freq_avg_), max_depth_(trie.max_depth_),
       smooth_(trie.smooth_), boundary_(trie.boundary_)
 {
     root_ = new FreqTrieNode(*(trie.root_));
-    if (trie.freq_avg_)
-    {
-        auto trie_depth = trie.depth();
-        freq_avg_ = new double[trie_depth];
-        memcpy(freq_avg_, trie.freq_avg_, sizeof(double) * trie_depth);
-    }
 }
 
 FreqTrie::~FreqTrie(void)
 {
-    clear_fm();
     delete root_;
 }
 
 FreqTrie &FreqTrie::operator=(FreqTrie const &trie)
 {
     *root_ = *(trie.root_);
-
-    clear_fm();
-    if (trie.freq_avg_)
-    {
-        auto trie_depth = trie.depth();
-        freq_avg_ = new double[trie_depth];
-        memcpy(freq_avg_, trie.freq_avg_, sizeof(double) * trie_depth);
-    }
+    freq_avg_ = trie.freq_avg_;
+    max_depth_ = trie.max_depth_;
+    smooth_ = trie.smooth_;
+    boundary_ = trie.boundary_;
 
     return *this;
 }
@@ -116,13 +104,8 @@ void FreqTrie::update_hsp1(void)
     auto trie_depth = depth();
     auto num_alphabets = root_->children.size() + 1;
 
-    auto *nums = new size_t[trie_depth];
-    auto *hl_avg = new double[trie_depth];
-    auto *hr_avg = new double[trie_depth];
-
-    memset(nums, 0, sizeof(size_t) * trie_depth);
-    memset(hl_avg, 0, sizeof(double) * trie_depth);
-    memset(hr_avg, 0, sizeof(double) * trie_depth);
+    std::vector<decltype(trie_depth)> nums(trie_depth, 0);
+    std::vector<double> hl_avg(trie_depth, 0), hr_avg(trie_depth, 0);
 
     for (auto const &node : *this)
     {
@@ -146,22 +129,14 @@ void FreqTrie::update_hsp1(void)
         node.second->hl /= hl_avg[node_depth];
         node.second->hr /= hr_avg[node_depth];
     }
-
-    delete [] nums;
-    delete [] hl_avg;
-    delete [] hr_avg;
 }
 
 void FreqTrie::update_fm(void)
 {
-    clear_fm();
-
     auto trie_depth = depth();
-    auto *nums = new size_t[trie_depth];
-    freq_avg_ = new double[trie_depth];
 
-    memset(nums, 0, sizeof(size_t) * trie_depth);
-    memset(freq_avg_, 0, sizeof(double) * trie_depth);
+    std::vector<decltype(trie_depth)> nums(trie_depth, 0);
+    freq_avg_.assign(trie_depth, 0);
 
     for (auto const &node : *this)
     {
@@ -174,13 +149,11 @@ void FreqTrie::update_fm(void)
     {
         freq_avg_[i] /= nums[i];
     }
-
-    delete [] nums;
 }
 
 void FreqTrie::update_iv(void)
 {
-    if (freq_avg_ == nullptr) { throw std::exception(); }
+    if (freq_avg_.empty()) { throw std::exception(); }
 
     for (auto const &node : *this)
     {
@@ -306,20 +279,9 @@ double FreqTrie::entropy(CharCounts counts, size_t num_events)
     return h;
 }
 
-void FreqTrie::clear_fm(void)
-{
-    if (freq_avg_ != nullptr)
-    {
-        delete [] freq_avg_;
-    }
-
-    freq_avg_ = nullptr;
-}
-
 void FreqTrie::clear(void)
 {
     root_->clear();
-    clear_fm();
 }
 
 /************************************************

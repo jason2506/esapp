@@ -83,11 +83,10 @@ private: // Private Method(s)
                              Sequence::const_iterator const &end) const;
 
     double entropy(CharCounts counts, size_t num_events);
-    void clear_fm(void);
 
 private: // Private Property(ies)
     FreqTrieNode *root_;
-    double *freq_avg_;
+    std::vector<double> freq_avg_;
     size_t max_depth_;
     double smooth_;
     Char boundary_;
