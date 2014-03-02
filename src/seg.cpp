@@ -43,7 +43,8 @@ void Segmenter::fit(std::vector<std::wstring> const &sequences)
     trie_.update_fm();
     trie_.update_iv();
 
-    std::vector<Seg> prev_segs, segs(tokens.size());
+    std::vector<Seg> prev_segs, segs;
+    segs.reserve(tokens.size());
     for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
     {
         auto it = tokens.begin();
@@ -98,6 +99,7 @@ std::vector<std::vector<std::wstring>> Segmenter::segment(
     std::vector<std::wstring> const &sequences) const
 {
     decltype(segment(sequences)) words_list;
+    words_list.reserve(sequences.size());
     for (auto const &sequence : sequences)
     {
         words_list.push_back(segment(sequence));
@@ -110,6 +112,7 @@ std::vector<std::vector<std::string>> Segmenter::segment(
     std::vector<std::string> const &sequences) const
 {
     decltype(segment(sequences)) words_list;
+    words_list.reserve(sequences.size());
     for (auto const &sequence : sequences)
     {
         words_list.push_back(segment(sequence));
@@ -132,6 +135,7 @@ std::vector<std::vector<std::string>> Segmenter::fit_and_segment(
     fit(ws_sequences);
 
     decltype(fit_and_segment(sequences)) words_list;
+    words_list.reserve(sequences.size());
     for (auto const &sequence : ws_sequences)
     {
         words_list.push_back(vec_ws2s(segment(sequence)));
@@ -224,6 +228,7 @@ std::vector<std::wstring> Segmenter::segment_sequence(
     std::wstring const &sequence, Seg const &seg) const
 {
     decltype(segment_sequence(sequence, seg)) words;
+    words.reserve(seg.size() + 1);
     segment_sequence(words, sequence, seg);
     return words;
 }

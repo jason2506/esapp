@@ -26,8 +26,10 @@ inline std::wstring s2ws(std::string const &str)
 
 inline std::vector<std::wstring> vec_s2ws(std::vector<std::string> const &vec)
 {
-    decltype(vec_s2ws(vec)) ws_vec(vec.size());
-    std::transform(vec.begin(), vec.end(), ws_vec.begin(), &s2ws);
+    decltype(vec_s2ws(vec)) ws_vec;
+    ws_vec.reserve(vec.size());
+    std::transform(vec.begin(), vec.end(),
+                   std::back_inserter(ws_vec), &s2ws);
     return ws_vec;
 }
 
@@ -39,8 +41,10 @@ inline std::string ws2s(std::wstring const &wstr)
 
 inline std::vector<std::string> vec_ws2s(std::vector<std::wstring> const &ws_vec)
 {
-    decltype(vec_ws2s(ws_vec)) vec(ws_vec.size());
-    std::transform(ws_vec.begin(), ws_vec.end(), vec.begin(), &ws2s);
+    decltype(vec_ws2s(ws_vec)) vec;
+    vec.reserve(ws_vec.size());
+    std::transform(ws_vec.begin(), ws_vec.end(),
+                   std::back_inserter(vec), &ws2s);
     return vec;
 }
 
