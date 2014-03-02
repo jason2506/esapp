@@ -34,19 +34,29 @@ cdef class Segmenter(object):
         del self._segmenter
 
     cpdef list fit_and_segment(self, sequences):
-        cdef vector[vector[string]] words_list
-        cdef vector[string] words
-        words_list = self._segmenter.fit_and_segment(to_string_vector(sequences))
-        return [from_string_vector(words) for words in words_list]
+        cdef vector[string] cpp_sequences, words
+        cdef string sequence
+        cpp_sequences = to_string_vector(sequences)
+        self._segmenter.fit(cpp_sequences)
+
+        result = []
+        for sequence in cpp_sequences:
+            words = self._segmenter.segment(sequence)
+            result.append(from_string_vector(words))
+        return result
 
     cpdef fit(self, sequences):
         self._segmenter.fit(to_string_vector(sequences))
 
     cpdef list segment_all(self, sequences):
-        cdef vector[vector[string]] words_list
         cdef vector[string] words
-        words_list = self._segmenter.segment(to_string_vector(sequences))
-        return [from_string_vector(words) for words in words_list]
+        cdef unicode sequence
+
+        result = []
+        for sequence in sequences:
+            words = self._segmenter.segment(sequence.encode('utf-8'))
+            result.append(from_string_vector(words))
+        return result
 
     cpdef list segment(self, unicode sequence):
         cdef vector[string] words
