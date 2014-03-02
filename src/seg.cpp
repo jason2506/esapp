@@ -71,7 +71,7 @@ void Segmenter::fit(std::vector<std::wstring> const &sequences)
 
 void Segmenter::fit(std::vector<std::string> const &sequences)
 {
-    auto ws_sequences = vec_s2ws(sequences);
+    auto ws_sequences = s2ws(sequences);
     fit(ws_sequences);
 }
 
@@ -92,7 +92,7 @@ std::vector<std::wstring> Segmenter::segment(std::wstring const &sequence) const
 
 std::vector<std::string> Segmenter::segment(std::string const &sequence) const
 {
-    return vec_ws2s(segment(s2ws(sequence)));
+    return ws2s(segment(s2ws(sequence)));
 }
 
 std::vector<std::vector<std::wstring>> Segmenter::segment(
@@ -131,14 +131,14 @@ std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
 std::vector<std::vector<std::string>> Segmenter::fit_and_segment(
     std::vector<std::string> const &sequences)
 {
-    auto ws_sequences = vec_s2ws(sequences);
+    auto ws_sequences = s2ws(sequences);
     fit(ws_sequences);
 
     decltype(fit_and_segment(sequences)) words_list;
     words_list.reserve(sequences.size());
     for (auto const &sequence : ws_sequences)
     {
-        words_list.push_back(vec_ws2s(segment(sequence)));
+        words_list.push_back(ws2s(segment(sequence)));
     }
 
     return words_list;
