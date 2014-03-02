@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <iterator>
+#include <memory>
 #include <stack>
 #include <string>
 #include <utility>
@@ -33,7 +34,6 @@ public: // Public Type(s)
 public: // Public Method(s)
     FreqTrie(size_t max_depth = 30, double smooth = 0.0, Char boundary = '\0');
     FreqTrie(FreqTrie const &trie);
-    ~FreqTrie(void);
 
     FreqTrie &operator=(FreqTrie const &node);
 
@@ -85,7 +85,7 @@ private: // Private Method(s)
     double entropy(CharCounts counts, size_t num_events);
 
 private: // Private Property(ies)
-    FreqTrieNode *root_;
+    std::unique_ptr<FreqTrieNode> root_;
     std::vector<double> freq_avg_;
     size_t max_depth_;
     double smooth_;

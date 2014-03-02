@@ -16,21 +16,18 @@ namespace esapp
  ************************************************/
 
 FreqTrie::FreqTrie(size_t max_depth, double smooth, Char boundary)
-    : max_depth_(max_depth), smooth_(smooth), boundary_(boundary)
+    : root_(new FreqTrieNode()), max_depth_(max_depth),
+      smooth_(smooth), boundary_(boundary)
 {
-    root_ = new FreqTrieNode();
+    // dn nothing
 }
 
 FreqTrie::FreqTrie(FreqTrie const &trie)
-    : freq_avg_(trie.freq_avg_), max_depth_(trie.max_depth_),
-      smooth_(trie.smooth_), boundary_(trie.boundary_)
+    : root_(new FreqTrieNode(*(trie.root_))), freq_avg_(trie.freq_avg_),
+      max_depth_(trie.max_depth_), smooth_(trie.smooth_),
+      boundary_(trie.boundary_)
 {
-    root_ = new FreqTrieNode(*(trie.root_));
-}
-
-FreqTrie::~FreqTrie(void)
-{
-    delete root_;
+    // do nothing
 }
 
 FreqTrie &FreqTrie::operator=(FreqTrie const &trie)
@@ -49,7 +46,7 @@ void FreqTrie::increase(Sequence const &sequence, bool include_self)
     auto n = sequence.size();
     for (decltype(n) i = 0; i < n; ++i)
     {
-        auto *node = root_;
+        auto *node = root_.get();
         for (decltype(n) j = i; j < n && j - i < max_depth_; ++j)
         {
             if (!include_self && i == 0 && j == n - 1) { continue; }
@@ -79,7 +76,7 @@ void FreqTrie::decrease(Sequence const &sequence, bool include_self)
     auto n = sequence.size();
     for (decltype(n) i = 0; i < n; ++i)
     {
-        auto *node = root_;
+        auto *node = root_.get();
         for (decltype(n) j = i; j < n && j - i < max_depth_; ++j)
         {
             if (!include_self && i == 0 && j == n - 1) { continue; }
@@ -217,12 +214,12 @@ size_t FreqTrie::max_depth(void) const
 
 FreqTrie::Iterator FreqTrie::begin(void)
 {
-    return ++Iterator(root_);
+    return ++Iterator(root_.get());
 }
 
 FreqTrie::ConstIterator FreqTrie::begin(void) const
 {
-    return ++ConstIterator(root_);
+    return ++ConstIterator(root_.get());
 }
 
 FreqTrie::Iterator FreqTrie::end(void)
@@ -244,7 +241,7 @@ FreqTrie::FreqTrieNode const *FreqTrie::find(
     Sequence::const_iterator const &begin,
     Sequence::const_iterator const &end) const
 {
-    auto *node = root_;
+    auto *node = root_.get();
     for (auto it = begin; it != end; ++it)
     {
         node = node->get(*it);
