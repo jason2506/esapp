@@ -19,7 +19,11 @@ FreqTrie::FreqTrie(size_t max_depth, double smooth, Char boundary)
     : root_(new FreqTrieNode()), max_depth_(max_depth),
       smooth_(smooth), boundary_(boundary)
 {
-    // dn nothing
+    if (smooth_ < 0)
+    {
+        throw std::invalid_argument("The smoothing parameter must be " \
+                                    "greater than 0.");
+    }
 }
 
 FreqTrie::FreqTrie(FreqTrie const &trie)
@@ -150,7 +154,11 @@ void FreqTrie::update_fm(void)
 
 void FreqTrie::update_iv(void)
 {
-    if (freq_avg_.empty()) { throw std::exception(); }
+    if (freq_avg_.empty())
+    {
+        throw std::logic_error("FreqTrie::update_iv() must be called after " \
+                               "calling FreqTrie::update_fm().");
+    }
 
     for (auto const &node : *this)
     {

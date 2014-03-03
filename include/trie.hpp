@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <iterator>
+#include <stdexcept>
 #include <memory>
 #include <stack>
 #include <string>

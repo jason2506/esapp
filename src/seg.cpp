@@ -19,7 +19,11 @@ Segmenter::Segmenter(double lrv_exp, size_t max_iters,
                      size_t max_length, double smooth)
     : trie_(max_length, smooth), lrv_exp_(lrv_exp), max_iters_(max_iters)
 {
-    // do nothing
+    if (lrv_exp_ < 0)
+    {
+        throw std::invalid_argument("The exponent parameter of LRV must be " \
+                                    "greater than 0.");
+    }
 }
 
 void Segmenter::fit(std::vector<std::wstring> const &sequences)
