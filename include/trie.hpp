@@ -9,6 +9,7 @@
 #ifndef ESAPP_TRIE_HPP_
 #define ESAPP_TRIE_HPP_
 
+#include <cmath>
 #include <unordered_map>
 #include <algorithm>
 #include <iterator>
