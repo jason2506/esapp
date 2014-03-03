@@ -107,7 +107,7 @@ public: // Public Type(s)
     typedef value_type const &reference;
 
 public: // Public Method(s)
-    BaseIterator(void);
+    BaseIterator(void) = default;
     BaseIterator(T *node);
 
     BaseIterator &operator++(void);

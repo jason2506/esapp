@@ -286,15 +286,7 @@ void FreqTrie::clear(void)
  ************************************************/
 
 template<typename T>
-FreqTrie::BaseIterator<T>::BaseIterator(void)
-    : stack_()
-{
-    // do nothing
-}
-
-template<typename T>
 FreqTrie::BaseIterator<T>::BaseIterator(T *node)
-    : stack_()
 {
     stack_.push(std::make_pair(0, node));
 }
