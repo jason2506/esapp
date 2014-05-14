@@ -379,7 +379,7 @@ FreqTrie::FreqTrieNode *FreqTrie::FreqTrieNode::get(Char key, bool create)
     if (it != children.end())   { return &(it->second); }
     else if (!create)           { return nullptr; }
 
-    children.emplace(key);
+    children.emplace(key, FreqTrieNode());
     return &(children[key]);
 }
 
