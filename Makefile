@@ -24,7 +24,7 @@ vpath %.a $(LIB_PATH)
 all: $(TARGET) $(EXAMPLE)
 
 $(EXAMPLE): $(TARGET) $(EXAMPLE).o
-	$(CXX) $(EX_PATH)/$@.cpp -I$(INC_PATH) -L$(LIB_PATH) -l$(LIB) -o $(EX_PATH)/$@ -std=c++11
+	$(CXX) $(EX_PATH)/$@.cpp -I$(INC_PATH) -L$(LIB_PATH) -l$(LIB) $(CXXFLAGS) -o $(EX_PATH)/$@
 
 $(EXAMPLE).o: $(EX_PATH)/$(EXAMPLE).cpp
 	@mkdir -p $(OBJ_PATH)
