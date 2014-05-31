@@ -406,4 +406,4 @@ void FreqTrie::FreqTrieNode::clear(void)
     f = hl = hr = iv = 0;
 }
 
-} // namespace esa
+} // namespace esapp

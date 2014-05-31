@@ -145,6 +145,6 @@ struct FreqTrie::FreqTrieNode
     double hl, hr, iv;
 }; // struct FreqTrie::FreqTrieNode
 
-} // namespace esa
+} // namespace esapp
 
 #endif // ESAPP_TRIE_HPP_

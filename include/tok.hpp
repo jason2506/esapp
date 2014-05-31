@@ -106,6 +106,6 @@ inline bool Tokenizer::scan(Sequence &token, Predicate pred)
     return scanned;
 }
 
-} // namespace esa
+} // namespace esapp
 
 #endif // ESAPP_TOK_HPP_

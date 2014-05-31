@@ -64,6 +64,6 @@ private: // Private Property(ies)
     size_t max_iters_;
 }; // class Segmenter
 
-} // namespace esa
+} // namespace esapp
 
 #endif // ESAPP_SEG_HPP_

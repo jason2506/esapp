@@ -237,4 +237,4 @@ std::vector<std::wstring> Segmenter::segment_sequence(
     return words;
 }
 
-} // namespace esa
+} // namespace esapp

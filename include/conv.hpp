@@ -55,6 +55,6 @@ inline std::vector<std::string> ws2s(std::vector<std::wstring> const &ws_vec)
     return transform<OutType, InType>(ws_vec, &ws2s);
 }
 
-} // namespace esa
+} // namespace esapp
 
 #endif // ESAPP_CONV_HPP_
