@@ -9,15 +9,10 @@
 #ifndef ESAPP_TRIE_HPP_
 #define ESAPP_TRIE_HPP_
 
-#include <cmath>
 #include <unordered_map>
-#include <algorithm>
-#include <iterator>
-#include <stdexcept>
-#include <memory>
-#include <stack>
-#include <string>
 #include <utility>
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace esapp
@@ -31,119 +26,173 @@ class FreqTrie
 {
 public: // Public Type(s)
     typedef wchar_t Term;
-    typedef std::basic_string<Term> Sequence;
+
+    struct Node;
+    typedef std::shared_ptr<Node> NodePtr;
 
 public: // Public Method(s)
-    FreqTrie(size_t max_depth = 30, double smooth = 0.0, Term boundary = '\0');
+    FreqTrie(void);
     FreqTrie(FreqTrie const &trie);
+
+    template <typename Iterator>
+    NodePtr insert(Iterator const &begin, Iterator const &end);
+
+    template <typename Iterator>
+    NodePtr const find(Iterator const &begin, Iterator const &end) const;
+
+    template <typename Iterator>
+    void increase(Iterator const &begin, Iterator const &end);
+
+    template <typename Iterator>
+    void decrease(Iterator const &begin, Iterator const &end);
 
     FreqTrie &operator=(FreqTrie const &node);
 
-    void increase(Sequence const &sequence, bool include_self = true);
-    void increase(std::vector<Sequence> const &sequences,
-                  bool include_self = true);
-    void decrease(Sequence const &sequence, bool include_self = true);
-    void decrease(std::vector<Sequence> const &sequences,
-                  bool include_self = true);
-
-    void update_hsp1(void);
-    void update_fm(void);
-    void update_iv(void);
-
-    double get_hl(Sequence const &sequence) const;
-    double get_hl(Sequence::const_iterator const &begin,
-                  Sequence::const_iterator const &end) const;
-    double get_hr(Sequence const &sequence) const;
-    double get_hr(Sequence::const_iterator const &begin,
-                  Sequence::const_iterator const &end) const;
-    double get_iv(Sequence const &sequence) const;
-    double get_iv(Sequence::const_iterator const &begin,
-                  Sequence::const_iterator const &end) const;
-
-    size_t depth(void) const;
-    size_t max_depth(void) const;
     void clear(void);
 
 private: // Private Type(s)
-    struct FreqTrieNode;
-    template<typename T> class BaseIterator;
-
-    typedef BaseIterator<FreqTrieNode> Iterator;
-    typedef BaseIterator<FreqTrieNode const> ConstIterator;
-
-    typedef std::unordered_map<Term, FreqTrieNode> NodeCollection;
-    typedef std::unordered_map<Term, size_t> TermCounts;
-
-private: // Private Method(s)
-    Iterator begin(void);
-    ConstIterator begin(void) const;
-    Iterator end(void);
-    ConstIterator end(void) const;
-
-    FreqTrieNode const *find(Sequence const &sequence) const;
-    FreqTrieNode const *find(Sequence::const_iterator const &begin,
-                             Sequence::const_iterator const &end) const;
-
-    double entropy(TermCounts counts, size_t num_events);
+    typedef std::unordered_map<Term, NodePtr> NodeCollection;
 
 private: // Private Property(ies)
-    std::unique_ptr<FreqTrieNode> root_;
-    std::vector<double> freq_avg_;
-    size_t max_depth_;
-    double smooth_;
-    Term boundary_;
+    NodePtr root_;
 }; // class FreqTrie
 
 /************************************************
- * Declaration: class FreqTrie::Iterator
+ * Declaration: struct FreqTrie::Node
  ************************************************/
 
-template<typename T>
-class FreqTrie::BaseIterator
+struct FreqTrie::Node
 {
-public: // Public Type(s)
-    typedef std::input_iterator_tag iterator_category;
-    typedef std::pair<size_t, T *> value_type;
-    typedef ptrdiff_t difference_type;
-    typedef value_type const *pointer;
-    typedef value_type const &reference;
+    Node(void);
 
-public: // Public Method(s)
-    BaseIterator(void) = default;
-    BaseIterator(T *node);
-
-    BaseIterator &operator++(void);
-    BaseIterator operator++(int);
-
-    reference operator*(void) const;
-    pointer operator->(void) const;
-
-    bool operator==(BaseIterator const &it) const;
-    bool operator!=(BaseIterator const &it) const;
-
-private: // Private Property(ies)
-    std::stack<value_type> stack_;
-}; // class FreqTrie::BaseIterator
-
-/************************************************
- * Declaration: struct FreqTrie::FreqTrieNode
- ************************************************/
-
-struct FreqTrie::FreqTrieNode
-{
-    FreqTrieNode(void);
-
-    FreqTrieNode const *get(Term key) const;
-    FreqTrieNode *get(Term key, bool create = false);
-    size_t depth(void) const;
+    FreqTrie::NodePtr const get(Term key) const;
+    FreqTrie::NodePtr get(Term key, bool create = false);
     void clear(void);
 
     FreqTrie::NodeCollection children;
-    FreqTrie::TermCounts sp1l;
-    FreqTrie::TermCounts sp1r;
     size_t f;
-    double hl, hr, iv;
-}; // struct FreqTrie::FreqTrieNode
+    double hl, hr;
+}; // struct FreqTrie::Node
+
+/************************************************
+ * Implementation: class FreqTrie
+ ************************************************/
+
+inline FreqTrie::FreqTrie(void)
+    : root_(new Node())
+{
+    // do nothing
+}
+
+inline FreqTrie::FreqTrie(FreqTrie const &trie)
+    : root_(new Node(*(trie.root_)))
+{
+    // do nothing
+}
+
+inline FreqTrie &FreqTrie::operator=(FreqTrie const &trie)
+{
+    *root_ = *(trie.root_);
+    return *this;
+}
+
+template <typename Iterator>
+FreqTrie::NodePtr FreqTrie::insert(Iterator const &begin, Iterator const &end)
+{
+    auto node = root_;
+    for (auto it = begin; it != end; ++it)
+    {
+        node = node->get(*it, true);
+    }
+
+    return node;
+}
+
+template <typename Iterator>
+FreqTrie::NodePtr const FreqTrie::find(Iterator const &begin, Iterator const &end) const
+{
+    auto node = root_;
+    for (auto it = begin; it != end; ++it)
+    {
+        node = node->get(*it);
+        if (!node) { break; }
+    }
+
+    return node;
+}
+
+template <typename Iterator>
+void FreqTrie::increase(Iterator const &begin, Iterator const &end)
+{
+    for (auto it_begin = begin; it_begin != end; ++it_begin)
+    {
+        auto node = root_;
+        for (auto it = it_begin; it != end; ++it)
+        {
+            if (it_begin == begin && it + 1 == end) { continue; }
+
+            node = node->get(*it);
+            if (!node) { break; }
+
+            node->f++;
+        }
+    }
+}
+
+template <typename Iterator>
+void FreqTrie::decrease(Iterator const &begin, Iterator const &end)
+{
+    for (auto it_begin = begin; it_begin != end; ++it_begin)
+    {
+        auto node = root_;
+        for (auto it = it_begin; it != end; ++it)
+        {
+            if (it_begin == begin && it + 1 == end) { continue; }
+
+            node = node->get(*it);
+            if (!node) { break; }
+
+            node->f--;
+        }
+    }
+}
+
+inline void FreqTrie::clear(void)
+{
+    root_->clear();
+}
+
+/************************************************
+ * Implementation: struct FreqTrie::FreqTrieNode
+ ************************************************/
+
+inline FreqTrie::Node::Node(void)
+    : f(0), hl(0), hr(0)
+{
+    // do nothing
+}
+
+inline FreqTrie::NodePtr const FreqTrie::Node::get(Term key) const
+{
+    auto it = children.find(key);
+    return (it != children.end()) ? it->second : NodePtr();
+}
+
+inline FreqTrie::NodePtr FreqTrie::Node::get(Term key, bool create)
+{
+    auto it = children.find(key);
+    if (it != children.end())   { return it->second; }
+    else if (!create)           { return NodePtr(); }
+
+    children.emplace(key, NodePtr(new Node()));
+    return children[key];
+}
+
+inline void FreqTrie::Node::clear(void)
+{
+    children.clear();
+    f = hl = hr = 0;
+}
 
 } // namespace esapp
 

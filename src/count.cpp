@@ -17,14 +17,22 @@ const StringCounter::TermId StringCounter::BOUNDARY_ = 0;
  * Implementation: class StringCounter
  ************************************************/
 
-StringCounter::StringCounter(size_t max_len, double smooth, Term boundary)
-    : max_len_(max_len), smooth_(smooth), boundary_(boundary),
+StringCounter::StringCounter(size_t max_len, double smooth,
+                             size_t min_store_len, Term boundary)
+    : max_len_(max_len), smooth_(smooth),
+      min_store_len_(min_store_len), boundary_(boundary),
       f_avgs_(max_len), hl_avgs_(max_len), hr_avgs_(max_len), str_nums_(max_len)
 {
     if (smooth_ < 0)
     {
         throw std::invalid_argument("The smoothing parameter must be " \
                                     "greater than or equal to 0.");
+    }
+
+    if (min_store_len_ < 1)
+    {
+        throw std::invalid_argument("Minimum store length must be " \
+                                    "greater than or equal to 1.");
     }
 }
 
@@ -52,7 +60,7 @@ void StringCounter::fit(std::vector<Sequence> const &sequences)
 
 void StringCounter::set_pres(std::vector<size_t> pres, size_t p, size_t n)
 {
-    // update preserve lengths
+    // update preserve lengths (for suffix array)
     size_t len = 1;
     for (auto i = n - 1, j = pres.size(); i > 0; i--)
     {
@@ -66,12 +74,34 @@ void StringCounter::set_pres(std::vector<size_t> pres, size_t p, size_t n)
     }
 
     count_min_lens_[p] = len - 1;
+
+    // update trie
+    auto &s = sa_.data();
+    auto i = p;
+    for (auto pos : pres)
+    {
+        trie_.decrease(s.begin() + i, s.begin() + p + pos);
+        i = p + pos;
+    }
+
+    trie_.decrease(s.begin() + i, s.begin() + p + n);
 }
 
 void StringCounter::unset_pres(std::vector<size_t> pres, size_t p, size_t n)
 {
-    // update preserve lengths
+    // update preserve lengths (for suffix array)
     std::fill(count_min_lens_.begin() + p, count_min_lens_.begin() + p + n, 0);
+
+    // update trie
+    auto &s = sa_.data();
+    auto i = p;
+    for (auto pos : pres)
+    {
+        trie_.increase(s.begin() + i, s.begin() + p + pos);
+        i = p + pos;
+    }
+
+    trie_.increase(s.begin() + i, s.begin() + p + n);
 }
 
 double StringCounter::get_iv(size_t i, size_t n) const
@@ -82,11 +112,20 @@ double StringCounter::get_iv(size_t i, size_t n) const
     IdSequence t(s.begin() + i, s.begin() + i + n);
 
     auto lb = sa_.lower_bound(t), ub = sa_.upper_bound(t);
+    auto count = ub - lb;
     double f = 0;
-    for (auto it = lb; it != ub; ++it)
+    if (count > min_store_len_)
     {
-        auto j = *it;
-        if (n > count_min_lens_[j]) { f += 1; }
+        auto node = trie_.find(t.begin(), t.end());
+        f = node->f;
+    }
+    else
+    {
+        for (auto it = lb; it != ub; ++it)
+        {
+            auto j = *it;
+            if (n > count_min_lens_[j]) { f += 1; }
+        }
     }
 
     return pow(f / f_avgs_[n - 1], n);
@@ -100,15 +139,27 @@ double StringCounter::get_hl(size_t i, size_t n) const
     IdSequence t(s.begin() + i, s.begin() + i + n);
 
     auto lb = sa_.lower_bound(t), ub = sa_.upper_bound(t);
-    TermCounts sp1l(char_id_map_.size());
-    for (auto it = lb; it != ub; ++it)
+    auto count = ub - lb;
+    double hl;
+    if (count > min_store_len_)
     {
-        auto j = *it;
-        if (j > 0)              { sp1l[s[j - 1]]++; }
-        else                    { sp1l[BOUNDARY_]++; }
+        auto node = trie_.find(t.begin(), t.end());
+        hl = node->hl;
+    }
+    else
+    {
+        TermCounts sp1l(char_id_map_.size());
+        for (auto it = lb; it != ub; ++it)
+        {
+            auto j = *it;
+            if (j > 0)              { sp1l[s[j - 1]]++; }
+            else                    { sp1l[BOUNDARY_]++; }
+        }
+
+        hl = entropy(sp1l);
     }
 
-    return entropy(sp1l) / hl_avgs_[n - 1];
+    return hl / hl_avgs_[n - 1];
 }
 
 double StringCounter::get_hr(size_t i, size_t n) const
@@ -119,15 +170,27 @@ double StringCounter::get_hr(size_t i, size_t n) const
     IdSequence t(s.begin() + i, s.begin() + i + n);
 
     auto lb = sa_.lower_bound(t), ub = sa_.upper_bound(t);
-    TermCounts sp1r(char_id_map_.size());
-    for (auto it = lb; it != ub; ++it)
+    auto count = ub - lb;
+    double hr;
+    if (count > min_store_len_)
     {
-        auto j = *it;
-        if (j + n < sa_.size()) { sp1r[s[j + n]]++; }
-        else                    { sp1r[BOUNDARY_]++; }
+        auto node = trie_.find(t.begin(), t.end());
+        hr = node->hr;
+    }
+    else
+    {
+        TermCounts sp1r(char_id_map_.size());
+        for (auto it = lb; it != ub; ++it)
+        {
+            auto j = *it;
+            if (j + n < sa_.size()) { sp1r[s[j + n]]++; }
+            else                    { sp1r[BOUNDARY_]++; }
+        }
+
+        hr = entropy(sp1r);
     }
 
-    return entropy(sp1r) / hr_avgs_[n - 1];
+    return hr / hr_avgs_[n - 1];
 }
 
 StringCounter::IdSequence StringCounter::init_char_id_map(Sequence const &s)
@@ -218,6 +281,15 @@ void StringCounter::calc_avg(void)
                 hl_avgs_[j] += hl;
                 hr_avgs_[j] += hr;
                 str_nums_[j]++;
+                if (f > min_store_len_)
+                {
+                    auto node = trie_.insert(s.begin() + sa_[i - 1],
+                                             s.begin() + sa_[i - 1] + j + 1);
+                    node->f = f;
+                    node->hl = hl;
+                    node->hr = hr;
+                }
+
                 sp1r_vec[j].clear();
             }
 
@@ -289,6 +361,15 @@ void StringCounter::calc_avg(void)
             hl_avgs_[j] += hl;
             hr_avgs_[j] += hr;
             str_nums_[j]++;
+            if (f > min_store_len_)
+            {
+                auto node = trie_.insert(s.begin() + sa_[i],
+                                         s.begin() + sa_[i] + j + 1);
+                node->f = f;
+                node->hl = hl;
+                node->hr = hr;
+            }
+
             sp1r_vec[j].clear();
         }
 

@@ -33,7 +33,8 @@ public: // Public Type(s)
     typedef std::basic_string<Term> Sequence;
 
 public: // Public Method(s)
-    StringCounter(size_t max_len = 30, double smooth = 0.0, Term boundary = 0);
+    StringCounter(size_t max_len = 30, double smooth = 0.0,
+                  size_t min_store_len = 1, Term boundary = 0);
 
     void fit(std::vector<Sequence> const &sequences);
 
@@ -62,6 +63,7 @@ private: // Private Method(s)
 private: // Private Property(ies)
     size_t max_len_;
     double smooth_;
+    size_t min_store_len_;
     Term boundary_;
 
     std::vector<double> f_avgs_;
@@ -72,6 +74,7 @@ private: // Private Property(ies)
     std::vector<size_t> count_min_lens_;
     std::unordered_map<Term, TermId> char_id_map_;
 
+    FreqTrie trie_;
     SuffixArray sa_;
 
     static const TermId BOUNDARY_;
