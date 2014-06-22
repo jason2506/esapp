@@ -30,11 +30,11 @@ namespace esapp
 class FreqTrie
 {
 public: // Public Type(s)
-    typedef wchar_t Char;
-    typedef std::basic_string<Char> Sequence;
+    typedef wchar_t Term;
+    typedef std::basic_string<Term> Sequence;
 
 public: // Public Method(s)
-    FreqTrie(size_t max_depth = 30, double smooth = 0.0, Char boundary = '\0');
+    FreqTrie(size_t max_depth = 30, double smooth = 0.0, Term boundary = '\0');
     FreqTrie(FreqTrie const &trie);
 
     FreqTrie &operator=(FreqTrie const &node);
@@ -71,8 +71,8 @@ private: // Private Type(s)
     typedef BaseIterator<FreqTrieNode> Iterator;
     typedef BaseIterator<FreqTrieNode const> ConstIterator;
 
-    typedef std::unordered_map<Char, FreqTrieNode> NodeCollection;
-    typedef std::unordered_map<Char, size_t> CharCounts;
+    typedef std::unordered_map<Term, FreqTrieNode> NodeCollection;
+    typedef std::unordered_map<Term, size_t> TermCounts;
 
 private: // Private Method(s)
     Iterator begin(void);
@@ -84,14 +84,14 @@ private: // Private Method(s)
     FreqTrieNode const *find(Sequence::const_iterator const &begin,
                              Sequence::const_iterator const &end) const;
 
-    double entropy(CharCounts counts, size_t num_events);
+    double entropy(TermCounts counts, size_t num_events);
 
 private: // Private Property(ies)
     std::unique_ptr<FreqTrieNode> root_;
     std::vector<double> freq_avg_;
     size_t max_depth_;
     double smooth_;
-    Char boundary_;
+    Term boundary_;
 }; // class FreqTrie
 
 /************************************************
@@ -133,14 +133,14 @@ struct FreqTrie::FreqTrieNode
 {
     FreqTrieNode(void);
 
-    FreqTrieNode const *get(Char key) const;
-    FreqTrieNode *get(Char key, bool create = false);
+    FreqTrieNode const *get(Term key) const;
+    FreqTrieNode *get(Term key, bool create = false);
     size_t depth(void) const;
     void clear(void);
 
     FreqTrie::NodeCollection children;
-    FreqTrie::CharCounts sp1l;
-    FreqTrie::CharCounts sp1r;
+    FreqTrie::TermCounts sp1l;
+    FreqTrie::TermCounts sp1r;
     size_t f;
     double hl, hr, iv;
 }; // struct FreqTrie::FreqTrieNode

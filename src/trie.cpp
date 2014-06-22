@@ -15,7 +15,7 @@ namespace esapp
  * Implementation: class FreqTrie
  ************************************************/
 
-FreqTrie::FreqTrie(size_t max_depth, double smooth, Char boundary)
+FreqTrie::FreqTrie(size_t max_depth, double smooth, Term boundary)
     : root_(new FreqTrieNode()), max_depth_(max_depth),
       smooth_(smooth), boundary_(boundary)
 {
@@ -259,7 +259,7 @@ FreqTrie::FreqTrieNode const *FreqTrie::find(
     return node;
 }
 
-double FreqTrie::entropy(CharCounts counts, size_t num_events)
+double FreqTrie::entropy(TermCounts counts, size_t num_events)
 {
     auto n = num_events * smooth_;
     for (auto const &count : counts)
@@ -362,7 +362,7 @@ FreqTrie::FreqTrieNode::FreqTrieNode(void) : f(0), hl(0), hr(0), iv(0)
     // do nothing
 }
 
-FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Char key) const
+FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Term key) const
 {
     auto it = children.find(key);
     if (it != children.end())
@@ -373,7 +373,7 @@ FreqTrie::FreqTrieNode const *FreqTrie::FreqTrieNode::get(Char key) const
     return nullptr;
 }
 
-FreqTrie::FreqTrieNode *FreqTrie::FreqTrieNode::get(Char key, bool create)
+FreqTrie::FreqTrieNode *FreqTrie::FreqTrieNode::get(Term key, bool create)
 {
     auto it = children.find(key);
     if (it != children.end())   { return &(it->second); }
