@@ -144,8 +144,23 @@ Segmenter::Seg Segmenter::optimize_segment(std::wstring const &sequence) const
             fs[i][j] = 0;
             for (decltype(j) k = 1; k <= j; ++k)
             {
-                auto hr = trie_.get_hr(begin, begin + k);
-                auto hl = trie_.get_hl(begin + k, end);
+                // find right most boundary before position k
+                auto x = 0;
+                while (fs[i + x][k - x - 1] != 0)
+                {
+                    x += fs[i + x][k - x - 1];
+                }
+
+                // find left most boundary after position k
+                auto y = j - k + 1;
+                while (fs[i + k][y - 1] != 0)
+                {
+                    y = fs[i + k][y - 1];
+                }
+
+                // calculate combined goodness value for position k
+                auto hr = trie_.get_hr(begin + x, begin + (k - x));
+                auto hl = trie_.get_hl(begin + k, begin + k + y);
                 auto lrv = pow(hr * hl, lrv_exp_);
                 auto cv = fv[i][k - 1] * fv[i + k][j - k] * lrv;
                 if (cv > fv[i][j])
