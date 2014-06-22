@@ -31,17 +31,6 @@ public: // Public Method(s)
     Segmenter(double lrv_exp, size_t max_iters = 10,
               size_t max_length = 30, double smooth = 0.0);
 
-    void fit(std::vector<std::wstring> const &sequences);
-    void fit(std::vector<std::string> const &sequences);
-
-    std::vector<std::wstring> segment(std::wstring const &sequence) const;
-    std::vector<std::string> segment(std::string const &sequence) const;
-
-    std::vector<std::vector<std::wstring>> segment(
-        std::vector<std::wstring> const &sequences) const;
-    std::vector<std::vector<std::string>> segment(
-        std::vector<std::string> const &sequences) const;
-
     std::vector<std::vector<std::wstring>> fit_and_segment(
         std::vector<std::wstring> const &sequences);
     std::vector<std::vector<std::string>> fit_and_segment(

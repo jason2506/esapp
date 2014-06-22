@@ -29,16 +29,6 @@ int main(void)
 
     Segmenter segmenter(2.0, 10, 30, 3);
 
-    /*
-    segmenter.fit(sequences);
-    for (auto const &sequence : sequences)
-    {
-        auto words = segmenter.segment(sequence);
-        copy(words.begin(), words.end(), ostream_iterator<string>(cout, " "));
-        cout << endl;
-    }
-    //*/
-
     auto words_list = segmenter.fit_and_segment(sequences);
     for (auto const &words : words_list)
     {
