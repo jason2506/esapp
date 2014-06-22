@@ -42,7 +42,7 @@ void StringCounter::fit(std::vector<Sequence> const &sequences)
     auto s = sequences[0];
     for (decltype(sequences.size()) i = 1; i < sequences.size(); i++)
     {
-        s.push_back(L'\0');
+        s.push_back(boundary_);
         s.append(sequences[i]);
     }
 
