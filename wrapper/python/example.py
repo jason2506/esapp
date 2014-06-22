@@ -22,13 +22,6 @@ def main():
 
     segmenter = Segmenter(2.0, 10, 30, 3)
 
-    '''
-    segmenter.fit(sequences)
-    for sequence in sequences:
-        words = segmenter.segment(sequence)
-        print(' '.join(words))
-    #'''
-
     words_list = segmenter.fit_and_segment(sequences)
     for words in words_list:
         print(' '.join(words))
