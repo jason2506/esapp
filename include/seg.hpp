@@ -9,13 +9,14 @@
 #ifndef ESAPP_SEG_HPP_
 #define ESAPP_SEG_HPP_
 
+#include <cmath>
 #include <algorithm>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <cmath>
 
 #include "tok.hpp"
-#include "trie.hpp"
+#include "count.hpp"
 #include "conv.hpp"
 
 namespace esapp
@@ -40,7 +41,7 @@ private: // Private Type(s)
     typedef std::vector<size_t> Seg;
 
 private: // Private Method(s)
-    Seg optimize_segment(std::wstring const &sequence) const;
+    Seg optimize_segment(size_t p, size_t n) const;
     void generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) const;
     void segment_sequence(std::vector<std::wstring> &words,
                           std::wstring const &sequence, Seg const &seg) const;
@@ -48,7 +49,7 @@ private: // Private Method(s)
                                                Seg const &seg) const;
 
 private: // Private Property(ies)
-    FreqTrie trie_;
+    StringCounter counter_;
     double lrv_exp_;
     size_t max_iters_;
 }; // class Segmenter

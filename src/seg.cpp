@@ -17,12 +17,12 @@ namespace esapp
 
 Segmenter::Segmenter(double lrv_exp, size_t max_iters,
                      size_t max_length, double smooth)
-    : trie_(max_length, smooth), lrv_exp_(lrv_exp), max_iters_(max_iters)
+    : counter_(max_length, smooth), lrv_exp_(lrv_exp), max_iters_(max_iters)
 {
     if (lrv_exp_ < 0)
     {
         throw std::invalid_argument("The exponent parameter of LRV must be " \
-                                    "greater than 0.");
+                                    "greater than or equal to 0.");
     }
 }
 
@@ -43,41 +43,37 @@ std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
         }
     }
 
-    // construct trie
-    trie_.clear();
-    trie_.increase(tokens);
-    trie_.update_hsp1();
-    trie_.update_fm();
-    trie_.update_iv();
+    // construct substring counter
+    counter_.fit(tokens);
 
-    std::vector<Seg> prev_segs(tokens.size()), segs(tokens.size());
+    auto m = tokens.size();
+    std::vector<Seg> prev_segs(m), segs(m);
     for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
     {
-        // restore original substring counts
-        if (i > 0)
+        // segment sequences
+        for (decltype(m) j = 0, p = 0; j < m; ++j)
         {
-            auto it = tokens.begin();
-            for (auto const &seg : prev_segs)
-            {
-                trie_.increase(segment_sequence(*it, seg), false);
-                ++it;
-            }
-        }
-
-        // segment sequence and adjust substring counts
-        auto it = tokens.begin();
-        for (auto &seg : segs)
-        {
-            seg = optimize_segment(*it);
-            trie_.decrease(segment_sequence(*it, seg), false);
-            ++it;
+            auto n = tokens[j].size();
+            segs[j] = optimize_segment(p, tokens[j].size());
+            p += n + 1;
         }
 
         if (prev_segs == segs) { break; }
 
-        // update trie
+        // update substring counts
+        for (decltype(m) j = 0, p = 0; j < m; ++j)
+        {
+            auto n = tokens[j].size();
+            if (i > 0)
+            {
+                counter_.unset_pres(prev_segs[j], p, n);
+            }
+
+            counter_.set_pres(segs[j], p, n);
+            p += n + 1;
+        }
+
         prev_segs.swap(segs);
-        trie_.update_iv();
     }
 
     // generate segmented word lists
@@ -117,9 +113,8 @@ std::vector<std::vector<std::string>> Segmenter::fit_and_segment(
     return words_list;
 }
 
-Segmenter::Seg Segmenter::optimize_segment(std::wstring const &sequence) const
+Segmenter::Seg Segmenter::optimize_segment(size_t p, size_t n) const
 {
-    auto n = sequence.size();
     if (n == 0) { return Seg(); }
 
     auto m = n * (1 + n) / 2;
@@ -133,14 +128,11 @@ Segmenter::Seg Segmenter::optimize_segment(std::wstring const &sequence) const
         fv[i] = fv[i - 1] + offset;
     }
 
-    auto it = sequence.begin();
     for (decltype(n) j = 0; j < n; ++j)
     {
         for (decltype(n) i = 0; i + j < n; ++i)
         {
-            auto begin = it + i;
-            auto end = it + i + j + 1;
-            fv[i][j] = trie_.get_iv(begin, end);
+            fv[i][j] = counter_.get_iv(p + i, j + 1);
             fs[i][j] = 0;
             for (decltype(j) k = 1; k <= j; ++k)
             {
@@ -159,8 +151,8 @@ Segmenter::Seg Segmenter::optimize_segment(std::wstring const &sequence) const
                 }
 
                 // calculate combined goodness value for position k
-                auto hr = trie_.get_hr(begin + x, begin + (k - x));
-                auto hl = trie_.get_hl(begin + k, begin + k + y);
+                auto hr = counter_.get_hr(p + i + x, k - x);
+                auto hl = counter_.get_hl(p + i + k, y);
                 auto lrv = pow(hr * hl, lrv_exp_);
                 auto cv = fv[i][k - 1] * fv[i + k][j - k] * lrv;
                 if (cv > fv[i][j])
