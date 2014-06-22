@@ -43,6 +43,7 @@ public: // Public Type(s)
 public: // Public Method(s)
     Tokenizer(Sequence const &sequence);
 
+    void reset(void);
     Sequence next(void);
     bool has_next(void) const;
 
@@ -66,6 +67,11 @@ inline Tokenizer::Tokenizer(Sequence const &sequence)
     : sequence_(sequence), it_(sequence.begin())
 {
     skip(&std::iswspace);
+}
+
+inline void Tokenizer::reset(void)
+{
+    it_ = sequence_.begin();
 }
 
 inline Tokenizer::Sequence Tokenizer::next(void)
