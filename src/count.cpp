@@ -17,22 +17,14 @@ const StringCounter::TermId StringCounter::BOUNDARY_ = 0;
  * Implementation: class StringCounter
  ************************************************/
 
-StringCounter::StringCounter(size_t max_len, double smooth,
-                             size_t min_store_len, Term boundary)
-    : max_len_(max_len), smooth_(smooth),
-      min_store_len_(min_store_len), boundary_(boundary),
+StringCounter::StringCounter(size_t max_len, double smooth, Term boundary)
+    : max_len_(max_len), smooth_(smooth), boundary_(boundary),
       f_avgs_(max_len), hl_avgs_(max_len), hr_avgs_(max_len), str_nums_(max_len)
 {
     if (smooth_ < 0)
     {
         throw std::invalid_argument("The smoothing parameter must be " \
                                     "greater than or equal to 0.");
-    }
-
-    if (min_store_len_ < 1)
-    {
-        throw std::invalid_argument("Minimum store length must be " \
-                                    "greater than or equal to 1.");
     }
 }
 
@@ -108,24 +100,19 @@ double StringCounter::get_iv(size_t i, size_t n) const
 {
     if (n > max_len_ || f_avgs_[n - 1] == 0.0) { return 0.0; }
 
-    auto &s = sa_.data();
-    IdSequence t(s.begin() + i, s.begin() + i + n);
-
-    auto lb = sa_.lower_bound(t), ub = sa_.upper_bound(t);
-    auto count = ub - lb;
-    double f = 0;
-    if (count > min_store_len_)
+    double f;
+    auto j = sa_.rank(i);
+    if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
     {
+        auto &s = sa_.data();
+        IdSequence t(s.begin() + i, s.begin() + i + n);
+
         auto node = trie_.find(t.begin(), t.end());
         f = node->f;
     }
     else
     {
-        for (auto it = lb; it != ub; ++it)
-        {
-            auto j = *it;
-            if (n > count_min_lens_[j]) { f += 1; }
-        }
+        f = n > count_min_lens_[i] ? 1 : 0;
     }
 
     return pow(f / f_avgs_[n - 1], n);
@@ -135,28 +122,19 @@ double StringCounter::get_hl(size_t i, size_t n) const
 {
     if (n > max_len_ || hl_avgs_[n - 1] == 0.0) { return 0.0; }
 
-    auto &s = sa_.data();
-    IdSequence t(s.begin() + i, s.begin() + i + n);
-
-    auto lb = sa_.lower_bound(t), ub = sa_.upper_bound(t);
-    auto count = ub - lb;
     double hl;
-    if (count > min_store_len_)
+    auto j = sa_.rank(i);
+    if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
     {
+        auto &s = sa_.data();
+        IdSequence t(s.begin() + i, s.begin() + i + n);
+
         auto node = trie_.find(t.begin(), t.end());
         hl = node->hl;
     }
     else
     {
-        TermCounts sp1l(char_id_map_.size());
-        for (auto it = lb; it != ub; ++it)
-        {
-            auto j = *it;
-            if (j > 0)              { sp1l[s[j - 1]]++; }
-            else                    { sp1l[BOUNDARY_]++; }
-        }
-
-        hl = entropy(sp1l);
+        hl = h1_;
     }
 
     return hl / hl_avgs_[n - 1];
@@ -166,28 +144,19 @@ double StringCounter::get_hr(size_t i, size_t n) const
 {
     if (n > max_len_ || hr_avgs_[n - 1] == 0.0) { return 0.0; }
 
-    auto &s = sa_.data();
-    IdSequence t(s.begin() + i, s.begin() + i + n);
-
-    auto lb = sa_.lower_bound(t), ub = sa_.upper_bound(t);
-    auto count = ub - lb;
     double hr;
-    if (count > min_store_len_)
+    auto j = sa_.rank(i);
+    if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
     {
+        auto &s = sa_.data();
+        IdSequence t(s.begin() + i, s.begin() + i + n);
+
         auto node = trie_.find(t.begin(), t.end());
         hr = node->hr;
     }
     else
     {
-        TermCounts sp1r(char_id_map_.size());
-        for (auto it = lb; it != ub; ++it)
-        {
-            auto j = *it;
-            if (j + n < sa_.size()) { sp1r[s[j + n]]++; }
-            else                    { sp1r[BOUNDARY_]++; }
-        }
-
-        hr = entropy(sp1r);
+        hr = h1_;
     }
 
     return hr / hr_avgs_[n - 1];
@@ -232,7 +201,7 @@ void StringCounter::calc_avg(void)
     typedef std::tuple<size_t, size_t, size_t, TermCounts> StackItem;
     std::stack<StackItem> lcp_stack;
     lcp_stack.emplace(0, 0, 0, TermCounts({{BOUNDARY_, 1}}));
-    auto h1 = entropy(std::get<3>(lcp_stack.top()));
+    h1_ = entropy(std::get<3>(lcp_stack.top()));
 
     std::fill(f_avgs_.begin(), f_avgs_.end(), 0);
     std::fill(hl_avgs_.begin(), hl_avgs_.end(), 0);
@@ -254,8 +223,8 @@ void StringCounter::calc_avg(void)
              j < max_len_ && idx < s.size() && s[idx] != BOUNDARY_; j++, idx++)
         {
             f_avgs_[j]++;
-            hl_avgs_[j] += h1;
-            hr_avgs_[j] += h1;
+            hl_avgs_[j] += h1_;
+            hr_avgs_[j] += h1_;
             str_nums_[j]++;
 
             sp1r_vec[j].clear();
@@ -281,14 +250,12 @@ void StringCounter::calc_avg(void)
                 hl_avgs_[j] += hl;
                 hr_avgs_[j] += hr;
                 str_nums_[j]++;
-                if (f > min_store_len_)
-                {
-                    auto node = trie_.insert(s.begin() + sa_[i - 1],
-                                             s.begin() + sa_[i - 1] + j + 1);
-                    node->f = f;
-                    node->hl = hl;
-                    node->hr = hr;
-                }
+
+                auto node = trie_.insert(s.begin() + sa_[i - 1],
+                                         s.begin() + sa_[i - 1] + j + 1);
+                node->f = f;
+                node->hl = hl;
+                node->hr = hr;
 
                 sp1r_vec[j].clear();
             }
@@ -339,8 +306,8 @@ void StringCounter::calc_avg(void)
          j < max_len_ && idx < s.size() && s[idx] != BOUNDARY_; j++, idx++)
     {
         f_avgs_[j]++;
-        hl_avgs_[j] += h1;
-        hr_avgs_[j] += h1;
+        hl_avgs_[j] += h1_;
+        hr_avgs_[j] += h1_;
         str_nums_[j]++;
 
         sp1r_vec[j].clear();
@@ -361,14 +328,12 @@ void StringCounter::calc_avg(void)
             hl_avgs_[j] += hl;
             hr_avgs_[j] += hr;
             str_nums_[j]++;
-            if (f > min_store_len_)
-            {
-                auto node = trie_.insert(s.begin() + sa_[i],
-                                         s.begin() + sa_[i] + j + 1);
-                node->f = f;
-                node->hl = hl;
-                node->hr = hr;
-            }
+
+            auto node = trie_.insert(s.begin() + sa_[i],
+                                     s.begin() + sa_[i] + j + 1);
+            node->f = f;
+            node->hl = hl;
+            node->hr = hr;
 
             sp1r_vec[j].clear();
         }
