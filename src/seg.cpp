@@ -117,73 +117,43 @@ Segmenter::Seg Segmenter::optimize_segment(size_t p, size_t n) const
 {
     if (n == 0) { return Seg(); }
 
-    auto m = n * (1 + n) / 2;
-    auto **fs = new size_t*[n];
-    auto **fv = new double*[n];
-    fs[0] = new size_t[m];
-    fv[0] = new double[m];
-    for (decltype(n) i = 1, offset = n; i < n; ++i, --offset)
+    auto *fs = new size_t[n];
+    auto *fv = new double[n];
+    auto *fr = new double[n];
+    for (decltype(n) i = 0; i < n; ++i)
     {
-        fs[i] = fs[i - 1] + offset;
-        fv[i] = fv[i - 1] + offset;
-    }
-
-    for (decltype(n) j = 0; j < n; ++j)
-    {
-        for (decltype(n) i = 0; i + j < n; ++i)
+        fs[i] = 0;
+        fv[i] = counter_.get_iv(p, i + 1);
+        fr[i] = counter_.get_hr(p, i + 1);
+        for (decltype(i) j = 0; j < i; ++j)
         {
-            fv[i][j] = counter_.get_iv(p + i, j + 1);
-            fs[i][j] = 0;
-            for (decltype(j) k = 1; k <= j; ++k)
+            auto hr = counter_.get_hr(p + fs[j], j - fs[j] + 1),
+                 hl = counter_.get_hl(p + j + 1, i - j),
+                 iv = counter_.get_iv(p + j + 1, i - j),
+                 lrv = pow(hr * hl, lrv_exp_),
+                 cv = fv[j] * iv * lrv;
+            if (cv > fv[i] || (cv == fv[i] && hr > fr[i]))
             {
-                // find right most boundary before position k
-                auto x = 0;
-                while (fs[i + x][k - x - 1] != 0)
-                {
-                    x += fs[i + x][k - x - 1];
-                }
-
-                // find left most boundary after position k
-                auto y = j - k + 1;
-                while (fs[i + k][y - 1] != 0)
-                {
-                    y = fs[i + k][y - 1];
-                }
-
-                // calculate combined goodness value for position k
-                auto hr = counter_.get_hr(p + i + x, k - x);
-                auto hl = counter_.get_hl(p + i + k, y);
-                auto lrv = pow(hr * hl, lrv_exp_);
-                auto cv = fv[i][k - 1] * fv[i + k][j - k] * lrv;
-                if (cv > fv[i][j])
-                {
-                    fv[i][j] = cv;
-                    fs[i][j] = k;
-                }
+                fv[i] = cv;
+                fs[i] = j + 1;
+                fr[i] = hr;
             }
         }
     }
 
     Seg seg;
-    generate_segment(seg, fs, 0, n - 1);
+    for (size_t i = fs[n - 1]; i > 0; i = fs[i - 1])
+    {
+        seg.push_back(i);
+    }
 
-    delete [] fs[0];
-    delete [] fv[0];
+    std::reverse(seg.begin(), seg.end());
+
     delete [] fs;
     delete [] fv;
+    delete [] fr;
 
     return seg;
-}
-
-void Segmenter::generate_segment(Seg &seg, size_t **fs,
-                                 size_t i, size_t j) const
-{
-    if (fs[i][j] == 0) { return; }
-
-    auto k = fs[i][j];
-    generate_segment(seg, fs, i, k - 1);
-    seg.push_back(i + k);
-    generate_segment(seg, fs, i + k, j - k);
 }
 
 void Segmenter::segment_sequence(std::vector<std::wstring> &words,

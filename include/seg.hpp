@@ -42,7 +42,6 @@ private: // Private Type(s)
 
 private: // Private Method(s)
     Seg optimize_segment(size_t p, size_t n) const;
-    void generate_segment(Seg &seg, size_t **fs, size_t i, size_t j) const;
     void segment_sequence(std::vector<std::wstring> &words,
                           std::wstring const &sequence, Seg const &seg) const;
     std::vector<std::wstring> segment_sequence(std::wstring const &sequence,
