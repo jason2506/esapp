@@ -105,9 +105,7 @@ double StringCounter::get_iv(size_t i, size_t n) const
     if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
     {
         auto &s = sa_.data();
-        IdSequence t(s.begin() + i, s.begin() + i + n);
-
-        auto node = trie_.find(t.begin(), t.end());
+        auto node = trie_.find(s.begin() + i, s.begin() + i + n);
         f = node->f;
     }
     else
@@ -127,9 +125,7 @@ double StringCounter::get_hl(size_t i, size_t n) const
     if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
     {
         auto &s = sa_.data();
-        IdSequence t(s.begin() + i, s.begin() + i + n);
-
-        auto node = trie_.find(t.begin(), t.end());
+        auto node = trie_.find(s.begin() + i, s.begin() + i + n);
         hl = node->hl;
     }
     else
@@ -149,9 +145,7 @@ double StringCounter::get_hr(size_t i, size_t n) const
     if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
     {
         auto &s = sa_.data();
-        IdSequence t(s.begin() + i, s.begin() + i + n);
-
-        auto node = trie_.find(t.begin(), t.end());
+        auto node = trie_.find(s.begin() + i, s.begin() + i + n);
         hr = node->hr;
     }
     else
