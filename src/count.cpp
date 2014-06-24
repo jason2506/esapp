@@ -196,6 +196,71 @@ StringCounter::IdSequence StringCounter::to_char_ids(Sequence const &s) const
     return idx_seq;
 }
 
+void StringCounter::acc_stats(std::stack<StackItem> &lcp_stack,
+                              std::vector<TermCounts> &sp1r_vec,
+                              size_t i, size_t lcp)
+{
+    auto &s = sa_.data();
+
+    // count substrings occurring only once
+    for (auto j = std::max(lcp, std::min(sa_.lcp(i), max_len_)),
+              idx = sa_[i] + j;
+         j < max_len_ && idx < s.size() && s[idx] != BOUNDARY_; j++, idx++)
+    {
+        f_avgs_[j]++;
+        hl_avgs_[j] += h1_;
+        hr_avgs_[j] += h1_;
+        str_nums_[j]++;
+
+        sp1r_vec[j].clear();
+    }
+
+    while (lcp < std::get<1>(lcp_stack.top()))
+    {
+        auto top = lcp_stack.top();
+        lcp_stack.pop();
+        if (lcp > std::get<1>(lcp_stack.top()))
+        {
+            auto sp1l = (sa_[i] > 0) ? s[sa_[i] - 1] : BOUNDARY_;
+            lcp_stack.emplace(i, lcp, 1, TermCounts({{sp1l, 1}}));
+        }
+
+        auto f = std::get<2>(top);
+        auto hl = entropy(std::get<3>(top));
+        for (auto j = std::get<1>(lcp_stack.top());
+             j < std::get<1>(top); j++)
+        {
+            auto hr = entropy(sp1r_vec[j]);
+            f_avgs_[j] += f;
+            hl_avgs_[j] += hl;
+            hr_avgs_[j] += hr;
+            str_nums_[j]++;
+
+            auto node = trie_.insert(s.begin() + sa_[i],
+                                     s.begin() + sa_[i] + j + 1);
+            node->f = f;
+            node->hl = hl;
+            node->hr = hr;
+
+            sp1r_vec[j].clear();
+        }
+
+        if (lcp_stack.size() > 1)
+        {
+            // update f and sp1l
+            std::get<2>(lcp_stack.top()) += std::get<2>(top) - 1;
+            for (auto const &kv : std::get<3>(top))
+            {
+                std::get<3>(lcp_stack.top())[kv.first] += kv.second;
+            }
+
+            auto j = std::get<0>(top);
+            auto sp1l = (sa_[j] > 0) ? s[sa_[j] - 1] : BOUNDARY_;
+            std::get<3>(lcp_stack.top())[sp1l]--;
+        }
+    }
+}
+
 void StringCounter::calc_avg(void)
 {
     typedef std::tuple<size_t, size_t, size_t, TermCounts> StackItem;
@@ -216,65 +281,7 @@ void StringCounter::calc_avg(void)
         if (s[sa_[i]] == BOUNDARY_) { continue; }
 
         auto lcp = std::min(sa_.lcp(i), max_len_);
-
-        // count substrings occurring only once
-        for (auto j = std::max(lcp, std::min(sa_.lcp(i - 1), max_len_)),
-                  idx = sa_[i - 1] + j;
-             j < max_len_ && idx < s.size() && s[idx] != BOUNDARY_; j++, idx++)
-        {
-            f_avgs_[j]++;
-            hl_avgs_[j] += h1_;
-            hr_avgs_[j] += h1_;
-            str_nums_[j]++;
-
-            sp1r_vec[j].clear();
-        }
-
-        while (lcp < std::get<1>(lcp_stack.top()))
-        {
-            auto top = lcp_stack.top();
-            lcp_stack.pop();
-            if (lcp > std::get<1>(lcp_stack.top()))
-            {
-                auto sp1l = (sa_[i - 1] > 0) ? s[sa_[i - 1] - 1] : BOUNDARY_;
-                lcp_stack.emplace(i - 1, lcp, 1, TermCounts({{sp1l, 1}}));
-            }
-
-            auto f = std::get<2>(top);
-            auto hl = entropy(std::get<3>(top));
-            for (auto j = std::get<1>(lcp_stack.top());
-                 j < std::get<1>(top); j++)
-            {
-                auto hr = entropy(sp1r_vec[j]);
-                f_avgs_[j] += f;
-                hl_avgs_[j] += hl;
-                hr_avgs_[j] += hr;
-                str_nums_[j]++;
-
-                auto node = trie_.insert(s.begin() + sa_[i - 1],
-                                         s.begin() + sa_[i - 1] + j + 1);
-                node->f = f;
-                node->hl = hl;
-                node->hr = hr;
-
-                sp1r_vec[j].clear();
-            }
-
-            if (lcp_stack.size() > 1)
-            {
-                // update f and sp1l
-                std::get<2>(lcp_stack.top()) += std::get<2>(top) - 1;
-                for (auto const &kv : std::get<3>(top))
-                {
-                    std::get<3>(lcp_stack.top())[kv.first] += kv.second;
-                }
-
-                auto j = std::get<0>(top);
-                auto sp1l = (sa_[j] > 0) ? s[sa_[j] - 1] : BOUNDARY_;
-                std::get<3>(lcp_stack.top())[sp1l]--;
-            }
-        }
-
+        acc_stats(lcp_stack, sp1r_vec, i - 1, lcp);
         if (lcp > std::get<1>(lcp_stack.top()))
         {
             auto sp1l = (sa_[i - 1] > 0) ? s[sa_[i - 1] - 1] : BOUNDARY_;
@@ -300,55 +307,7 @@ void StringCounter::calc_avg(void)
         }
     }
 
-    // count substrings occurring only once
-    auto i = sa_.size() - 1;
-    for (auto j = std::min(sa_.lcp(i), max_len_), idx = sa_[i] + j;
-         j < max_len_ && idx < s.size() && s[idx] != BOUNDARY_; j++, idx++)
-    {
-        f_avgs_[j]++;
-        hl_avgs_[j] += h1_;
-        hr_avgs_[j] += h1_;
-        str_nums_[j]++;
-
-        sp1r_vec[j].clear();
-    }
-
-    while (lcp_stack.size() > 1)
-    {
-        auto top = lcp_stack.top();
-        lcp_stack.pop();
-
-        auto f = std::get<2>(top);
-        auto hl = entropy(std::get<3>(top));
-        for (auto j = std::get<1>(lcp_stack.top());
-             j < std::get<1>(top); j++)
-        {
-            auto hr = entropy(sp1r_vec[j]);
-            f_avgs_[j] += f;
-            hl_avgs_[j] += hl;
-            hr_avgs_[j] += hr;
-            str_nums_[j]++;
-
-            auto node = trie_.insert(s.begin() + sa_[i],
-                                     s.begin() + sa_[i] + j + 1);
-            node->f = f;
-            node->hl = hl;
-            node->hr = hr;
-
-            sp1r_vec[j].clear();
-        }
-
-        // update f and sp1l
-        std::get<2>(lcp_stack.top()) += std::get<2>(top) - 1;
-        for (auto const &kv : std::get<3>(top))
-        {
-            std::get<3>(lcp_stack.top())[kv.first] += kv.second;
-        }
-
-        auto j = std::get<0>(top);
-        auto sp1l = (sa_[j] > 0) ? s[sa_[j] - 1] : BOUNDARY_;
-        std::get<3>(lcp_stack.top())[sp1l]--;
-    }
+    acc_stats(lcp_stack, sp1r_vec, sa_.size() - 1, 0);
 
     // calculate average
     for (decltype(max_len_) j = 0; j < max_len_; j++)

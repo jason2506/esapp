@@ -50,11 +50,15 @@ private: // Private Type(s)
     typedef SuffixArray::Term TermId;
     typedef std::vector<TermId> IdSequence;
     typedef std::unordered_map<TermId, size_t> TermCounts;
+    typedef std::tuple<size_t, size_t, size_t, TermCounts> StackItem;
 
 private: // Private Method(s)
     IdSequence init_char_id_map(Sequence const &s);
     IdSequence to_char_ids(Sequence const &s) const;
 
+    void acc_stats(std::stack<StackItem> &lcp_stack,
+                   std::vector<TermCounts> &sp1r_vec,
+                   size_t i, size_t lcp);
     void calc_avg(void);
 
     double entropy(TermCounts const &counts) const;
