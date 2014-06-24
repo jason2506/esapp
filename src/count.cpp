@@ -205,8 +205,6 @@ void StringCounter::acc_stats(std::stack<StackItem> &lcp_stack,
         hl_avgs_[j] += h1_;
         hr_avgs_[j] += h1_;
         str_nums_[j]++;
-
-        sp1r_vec[j].clear();
     }
 
     while (lcp < std::get<1>(lcp_stack.top()))
@@ -288,8 +286,10 @@ void StringCounter::calc_avg(void)
         std::get<3>(lcp_stack.top())[sp1l]++;
 
         // update sp1r
-        for (decltype(max_len_) j = 0, idx = sa_[i] + j + 1;
-             j < max_len_; j++, idx++)
+        auto len = (i + 1 < n)
+            ? std::min(std::max(sa_.lcp(i + 1), lcp), max_len_)
+            : max_len_;
+        for (decltype(len) j = 0, idx = sa_[i] + j + 1; j < len; j++, idx++)
         {
             if (idx == s.size() || s[idx] == BOUNDARY_)
             {
