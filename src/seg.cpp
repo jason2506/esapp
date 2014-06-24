@@ -54,7 +54,7 @@ std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
         for (decltype(m) j = 0, p = 0; j < m; ++j)
         {
             auto n = tokens[j].size();
-            segs[j] = optimize_segment(p, tokens[j].size());
+            optimize_segment(segs[j], p, tokens[j].size());
             p += n + 1;
         }
 
@@ -113,9 +113,9 @@ std::vector<std::vector<std::string>> Segmenter::fit_and_segment(
     return words_list;
 }
 
-Segmenter::Seg Segmenter::optimize_segment(size_t p, size_t n) const
+void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
 {
-    if (n == 0) { return Seg(); }
+    if (n == 0) { return; }
 
     auto *fs = new size_t[n];
     auto *fv = new double[n];
@@ -141,7 +141,7 @@ Segmenter::Seg Segmenter::optimize_segment(size_t p, size_t n) const
         }
     }
 
-    Seg seg;
+    seg.clear();
     for (size_t i = fs[n - 1]; i > 0; i = fs[i - 1])
     {
         seg.push_back(i);
@@ -152,16 +152,12 @@ Segmenter::Seg Segmenter::optimize_segment(size_t p, size_t n) const
     delete [] fs;
     delete [] fv;
     delete [] fr;
-
-    return seg;
 }
 
 void Segmenter::segment_sequence(std::vector<std::wstring> &words,
                                  std::wstring const &sequence,
                                  Seg const &seg) const
 {
-    if (sequence.empty()) { return; }
-
     Seg::value_type start = 0;
     for (auto const &pos : seg)
     {

@@ -41,7 +41,7 @@ private: // Private Type(s)
     typedef std::vector<size_t> Seg;
 
 private: // Private Method(s)
-    Seg optimize_segment(size_t p, size_t n) const;
+    void optimize_segment(Seg &seg, size_t p, size_t n) const;
     void segment_sequence(std::vector<std::wstring> &words,
                           std::wstring const &sequence, Seg const &seg) const;
     std::vector<std::wstring> segment_sequence(std::wstring const &sequence,
