@@ -54,7 +54,7 @@ std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
         for (decltype(m) j = 0, p = 0; j < m; ++j)
         {
             auto n = tokens[j].size();
-            optimize_segment(segs[j], p, tokens[j].size());
+            optimize_segment(segs[j], p, n);
             p += n + 1;
         }
 
