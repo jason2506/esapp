@@ -12,8 +12,8 @@
 #include <cmath>
 #include <algorithm>
 #include <stack>
-#include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "sufarr.hpp"
@@ -56,11 +56,7 @@ private: // Private Method(s)
     IdSequence init_char_id_map(Sequence const &s);
     IdSequence to_char_ids(Sequence const &s) const;
 
-    void acc_stats(std::stack<StackItem> &lcp_stack,
-                   std::vector<TermCounts> &sp1r_vec,
-                   size_t i, size_t lcp);
     void calc_avg(void);
-
     double entropy(TermCounts const &counts) const;
 
 private: // Private Property(ies)
