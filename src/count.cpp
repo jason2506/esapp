@@ -204,7 +204,7 @@ void StringCounter::calc_avg(void)
             lcp_stack.pop();
             if (lcp > lcp_stack.top().second)
             {
-                lcp_stack.emplace(i, lcp);
+                lcp_stack.emplace(top.first, lcp);
             }
 
             // calculate sp1l
