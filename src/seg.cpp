@@ -121,17 +121,11 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
     auto *fv = new double[n];
     for (decltype(n) i = 0; i < n; ++i)
     {
-        auto iv = counter_.get_iv(p, i + 1),
-             hr = counter_.get_hr(p, i + 1),
-             hl = counter_.get_hl(p, i + 1);
         fs[i] = 0;
-        fv[i] = iv * pow(hr * hl, lrv_exp_);
+        fv[i] = counter_.score(p, i + 1, lrv_exp_);
         for (decltype(i) j = 0; j < i; ++j)
         {
-            auto iv = counter_.get_iv(p + j + 1, i - j),
-                 hr = counter_.get_hr(p + j + 1, i - j),
-                 hl = counter_.get_hl(p + j + 1, i - j),
-                 cv = fv[j] * iv * pow(hr * hl, lrv_exp_);
+            auto cv = fv[j] * counter_.score(p + j + 1, i - j, lrv_exp_);
             if (cv > fv[i])
             {
                 fv[i] = cv;

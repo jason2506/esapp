@@ -40,9 +40,7 @@ public: // Public Method(s)
     void set_pres(std::vector<size_t> pres, size_t p, size_t n);
     void unset_pres(std::vector<size_t> pres, size_t p, size_t n);
 
-    double get_iv(size_t i, size_t n) const;
-    double get_hl(size_t i, size_t n) const;
-    double get_hr(size_t i, size_t n) const;
+    double score(size_t i, size_t n, double lrv_exp) const;
 
     void clear(void);
 

@@ -96,64 +96,30 @@ void StringCounter::unset_pres(std::vector<size_t> pres, size_t p, size_t n)
     trie_.increase(s.begin() + i, s.begin() + p + n);
 }
 
-double StringCounter::get_iv(size_t i, size_t n) const
+double StringCounter::score(size_t i, size_t n, double lrv_exp) const
 {
     if (n > max_len_ || f_avgs_[n - 1] == 0.0) { return 0.0; }
 
-    double f;
+    double f, hl, hr;
     auto j = sa_.rank(i);
     if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
     {
         auto &s = sa_.data();
         auto node = trie_.find(s.begin() + i, s.begin() + i + n);
         f = node->f;
-    }
-    else
-    {
-        f = n > count_min_lens_[i] ? 1 : 0;
-    }
-
-    return pow(f / f_avgs_[n - 1], n);
-}
-
-double StringCounter::get_hl(size_t i, size_t n) const
-{
-    if (n > max_len_ || hl_avgs_[n - 1] == 0.0) { return 0.0; }
-
-    double hl;
-    auto j = sa_.rank(i);
-    if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
-    {
-        auto &s = sa_.data();
-        auto node = trie_.find(s.begin() + i, s.begin() + i + n);
         hl = node->hl;
-    }
-    else
-    {
-        hl = h1_;
-    }
-
-    return hl / hl_avgs_[n - 1];
-}
-
-double StringCounter::get_hr(size_t i, size_t n) const
-{
-    if (n > max_len_ || hr_avgs_[n - 1] == 0.0) { return 0.0; }
-
-    double hr;
-    auto j = sa_.rank(i);
-    if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
-    {
-        auto &s = sa_.data();
-        auto node = trie_.find(s.begin() + i, s.begin() + i + n);
         hr = node->hr;
     }
     else
     {
-        hr = h1_;
+        f = n > count_min_lens_[i] ? 1 : 0;
+        hl = hr = h1_;
     }
 
-    return hr / hr_avgs_[n - 1];
+    f /= f_avgs_[n - 1];
+    hl /= hl_avgs_[n - 1];
+    hr /= hr_avgs_[n - 1];
+    return pow(f, n) * pow(hl * hr, lrv_exp);
 }
 
 StringCounter::IdSequence StringCounter::init_char_id_map(Sequence const &s)
