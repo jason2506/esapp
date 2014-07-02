@@ -119,24 +119,23 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
 
     auto *fs = new size_t[n];
     auto *fv = new double[n];
-    auto *fr = new double[n];
     for (decltype(n) i = 0; i < n; ++i)
     {
+        auto iv = counter_.get_iv(p, i + 1),
+             hr = counter_.get_hr(p, i + 1),
+             hl = counter_.get_hl(p, i + 1);
         fs[i] = 0;
-        fv[i] = counter_.get_iv(p, i + 1);
-        fr[i] = counter_.get_hr(p, i + 1);
+        fv[i] = iv * pow(hr * hl, lrv_exp_);
         for (decltype(i) j = 0; j < i; ++j)
         {
-            auto hr = counter_.get_hr(p + fs[j], j - fs[j] + 1),
+            auto iv = counter_.get_iv(p + j + 1, i - j),
+                 hr = counter_.get_hr(p + j + 1, i - j),
                  hl = counter_.get_hl(p + j + 1, i - j),
-                 iv = counter_.get_iv(p + j + 1, i - j),
-                 lrv = pow(hr * hl, lrv_exp_),
-                 cv = fv[j] * iv * lrv;
-            if (cv > fv[i] || (cv == fv[i] && hr > fr[i]))
+                 cv = fv[j] * iv * pow(hr * hl, lrv_exp_);
+            if (cv > fv[i])
             {
                 fv[i] = cv;
                 fs[i] = j + 1;
-                fr[i] = hr;
             }
         }
     }
@@ -151,7 +150,6 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
 
     delete [] fs;
     delete [] fv;
-    delete [] fr;
 }
 
 void Segmenter::segment_sequence(std::vector<std::wstring> &words,
