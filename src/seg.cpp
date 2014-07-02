@@ -17,13 +17,9 @@ namespace esapp
 
 Segmenter::Segmenter(double lrv_exp, size_t max_iters,
                      size_t max_length, double smooth)
-    : counter_(max_length, smooth), lrv_exp_(lrv_exp), max_iters_(max_iters)
+    : counter_(lrv_exp, max_length, smooth), max_iters_(max_iters)
 {
-    if (lrv_exp_ < 0)
-    {
-        throw std::invalid_argument("The exponent parameter of LRV must be " \
-                                    "greater than or equal to 0.");
-    }
+    // do nothing
 }
 
 std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
@@ -122,10 +118,10 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
     for (decltype(n) i = 0; i < n; ++i)
     {
         fs[i] = 0;
-        fv[i] = counter_.score(p, i + 1, lrv_exp_);
+        fv[i] = counter_.score(p, i + 1);
         for (decltype(i) j = 0; j < i; ++j)
         {
-            auto cv = fv[j] * counter_.score(p + j + 1, i - j, lrv_exp_);
+            auto cv = fv[j] * counter_.score(p + j + 1, i - j);
             if (cv > fv[i])
             {
                 fv[i] = cv;

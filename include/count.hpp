@@ -33,14 +33,15 @@ public: // Public Type(s)
     typedef std::basic_string<Term> Sequence;
 
 public: // Public Method(s)
-    StringCounter(size_t max_len = 30, double smooth = 0.0, Term boundary = 0);
+    StringCounter(double lrv_exp, size_t max_len = 30, double smooth = 0.0,
+                  Term boundary = 0);
 
     void fit(std::vector<Sequence> const &sequences);
 
     void set_pres(std::vector<size_t> pres, size_t p, size_t n);
     void unset_pres(std::vector<size_t> pres, size_t p, size_t n);
 
-    double score(size_t i, size_t n, double lrv_exp) const;
+    double score(size_t i, size_t n) const;
 
     void clear(void);
 
@@ -58,6 +59,7 @@ private: // Private Method(s)
     double entropy(TermCounts const &counts) const;
 
 private: // Private Property(ies)
+    double lrv_exp_;
     size_t max_len_;
     double smooth_;
     Term boundary_;

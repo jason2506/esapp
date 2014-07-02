@@ -17,10 +17,17 @@ const StringCounter::TermId StringCounter::BOUNDARY_ = 0;
  * Implementation: class StringCounter
  ************************************************/
 
-StringCounter::StringCounter(size_t max_len, double smooth, Term boundary)
-    : max_len_(max_len), smooth_(smooth), boundary_(boundary),
+StringCounter::StringCounter(double lrv_exp, size_t max_len, double smooth,
+                             Term boundary)
+    : lrv_exp_(lrv_exp), max_len_(max_len), smooth_(smooth), boundary_(boundary),
       f_avgs_(max_len), hl_avgs_(max_len), hr_avgs_(max_len), str_nums_(max_len)
 {
+    if (lrv_exp_ < 0)
+    {
+        throw std::invalid_argument("The exponent parameter of LRV must be " \
+                                    "greater than or equal to 0.");
+    }
+
     if (smooth_ < 0)
     {
         throw std::invalid_argument("The smoothing parameter must be " \
@@ -96,7 +103,7 @@ void StringCounter::unset_pres(std::vector<size_t> pres, size_t p, size_t n)
     trie_.increase(s.begin() + i, s.begin() + p + n);
 }
 
-double StringCounter::score(size_t i, size_t n, double lrv_exp) const
+double StringCounter::score(size_t i, size_t n) const
 {
     if (n > max_len_ || f_avgs_[n - 1] == 0.0) { return 0.0; }
 
@@ -119,7 +126,7 @@ double StringCounter::score(size_t i, size_t n, double lrv_exp) const
     f /= f_avgs_[n - 1];
     hl /= hl_avgs_[n - 1];
     hr /= hr_avgs_[n - 1];
-    return pow(f, n) * pow(hl * hr, lrv_exp);
+    return pow(f, n) * pow(hl * hr, lrv_exp_);
 }
 
 StringCounter::IdSequence StringCounter::init_char_id_map(Sequence const &s)

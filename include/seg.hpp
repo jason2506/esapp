@@ -49,7 +49,6 @@ private: // Private Method(s)
 
 private: // Private Property(ies)
     StringCounter counter_;
-    double lrv_exp_;
     size_t max_iters_;
 }; // class Segmenter
 
