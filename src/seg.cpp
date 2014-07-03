@@ -113,8 +113,8 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
 {
     if (n == 0) { return; }
 
-    auto *fs = new size_t[n];
-    auto *fv = new double[n];
+    std::vector<size_t> fs(n);
+    std::vector<double> fv(n);
     for (decltype(n) i = 0; i < n; ++i)
     {
         fs[i] = 0;
@@ -137,9 +137,6 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
     }
 
     std::reverse(seg.begin(), seg.end());
-
-    delete [] fs;
-    delete [] fv;
 }
 
 void Segmenter::segment_sequence(std::vector<std::wstring> &words,
