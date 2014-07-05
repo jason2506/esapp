@@ -29,6 +29,7 @@ namespace esapp
 class StringCounter
 {
 public: // Public Type(s)
+    typedef SuffixArray::Index Index;
     typedef wchar_t Term;
     typedef std::basic_string<Term> Sequence;
 
@@ -38,8 +39,8 @@ public: // Public Method(s)
 
     void fit(std::vector<Sequence> const &sequences);
 
-    void set_pres(std::vector<size_t> pres, size_t p, size_t n);
-    void unset_pres(std::vector<size_t> pres, size_t p, size_t n);
+    void set_pres(std::vector<Index> pres, size_t p, size_t n);
+    void unset_pres(std::vector<Index> pres, size_t p, size_t n);
 
     double score(size_t i, size_t n) const;
 
@@ -48,8 +49,7 @@ public: // Public Method(s)
 private: // Private Type(s)
     typedef SuffixArray::Term TermId;
     typedef std::vector<TermId> IdSequence;
-    typedef std::unordered_map<TermId, size_t> TermCounts;
-    typedef std::tuple<size_t, size_t, size_t, TermCounts> StackItem;
+    typedef std::unordered_map<TermId, Index> TermCounts;
 
 private: // Private Method(s)
     IdSequence init_char_id_map(Sequence const &s);
@@ -68,9 +68,9 @@ private: // Private Property(ies)
     std::vector<double> f_avgs_;
     std::vector<double> hl_avgs_;
     std::vector<double> hr_avgs_;
-    std::vector<size_t> str_nums_;
+    std::vector<Index> str_nums_;
 
-    std::vector<size_t> count_min_lens_;
+    std::vector<Index> count_min_lens_;
     std::unordered_map<Term, TermId> char_id_map_;
 
     FreqTrie trie_;

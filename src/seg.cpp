@@ -131,7 +131,7 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
     }
 
     seg.clear();
-    for (size_t i = fs[n - 1]; i > 0; i = fs[i - 1])
+    for (auto i = fs[n - 1]; i > 0; i = fs[i - 1])
     {
         seg.push_back(i);
     }

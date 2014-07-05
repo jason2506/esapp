@@ -57,10 +57,10 @@ void StringCounter::fit(std::vector<Sequence> const &sequences)
     std::fill(count_min_lens_.begin(), count_min_lens_.end(), 0);
 }
 
-void StringCounter::set_pres(std::vector<size_t> pres, size_t p, size_t n)
+void StringCounter::set_pres(std::vector<Index> pres, size_t p, size_t n)
 {
     // update preserve lengths (for suffix array)
-    size_t len = 1;
+    Index len = 1;
     for (auto i = n - 1, j = pres.size(); i > 0; i--)
     {
         count_min_lens_[p + i] = len++;
@@ -86,7 +86,7 @@ void StringCounter::set_pres(std::vector<size_t> pres, size_t p, size_t n)
     trie_.decrease(s.begin() + i, s.begin() + p + n);
 }
 
-void StringCounter::unset_pres(std::vector<size_t> pres, size_t p, size_t n)
+void StringCounter::unset_pres(std::vector<Index> pres, size_t p, size_t n)
 {
     // update preserve lengths (for suffix array)
     std::fill(count_min_lens_.begin() + p, count_min_lens_.begin() + p + n, 0);
@@ -165,7 +165,7 @@ StringCounter::IdSequence StringCounter::to_char_ids(Sequence const &s) const
 
 void StringCounter::calc_avg(void)
 {
-    typedef std::pair<size_t, size_t> StackItem;
+    typedef std::pair<Index, Index> StackItem;
     std::stack<StackItem> lcp_stack;
     lcp_stack.emplace(0, 0);
     h1_ = entropy(TermCounts({{BOUNDARY_, 1}}));
