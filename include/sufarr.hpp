@@ -54,17 +54,10 @@ public: // Public Method(s)
     const_iterator begin(void) const;
     const_iterator end(void) const;
 
-    const_iterator find(sequence const &t) const;
-    size_t count(sequence const &t) const;
-    const_iterator lower_bound(sequence const &t) const;
-    const_iterator upper_bound(sequence const &t) const;
-    std::pair<const_iterator, const_iterator> equal_range(sequence const &t) const;
-
 private: // Private Method(s)
     void construct(void);
     void construct(size_t num_alphas);
 
-    value_type calc_lcp(sequence const &t, size_t i) const;
     bool is_lms(std::vector<bool> const &suf_types, size_t i, size_t len_s);
 
     template <typename T>
@@ -151,17 +144,6 @@ inline suffix_array::const_iterator suffix_array::begin(void) const
 inline suffix_array::const_iterator suffix_array::end(void) const
 {
     return sa_.end();
-}
-
-inline size_t suffix_array::count(sequence const &t) const
-{
-    return upper_bound(t) - lower_bound(t);
-}
-
-inline std::pair<suffix_array::const_iterator, suffix_array::const_iterator>
-suffix_array::equal_range(sequence const &t) const
-{
-    return make_pair(lower_bound(t), upper_bound(t));
 }
 
 } // namespace esapp
