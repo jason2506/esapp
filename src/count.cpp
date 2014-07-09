@@ -17,10 +17,10 @@ const string_counter::term_id string_counter::BOUNDARY_ = 0;
  * Implementation: class string_counter
  ************************************************/
 
-string_counter::string_counter(double lrv_exp, size_t max_len, double smooth,
-                               term_type boundary)
-    : lrv_exp_(lrv_exp), max_len_(max_len), smooth_(smooth), boundary_(boundary),
-      f_avgs_(max_len), hl_avgs_(max_len), hr_avgs_(max_len), str_nums_(max_len)
+string_counter::string_counter(double lrv_exp, size_t max_len, double smooth)
+    : lrv_exp_(lrv_exp), max_len_(max_len), smooth_(smooth),
+      f_avgs_(max_len), hl_avgs_(max_len), hr_avgs_(max_len),
+      str_nums_(max_len)
 {
     if (lrv_exp_ < 0)
     {
@@ -37,19 +37,15 @@ string_counter::string_counter(double lrv_exp, size_t max_len, double smooth,
 
 void string_counter::fit(std::vector<sequence> const &sequences)
 {
-    // concatenate sequences
-    auto s = sequences[0];
-    for (decltype(sequences.size()) i = 1; i < sequences.size(); i++)
+    // concatenate and encode sequences
+    encoded_multistring s;
+    for (auto const &sequence : sequences)
     {
-        s.push_back(boundary_);
-        s.append(sequences[i]);
+        s.append(sequence);
     }
 
-    // convert term sequence into id sequence
-    auto idx_seq = init_char_id_map(s);
-
     // calculate average statistics of substrings
-    sa_.construct(idx_seq, char_id_map_.size());
+    sa_.construct(std::move(s));
     calc_avg();
 
     // initialize vector of preserve lengths
@@ -129,40 +125,6 @@ double string_counter::score(size_t i, size_t n) const
     return pow(f, n) * pow(hl * hr, lrv_exp_);
 }
 
-string_counter::id_sequence string_counter::init_char_id_map(sequence const &s)
-{
-    char_id_map_.clear();
-    char_id_map_[boundary_] = BOUNDARY_;
-
-    decltype(init_char_id_map(s)) id_seq;
-    id_seq.reserve(s.size());
-
-    typename decltype(id_seq)::value_type idx = 1;
-    for (auto const &c : s)
-    {
-        if (char_id_map_.find(c) == char_id_map_.end())
-        {
-            char_id_map_[c] = idx++;
-        }
-
-        id_seq.push_back(char_id_map_[c]);
-    }
-
-    return id_seq;
-}
-
-string_counter::id_sequence string_counter::to_char_ids(sequence const &s) const
-{
-    decltype(to_char_ids(s)) idx_seq;
-    idx_seq.reserve(s.size());
-    for (auto const &c : s)
-    {
-        idx_seq.push_back(char_id_map_.at(c));
-    }
-
-    return idx_seq;
-}
-
 void string_counter::calc_avg(void)
 {
     typedef std::pair<index_type, index_type> stack_item;
@@ -190,7 +152,7 @@ void string_counter::calc_avg(void)
 
         // count substrings occurring only once
         for (auto j = std::max(lcp, prev_lcp), idx = sa_[i] + j;
-             j < max_len_ && idx < s.size() && s[idx] != BOUNDARY_; j++, idx++)
+             j < max_len_ && s[idx] != BOUNDARY_; j++, idx++)
         {
             f_avgs_[j]++;
             hl_avgs_[j] += h1_;
@@ -263,7 +225,7 @@ void string_counter::calc_avg(void)
 
 double string_counter::entropy(term_counts const &counts) const
 {
-    auto num_events = char_id_map_.size();
+    auto num_events = sa_.data().alphabet_count();
     auto n = num_events * smooth_;
     for (auto const &count : counts)
     {

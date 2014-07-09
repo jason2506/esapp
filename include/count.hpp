@@ -34,8 +34,7 @@ public: // Public Type(s)
     typedef std::basic_string<term_type> sequence;
 
 public: // Public Method(s)
-    string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0,
-                   term_type boundary = 0);
+    string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
 
     void fit(std::vector<sequence> const &sequences);
 
@@ -52,9 +51,6 @@ private: // Private Type(s)
     typedef std::unordered_map<term_id, index_type> term_counts;
 
 private: // Private Method(s)
-    id_sequence init_char_id_map(sequence const &s);
-    id_sequence to_char_ids(sequence const &s) const;
-
     void calc_avg(void);
     double entropy(term_counts const &counts) const;
 
@@ -62,7 +58,6 @@ private: // Private Property(ies)
     double lrv_exp_;
     index_type max_len_;
     double smooth_;
-    term_type boundary_;
     double h1_;
 
     std::vector<double> f_avgs_;
@@ -71,7 +66,6 @@ private: // Private Property(ies)
     std::vector<index_type> str_nums_;
 
     std::vector<index_type> count_min_lens_;
-    std::unordered_map<term_type, term_id> char_id_map_;
 
     freq_trie trie_;
     suffix_array sa_;

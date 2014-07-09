@@ -26,35 +26,20 @@ suffix_array::suffix_array(sequence const &s)
     construct();
 }
 
-suffix_array::suffix_array(sequence const &s, size_t num_alphas)
-{
-    construct(num_alphas);
-}
-
 void suffix_array::construct(sequence const &s)
 {
     s_ = s;
     construct();
 }
 
-void suffix_array::construct(sequence const &s, size_t num_alphas)
+void suffix_array::construct()
 {
-    s_ = s;
-    construct(num_alphas);
-}
-
-void suffix_array::construct(void)
-{
-    construct(*(std::max_element(s_.begin(), s_.end())));
-}
-
-void suffix_array::construct(size_t num_alphas)
-{
-    auto len_s = s_.size() + 1;
+    auto num_alphas = s_.alphabet_count();
+    auto len_s = s_.size();
     sa_.resize(len_s);
 
-    std::vector<value_type> bkt(num_alphas + 1);
-    gen_sa(s_.begin(), sa_, bkt, len_s, num_alphas + 1);
+    std::vector<value_type> bkt(num_alphas);
+    gen_sa(s_.begin(), sa_, bkt, len_s, num_alphas);
     gen_isa();
     gen_lcpa();
 }
@@ -155,8 +140,7 @@ void suffix_array::init_bkt(T const &s, std::vector<value_type> &bkt,
                             size_t len_s, size_t num_alphas, bool end)
 {
     fill_n(bkt.begin(), num_alphas, 0);
-    bkt[0] = 1;
-    for (decltype(len_s) i = 0; i < len_s - 1; i++)
+    for (decltype(len_s) i = 0; i < len_s; i++)
     {
         bkt[s[i]]++;
     }
@@ -340,7 +324,8 @@ void suffix_array::gen_lcpa(void)
         {
             auto j = sa_[isa_[i] - 1];
             if (lcp > 0) { lcp--; }
-            while (s_[i + lcp] == s_[j + lcp] && s_[i + lcp] != 0) { lcp++; }
+            while (i + lcp < s_.size() && j + lcp < s_.size() &&
+                   s_[i + lcp] == s_[j + lcp] && s_[i + lcp] != 0) { lcp++; }
 
             lcpa_[isa_[i]] = lcp;
         }

@@ -15,6 +15,8 @@
 #include <type_traits>
 #include <vector>
 
+#include "encstr.hpp"
+
 namespace esapp
 {
 
@@ -26,8 +28,8 @@ class suffix_array
 {
 public: // Public Type(s) - Part 1
     typedef size_t value_type;
-    typedef uint16_t term_type;
-    typedef std::vector<term_type> sequence;
+    typedef encoded_multistring sequence;
+    typedef encoded_multistring::value_type term_type;
 
     typedef typename std::vector<value_type>::const_iterator iterator;
     typedef typename std::vector<value_type>::const_iterator const_iterator;
@@ -35,10 +37,8 @@ public: // Public Type(s) - Part 1
 public: // Public Method(s)
     suffix_array(void);
     suffix_array(sequence const &s);
-    suffix_array(sequence const &s, size_t num_alphas);
 
     void construct(sequence const &s);
-    void construct(sequence const &s, size_t num_alphas);
     void clear(void);
 
     size_t size(void) const;
