@@ -23,13 +23,13 @@ namespace esapp
 {
 
 /************************************************
- * Declaration: class Segmenter
+ * Declaration: class segmenter
  ************************************************/
 
-class Segmenter
+class segmenter
 {
 public: // Public Method(s)
-    Segmenter(double lrv_exp, size_t max_iters = 10,
+    segmenter(double lrv_exp, size_t max_iters = 10,
               size_t max_length = 30, double smooth = 0.0);
 
     std::vector<std::vector<std::wstring>> fit_and_segment(
@@ -38,20 +38,21 @@ public: // Public Method(s)
         std::vector<std::string> const &sequences);
 
 private: // Private Type(s)
-    typedef StringCounter::Index Index;
-    typedef std::vector<Index> Seg;
+    typedef string_counter::index_type index_type;
+    typedef std::vector<index_type> segment;
 
 private: // Private Method(s)
-    void optimize_segment(Seg &seg, size_t p, size_t n) const;
+    void optimize_segment(segment &seg, size_t p, size_t n) const;
     void segment_sequence(std::vector<std::wstring> &words,
-                          std::wstring const &sequence, Seg const &seg) const;
+                          std::wstring const &sequence,
+                          segment const &seg) const;
     std::vector<std::wstring> segment_sequence(std::wstring const &sequence,
-                                               Seg const &seg) const;
+                                               segment const &seg) const;
 
 private: // Private Property(ies)
-    StringCounter counter_;
+    string_counter counter_;
     size_t max_iters_;
-}; // class Segmenter
+}; // class segmenter
 
 } // namespace esapp
 

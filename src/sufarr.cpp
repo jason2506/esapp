@@ -12,57 +12,57 @@ namespace esapp
 {
 
 /************************************************
- * Implementation: class SuffixArray
+ * Implementation: class suffix_array
  ************************************************/
 
-SuffixArray::SuffixArray(void)
+suffix_array::suffix_array(void)
 {
     // do nothing
 }
 
-SuffixArray::SuffixArray(Sequence const &s)
+suffix_array::suffix_array(sequence const &s)
     : s_(s)
 {
     construct();
 }
 
-SuffixArray::SuffixArray(Sequence const &s, size_t num_alphas)
+suffix_array::suffix_array(sequence const &s, size_t num_alphas)
 {
     construct(num_alphas);
 }
 
-void SuffixArray::construct(Sequence const &s)
+void suffix_array::construct(sequence const &s)
 {
     s_ = s;
     construct();
 }
 
-void SuffixArray::construct(Sequence const &s, size_t num_alphas)
+void suffix_array::construct(sequence const &s, size_t num_alphas)
 {
     s_ = s;
     construct(num_alphas);
 }
 
-void SuffixArray::construct(void)
+void suffix_array::construct(void)
 {
     construct(*(std::max_element(s_.begin(), s_.end())));
 }
 
-void SuffixArray::construct(size_t num_alphas)
+void suffix_array::construct(size_t num_alphas)
 {
     auto len_s = s_.size() + 1;
     sa_.resize(len_s);
 
-    std::vector<Index> bkt(num_alphas + 1);
+    std::vector<value_type> bkt(num_alphas + 1);
     gen_sa(s_.begin(), sa_, bkt, len_s, num_alphas + 1);
     gen_isa();
     gen_lcpa();
 }
 
-SuffixArray::ConstIterator SuffixArray::find(Sequence const &t) const
+suffix_array::const_iterator suffix_array::find(sequence const &t) const
 {
     auto len_s = s_.size(), len_t = t.size();
-    decltype(len_s) l = 1, r = len_s;
+    value_type l = 1, r = len_s;
     while (l + 1 < r)
     {
         auto m = (l + r) / 2, mlcp = calc_lcp(t, m);
@@ -74,12 +74,12 @@ SuffixArray::ConstIterator SuffixArray::find(Sequence const &t) const
     return sa_.end();
 }
 
-SuffixArray::ConstIterator SuffixArray::lower_bound(Sequence const &t) const
+suffix_array::const_iterator suffix_array::lower_bound(sequence const &t) const
 {
     auto len_s = s_.size(), len_t = t.size();
     auto llcp = calc_lcp(t, 1), rlcp = calc_lcp(t, len_s);
 
-    Index sa_idx;
+    value_type sa_idx;
     if (llcp == len_t || t[llcp] < s_[sa_[1] + llcp])
     {
         sa_idx = 1;
@@ -90,7 +90,7 @@ SuffixArray::ConstIterator SuffixArray::lower_bound(Sequence const &t) const
     }
     else
     {
-        decltype(len_s) l = 1, r = len_s;
+        value_type l = 1, r = len_s;
         while (l + 1 < r)
         {
             auto m = (l + r) / 2, mlcp = calc_lcp(t, m);
@@ -104,12 +104,12 @@ SuffixArray::ConstIterator SuffixArray::lower_bound(Sequence const &t) const
     return sa_.begin() + sa_idx;
 }
 
-SuffixArray::ConstIterator SuffixArray::upper_bound(Sequence const &t) const
+suffix_array::const_iterator suffix_array::upper_bound(sequence const &t) const
 {
     auto len_s = s_.size(), len_t = t.size();
     auto llcp = calc_lcp(t, 1), rlcp = calc_lcp(t, len_s);
 
-    Index sa_idx;
+    value_type sa_idx;
     if (llcp < len_t && t[llcp] < s_[sa_[1] + llcp])
     {
         sa_idx = 1;
@@ -120,7 +120,7 @@ SuffixArray::ConstIterator SuffixArray::upper_bound(Sequence const &t) const
     }
     else
     {
-        decltype(len_s) l = 1, r = len_s;
+        value_type l = 1, r = len_s;
         while (l + 1 < r)
         {
             auto m = (l + r) / 2, mlcp = calc_lcp(t, m);
@@ -134,7 +134,7 @@ SuffixArray::ConstIterator SuffixArray::upper_bound(Sequence const &t) const
     return sa_.begin() + sa_idx;
 }
 
-size_t SuffixArray::calc_lcp(Sequence const &t, size_t i) const
+suffix_array::value_type suffix_array::calc_lcp(sequence const &t, size_t i) const
 {
     decltype(calc_lcp(t, i)) lcp = 0;
     auto len_s = s_.size(), len_t = t.size();
@@ -144,15 +144,15 @@ size_t SuffixArray::calc_lcp(Sequence const &t, size_t i) const
     return lcp;
 }
 
-inline bool SuffixArray::is_lms(std::vector<bool> const &suf_types,
-                                size_t i, size_t len_s)
+inline bool suffix_array::is_lms(std::vector<bool> const &suf_types,
+                                 size_t i, size_t len_s)
 {
     return i > 0 && i < len_s && suf_types[i] && !suf_types[i - 1];
 }
 
 template <typename T>
-void SuffixArray::init_bkt(T const &s, std::vector<Index> &bkt,
-                           size_t len_s, size_t num_alphas, bool end)
+void suffix_array::init_bkt(T const &s, std::vector<value_type> &bkt,
+                            size_t len_s, size_t num_alphas, bool end)
 {
     fill_n(bkt.begin(), num_alphas, 0);
     bkt[0] = 1;
@@ -171,9 +171,10 @@ void SuffixArray::init_bkt(T const &s, std::vector<Index> &bkt,
 }
 
 template <typename T>
-void SuffixArray::induce(T const &s, std::vector<bool> const &suf_types,
-                         std::vector<Index> &sa, std::vector<Index> &bkt,
-                         size_t len_s, size_t num_alphas)
+void suffix_array::induce(T const &s, std::vector<bool> const &suf_types,
+                          std::vector<value_type> &sa,
+                          std::vector<value_type> &bkt,
+                          size_t len_s, size_t num_alphas)
 {
     init_bkt(s, bkt, len_s, num_alphas, false);
     for (decltype(len_s) i = 0; i < len_s; i++)
@@ -199,9 +200,9 @@ void SuffixArray::induce(T const &s, std::vector<bool> const &suf_types,
 }
 
 template <typename T>
-void SuffixArray::gen_sa(T const &s, std::vector<Index> &sa,
-                         std::vector<Index> &bkt,
-                         size_t len_s, size_t num_alphas)
+void suffix_array::gen_sa(T const &s, std::vector<value_type> &sa,
+                          std::vector<value_type> &bkt,
+                          size_t len_s, size_t num_alphas)
 {
     // LS-type array in bits
     std::vector<bool> suf_types(len_s);
@@ -216,7 +217,7 @@ void SuffixArray::gen_sa(T const &s, std::vector<Index> &sa,
 
     // stage 1: reduce the problem by at least 1/2 sort all the S-substrings
     init_bkt(s, bkt, len_s, num_alphas, true);
-    fill_n(sa.begin(), len_s, std::numeric_limits<Index>::max());
+    fill_n(sa.begin(), len_s, std::numeric_limits<value_type>::max());
     for (decltype(len_s) i = 1; i < len_s; i++)
     {
         if (is_lms(suf_types, i, len_s))
@@ -241,7 +242,7 @@ void SuffixArray::gen_sa(T const &s, std::vector<Index> &sa,
     auto prev = sa[0];
     decltype(len_s) num_names = 1;
     fill_n(sa.begin() + num_lms, len_s - num_lms,
-           std::numeric_limits<Index>::max());
+           std::numeric_limits<value_type>::max());
     sa[num_lms + (prev >> 1)] = 0;
     for (decltype(num_lms) i = 1; i < num_lms; i++)
     {
@@ -309,7 +310,7 @@ void SuffixArray::gen_sa(T const &s, std::vector<Index> &sa,
 
     init_bkt(s, bkt, len_s, num_alphas, true);
     fill_n(sa.begin() + num_lms, len_s - num_lms,
-           std::numeric_limits<Index>::max());
+           std::numeric_limits<value_type>::max());
     for (decltype(num_lms) i = num_lms; i-- > 0; )
     {
         auto j = sa[i];
@@ -320,7 +321,7 @@ void SuffixArray::gen_sa(T const &s, std::vector<Index> &sa,
     induce(s, suf_types, sa, bkt, len_s, num_alphas);
 }
 
-void SuffixArray::gen_isa(void)
+void suffix_array::gen_isa(void)
 {
     isa_.resize(sa_.size());
     for (decltype(sa_.size()) i = 0; i < sa_.size(); i++)
@@ -329,7 +330,7 @@ void SuffixArray::gen_isa(void)
     }
 }
 
-void SuffixArray::gen_lcpa(void)
+void suffix_array::gen_lcpa(void)
 {
     lcpa_.resize(sa_.size());
     typename decltype(lcpa_)::value_type lcp = 0;

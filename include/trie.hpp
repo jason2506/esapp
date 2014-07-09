@@ -19,26 +19,26 @@ namespace esapp
 {
 
 /************************************************
- * Declaration: class FreqTrie
+ * Declaration: class freq_trie
  ************************************************/
 
-class FreqTrie
+class freq_trie
 {
 public: // Public Type(s)
-    typedef wchar_t Term;
+    typedef wchar_t term_type;
 
-    struct Node;
-    typedef std::shared_ptr<Node> NodePtr;
+    struct node;
+    typedef std::shared_ptr<node> node_pointer;
 
 public: // Public Method(s)
-    FreqTrie(void);
-    FreqTrie(FreqTrie const &trie);
+    freq_trie(void);
+    freq_trie(freq_trie const &trie);
 
     template <typename Iterator>
-    NodePtr insert(Iterator const &begin, Iterator const &end);
+    node_pointer insert(Iterator const &begin, Iterator const &end);
 
     template <typename Iterator>
-    NodePtr const find(Iterator const &begin, Iterator const &end) const;
+    node_pointer const find(Iterator const &begin, Iterator const &end) const;
 
     template <typename Iterator>
     void increase(Iterator const &begin, Iterator const &end);
@@ -46,58 +46,59 @@ public: // Public Method(s)
     template <typename Iterator>
     void decrease(Iterator const &begin, Iterator const &end);
 
-    FreqTrie &operator=(FreqTrie const &node);
+    freq_trie &operator=(freq_trie const &node);
 
     void clear(void);
 
 private: // Private Type(s)
-    typedef std::unordered_map<Term, NodePtr> NodeCollection;
+    typedef std::unordered_map<term_type, node_pointer> NodeCollection;
 
 private: // Private Property(ies)
-    NodePtr root_;
-}; // class FreqTrie
+    node_pointer root_;
+}; // class freq_trie
 
 /************************************************
- * Declaration: struct FreqTrie::Node
+ * Declaration: struct freq_trie::node
  ************************************************/
 
-struct FreqTrie::Node
+struct freq_trie::node
 {
-    Node(void);
+    node(void);
 
-    FreqTrie::NodePtr const get(Term key) const;
-    FreqTrie::NodePtr get(Term key, bool create = false);
+    freq_trie::node_pointer const get(term_type key) const;
+    freq_trie::node_pointer get(term_type key, bool create = false);
     void clear(void);
 
-    FreqTrie::NodeCollection children;
+    freq_trie::NodeCollection children;
     size_t f;
     double hl, hr;
-}; // struct FreqTrie::Node
+}; // struct freq_trie::node
 
 /************************************************
- * Implementation: class FreqTrie
+ * Implementation: class freq_trie
  ************************************************/
 
-inline FreqTrie::FreqTrie(void)
-    : root_(new Node())
+inline freq_trie::freq_trie(void)
+    : root_(new node())
 {
     // do nothing
 }
 
-inline FreqTrie::FreqTrie(FreqTrie const &trie)
-    : root_(new Node(*(trie.root_)))
+inline freq_trie::freq_trie(freq_trie const &trie)
+    : root_(new node(*(trie.root_)))
 {
     // do nothing
 }
 
-inline FreqTrie &FreqTrie::operator=(FreqTrie const &trie)
+inline freq_trie &freq_trie::operator=(freq_trie const &trie)
 {
     *root_ = *(trie.root_);
     return *this;
 }
 
 template <typename Iterator>
-FreqTrie::NodePtr FreqTrie::insert(Iterator const &begin, Iterator const &end)
+freq_trie::node_pointer freq_trie::insert(Iterator const &begin,
+                                          Iterator const &end)
 {
     auto node = root_;
     for (auto it = begin; it != end; ++it)
@@ -109,7 +110,8 @@ FreqTrie::NodePtr FreqTrie::insert(Iterator const &begin, Iterator const &end)
 }
 
 template <typename Iterator>
-FreqTrie::NodePtr const FreqTrie::find(Iterator const &begin, Iterator const &end) const
+freq_trie::node_pointer const freq_trie::find(Iterator const &begin,
+                                              Iterator const &end) const
 {
     auto node = root_;
     for (auto it = begin; it != end; ++it)
@@ -122,7 +124,7 @@ FreqTrie::NodePtr const FreqTrie::find(Iterator const &begin, Iterator const &en
 }
 
 template <typename Iterator>
-void FreqTrie::increase(Iterator const &begin, Iterator const &end)
+void freq_trie::increase(Iterator const &begin, Iterator const &end)
 {
     for (auto it_begin = begin; it_begin != end; ++it_begin)
     {
@@ -140,7 +142,7 @@ void FreqTrie::increase(Iterator const &begin, Iterator const &end)
 }
 
 template <typename Iterator>
-void FreqTrie::decrease(Iterator const &begin, Iterator const &end)
+void freq_trie::decrease(Iterator const &begin, Iterator const &end)
 {
     for (auto it_begin = begin; it_begin != end; ++it_begin)
     {
@@ -157,38 +159,38 @@ void FreqTrie::decrease(Iterator const &begin, Iterator const &end)
     }
 }
 
-inline void FreqTrie::clear(void)
+inline void freq_trie::clear(void)
 {
     root_->clear();
 }
 
 /************************************************
- * Implementation: struct FreqTrie::FreqTrieNode
+ * Implementation: struct freq_trie::freq_trieNode
  ************************************************/
 
-inline FreqTrie::Node::Node(void)
+inline freq_trie::node::node(void)
     : f(0), hl(0), hr(0)
 {
     // do nothing
 }
 
-inline FreqTrie::NodePtr const FreqTrie::Node::get(Term key) const
+inline freq_trie::node_pointer const freq_trie::node::get(term_type key) const
 {
     auto it = children.find(key);
-    return (it != children.end()) ? it->second : NodePtr();
+    return (it != children.end()) ? it->second : node_pointer();
 }
 
-inline FreqTrie::NodePtr FreqTrie::Node::get(Term key, bool create)
+inline freq_trie::node_pointer freq_trie::node::get(term_type key, bool create)
 {
     auto it = children.find(key);
     if (it != children.end())   { return it->second; }
-    else if (!create)           { return NodePtr(); }
+    else if (!create)           { return node_pointer(); }
 
-    children.emplace(key, NodePtr(new Node()));
+    children.emplace(key, node_pointer(new node()));
     return children[key];
 }
 
-inline void FreqTrie::Node::clear(void)
+inline void freq_trie::node::clear(void)
 {
     children.clear();
     f = hl = hr = 0;

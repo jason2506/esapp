@@ -11,7 +11,7 @@ from libcpp.string cimport string
 
 
 cdef extern from 'seg.hpp':
-    cdef cppclass _Segmenter 'esapp::Segmenter':
+    cdef cppclass _Segmenter 'esapp::segmenter':
         _Segmenter(double, size_t, size_t, double) nogil except +
 
         vector[vector[string]] fit_and_segment(const vector[string] &) nogil

@@ -32,19 +32,19 @@ inline int isfwalnum(std::wint_t c)
 }
 
 /************************************************
- * Declaration: class Tokenizer
+ * Declaration: class tokenizer
  ************************************************/
 
-class Tokenizer
+class tokenizer
 {
 public: // Public Type(s)
-    typedef std::wstring Sequence;
+    typedef std::wstring sequence;
 
 public: // Public Method(s)
-    Tokenizer(Sequence const &sequence);
+    tokenizer(sequence const &s);
 
     void reset(void);
-    Sequence next(void);
+    sequence next(void);
     bool has_next(void) const;
 
 private: // Private Method(s)
@@ -52,29 +52,29 @@ private: // Private Method(s)
     void skip(Predicate pred);
 
     template <typename Predicate>
-    bool scan(Sequence &token, Predicate pred);
+    bool scan(sequence &token, Predicate pred);
 
 private: // Private Property(ies)
-    Sequence const &sequence_;
-    Sequence::const_iterator it_;
-}; // class Tokenizer
+    sequence const &s_;
+    sequence::const_iterator it_;
+}; // class tokenizer
 
 /************************************************
- * Implementation: class Tokenizer
+ * Implementation: class tokenizer
  ************************************************/
 
-inline Tokenizer::Tokenizer(Sequence const &sequence)
-    : sequence_(sequence), it_(sequence.begin())
+inline tokenizer::tokenizer(sequence const &s)
+    : s_(s), it_(s.begin())
 {
     skip(&std::iswspace);
 }
 
-inline void Tokenizer::reset(void)
+inline void tokenizer::reset(void)
 {
-    it_ = sequence_.begin();
+    it_ = s_.begin();
 }
 
-inline Tokenizer::Sequence Tokenizer::next(void)
+inline tokenizer::sequence tokenizer::next(void)
 {
     decltype(next()) token;
     if (!scan(token, &ischs) &&
@@ -89,19 +89,19 @@ inline Tokenizer::Sequence Tokenizer::next(void)
     return token;
 }
 
-inline bool Tokenizer::has_next(void) const
+inline bool tokenizer::has_next(void) const
 {
-    return it_ != sequence_.end();
+    return it_ != s_.end();
 }
 
 template <typename Predicate>
-inline void Tokenizer::skip(Predicate pred)
+inline void tokenizer::skip(Predicate pred)
 {
     for ( ; has_next() && pred(*it_); ++it_) { /* do nothing */ }
 }
 
 template <typename Predicate>
-inline bool Tokenizer::scan(Sequence &token, Predicate pred)
+inline bool tokenizer::scan(sequence &token, Predicate pred)
 {
     auto begin = it_;
     skip(pred);

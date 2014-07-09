@@ -23,67 +23,67 @@ namespace esapp
 {
 
 /************************************************
- * Declaration: class StringCounter
+ * Declaration: class string_counter
  ************************************************/
 
-class StringCounter
+class string_counter
 {
 public: // Public Type(s)
-    typedef SuffixArray::Index Index;
-    typedef wchar_t Term;
-    typedef std::basic_string<Term> Sequence;
+    typedef suffix_array::value_type index_type;
+    typedef wchar_t term_type;
+    typedef std::basic_string<term_type> sequence;
 
 public: // Public Method(s)
-    StringCounter(double lrv_exp, size_t max_len = 30, double smooth = 0.0,
-                  Term boundary = 0);
+    string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0,
+                   term_type boundary = 0);
 
-    void fit(std::vector<Sequence> const &sequences);
+    void fit(std::vector<sequence> const &sequences);
 
-    void set_pres(std::vector<Index> pres, size_t p, size_t n);
-    void unset_pres(std::vector<Index> pres, size_t p, size_t n);
+    void set_pres(std::vector<index_type> pres, size_t p, size_t n);
+    void unset_pres(std::vector<index_type> pres, size_t p, size_t n);
 
     double score(size_t i, size_t n) const;
 
     void clear(void);
 
 private: // Private Type(s)
-    typedef SuffixArray::Term TermId;
-    typedef std::vector<TermId> IdSequence;
-    typedef std::unordered_map<TermId, Index> TermCounts;
+    typedef suffix_array::term_type term_id;
+    typedef std::vector<term_id> id_sequence;
+    typedef std::unordered_map<term_id, index_type> term_counts;
 
 private: // Private Method(s)
-    IdSequence init_char_id_map(Sequence const &s);
-    IdSequence to_char_ids(Sequence const &s) const;
+    id_sequence init_char_id_map(sequence const &s);
+    id_sequence to_char_ids(sequence const &s) const;
 
     void calc_avg(void);
-    double entropy(TermCounts const &counts) const;
+    double entropy(term_counts const &counts) const;
 
 private: // Private Property(ies)
     double lrv_exp_;
-    size_t max_len_;
+    index_type max_len_;
     double smooth_;
-    Term boundary_;
+    term_type boundary_;
     double h1_;
 
     std::vector<double> f_avgs_;
     std::vector<double> hl_avgs_;
     std::vector<double> hr_avgs_;
-    std::vector<Index> str_nums_;
+    std::vector<index_type> str_nums_;
 
-    std::vector<Index> count_min_lens_;
-    std::unordered_map<Term, TermId> char_id_map_;
+    std::vector<index_type> count_min_lens_;
+    std::unordered_map<term_type, term_id> char_id_map_;
 
-    FreqTrie trie_;
-    SuffixArray sa_;
+    freq_trie trie_;
+    suffix_array sa_;
 
-    static const TermId BOUNDARY_;
-}; // class StringCounter
+    static const term_id BOUNDARY_;
+}; // class string_counter
 
 /************************************************
- * Implementation: class StringCounter
+ * Implementation: class string_counter
  ************************************************/
 
-inline void StringCounter::clear(void)
+inline void string_counter::clear(void)
 {
     sa_.clear();
 }

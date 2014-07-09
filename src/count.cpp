@@ -11,14 +11,14 @@
 namespace esapp
 {
 
-const StringCounter::TermId StringCounter::BOUNDARY_ = 0;
+const string_counter::term_id string_counter::BOUNDARY_ = 0;
 
 /************************************************
- * Implementation: class StringCounter
+ * Implementation: class string_counter
  ************************************************/
 
-StringCounter::StringCounter(double lrv_exp, size_t max_len, double smooth,
-                             Term boundary)
+string_counter::string_counter(double lrv_exp, size_t max_len, double smooth,
+                               term_type boundary)
     : lrv_exp_(lrv_exp), max_len_(max_len), smooth_(smooth), boundary_(boundary),
       f_avgs_(max_len), hl_avgs_(max_len), hr_avgs_(max_len), str_nums_(max_len)
 {
@@ -35,7 +35,7 @@ StringCounter::StringCounter(double lrv_exp, size_t max_len, double smooth,
     }
 }
 
-void StringCounter::fit(std::vector<Sequence> const &sequences)
+void string_counter::fit(std::vector<sequence> const &sequences)
 {
     // concatenate sequences
     auto s = sequences[0];
@@ -57,10 +57,10 @@ void StringCounter::fit(std::vector<Sequence> const &sequences)
     std::fill(count_min_lens_.begin(), count_min_lens_.end(), 0);
 }
 
-void StringCounter::set_pres(std::vector<Index> pres, size_t p, size_t n)
+void string_counter::set_pres(std::vector<index_type> pres, size_t p, size_t n)
 {
     // update preserve lengths (for suffix array)
-    Index len = 1;
+    index_type len = 1;
     for (auto i = n - 1, j = pres.size(); i > 0; i--)
     {
         count_min_lens_[p + i] = len++;
@@ -86,7 +86,7 @@ void StringCounter::set_pres(std::vector<Index> pres, size_t p, size_t n)
     trie_.decrease(s.begin() + i, s.begin() + p + n);
 }
 
-void StringCounter::unset_pres(std::vector<Index> pres, size_t p, size_t n)
+void string_counter::unset_pres(std::vector<index_type> pres, size_t p, size_t n)
 {
     // update preserve lengths (for suffix array)
     std::fill(count_min_lens_.begin() + p, count_min_lens_.begin() + p + n, 0);
@@ -103,7 +103,7 @@ void StringCounter::unset_pres(std::vector<Index> pres, size_t p, size_t n)
     trie_.increase(s.begin() + i, s.begin() + p + n);
 }
 
-double StringCounter::score(size_t i, size_t n) const
+double string_counter::score(size_t i, size_t n) const
 {
     if (n > max_len_ || f_avgs_[n - 1] == 0.0) { return 0.0; }
 
@@ -129,7 +129,7 @@ double StringCounter::score(size_t i, size_t n) const
     return pow(f, n) * pow(hl * hr, lrv_exp_);
 }
 
-StringCounter::IdSequence StringCounter::init_char_id_map(Sequence const &s)
+string_counter::id_sequence string_counter::init_char_id_map(sequence const &s)
 {
     char_id_map_.clear();
     char_id_map_[boundary_] = BOUNDARY_;
@@ -151,7 +151,7 @@ StringCounter::IdSequence StringCounter::init_char_id_map(Sequence const &s)
     return id_seq;
 }
 
-StringCounter::IdSequence StringCounter::to_char_ids(Sequence const &s) const
+string_counter::id_sequence string_counter::to_char_ids(sequence const &s) const
 {
     decltype(to_char_ids(s)) idx_seq;
     idx_seq.reserve(s.size());
@@ -163,12 +163,12 @@ StringCounter::IdSequence StringCounter::to_char_ids(Sequence const &s) const
     return idx_seq;
 }
 
-void StringCounter::calc_avg(void)
+void string_counter::calc_avg(void)
 {
-    typedef std::pair<Index, Index> StackItem;
-    std::stack<StackItem> lcp_stack;
+    typedef std::pair<index_type, index_type> stack_item;
+    std::stack<stack_item> lcp_stack;
     lcp_stack.emplace(0, 0);
-    h1_ = entropy(TermCounts({{BOUNDARY_, 1}}));
+    h1_ = entropy(term_counts({{BOUNDARY_, 1}}));
 
     std::fill(f_avgs_.begin(), f_avgs_.end(), 0);
     std::fill(hl_avgs_.begin(), hl_avgs_.end(), 0);
@@ -208,7 +208,7 @@ void StringCounter::calc_avg(void)
             }
 
             // calculate sp1l
-            TermCounts sp1l;
+            term_counts sp1l;
             for (auto k = top.first; k <= i; k++)
             {
                 auto c = sa_[k] > 0 ? s[sa_[k] - 1] : BOUNDARY_;
@@ -220,7 +220,7 @@ void StringCounter::calc_avg(void)
             for (auto j = lcp_stack.top().second; j < top.second; j++)
             {
                 // calculate sp1r
-                TermCounts sp1r;
+                term_counts sp1r;
                 for (auto k = top.first; k <= i; k++)
                 {
                     auto idx = sa_[k] + j + 1;
@@ -261,7 +261,7 @@ void StringCounter::calc_avg(void)
     }
 }
 
-double StringCounter::entropy(TermCounts const &counts) const
+double string_counter::entropy(term_counts const &counts) const
 {
     auto num_events = char_id_map_.size();
     auto n = num_events * smooth_;

@@ -12,27 +12,27 @@ namespace esapp
 {
 
 /************************************************
- * Implementation: class Segmenter
+ * Implementation: class segmenter
  ************************************************/
 
-Segmenter::Segmenter(double lrv_exp, size_t max_iters,
+segmenter::segmenter(double lrv_exp, size_t max_iters,
                      size_t max_length, double smooth)
     : counter_(lrv_exp, max_length, smooth), max_iters_(max_iters)
 {
     // do nothing
 }
 
-std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
+std::vector<std::vector<std::wstring>> segmenter::fit_and_segment(
     std::vector<std::wstring> const &sequences)
 {
     // pre-segment sequences by alphabets, numbers, and symbols
     std::vector<std::wstring> tokens;
     for (auto const &sequence : sequences)
     {
-        Tokenizer tokenizer(sequence);
-        while (tokenizer.has_next())
+        tokenizer tok(sequence);
+        while (tok.has_next())
         {
-            auto token = tokenizer.next();
+            auto token = tok.next();
             if (!ischs(token[0])) { continue; }
 
             tokens.push_back(token);
@@ -43,7 +43,7 @@ std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
     counter_.fit(tokens);
 
     auto m = tokens.size();
-    std::vector<Seg> prev_segs(m), segs(m);
+    std::vector<segment> prev_segs(m), segs(m);
     for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
     {
         // segment sequences
@@ -79,10 +79,10 @@ std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
     for (auto const &sequence : sequences)
     {
         decltype(words_list)::value_type words;
-        Tokenizer tokenizer(sequence);
-        while (tokenizer.has_next())
+        tokenizer tok(sequence);
+        while (tok.has_next())
         {
-            auto token = tokenizer.next();
+            auto token = tok.next();
             if (ischs(token[0]))    { segment_sequence(words, token, *it++); }
             else                    { words.push_back(token); }
         }
@@ -93,7 +93,7 @@ std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
     return words_list;
 }
 
-std::vector<std::vector<std::string>> Segmenter::fit_and_segment(
+std::vector<std::vector<std::string>> segmenter::fit_and_segment(
     std::vector<std::string> const &sequences)
 {
     auto ws_sequences = s2ws(sequences);
@@ -109,7 +109,7 @@ std::vector<std::vector<std::string>> Segmenter::fit_and_segment(
     return words_list;
 }
 
-void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
+void segmenter::optimize_segment(segment &seg, size_t p, size_t n) const
 {
     if (n == 0) { return; }
 
@@ -139,11 +139,11 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
     std::reverse(seg.begin(), seg.end());
 }
 
-void Segmenter::segment_sequence(std::vector<std::wstring> &words,
+void segmenter::segment_sequence(std::vector<std::wstring> &words,
                                  std::wstring const &sequence,
-                                 Seg const &seg) const
+                                 segment const &seg) const
 {
-    Seg::value_type start = 0;
+    segment::value_type start = 0;
     for (auto const &pos : seg)
     {
         auto word = sequence.substr(start, pos - start);
@@ -155,8 +155,8 @@ void Segmenter::segment_sequence(std::vector<std::wstring> &words,
     words.push_back(word);
 }
 
-std::vector<std::wstring> Segmenter::segment_sequence(
-    std::wstring const &sequence, Seg const &seg) const
+std::vector<std::wstring> segmenter::segment_sequence(
+    std::wstring const &sequence, segment const &seg) const
 {
     decltype(segment_sequence(sequence, seg)) words;
     words.reserve(seg.size() + 1);
