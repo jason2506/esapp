@@ -35,17 +35,10 @@ string_counter::string_counter(double lrv_exp, size_t max_len, double smooth)
     }
 }
 
-void string_counter::fit(std::vector<sequence> const &sequences)
+void string_counter::fit(encoded_multistring const &s)
 {
-    // concatenate and encode sequences
-    encoded_multistring s;
-    for (auto const &sequence : sequences)
-    {
-        s.append(sequence);
-    }
-
     // calculate average statistics of substrings
-    sa_.construct(std::move(s));
+    sa_.construct(s);
     calc_avg();
 
     // initialize vector of preserve lengths

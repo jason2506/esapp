@@ -16,8 +16,8 @@ namespace esapp
  ************************************************/
 
 segmenter::segmenter(double lrv_exp, size_t max_iters,
-                     size_t max_length, double smooth)
-    : counter_(lrv_exp, max_length, smooth), max_iters_(max_iters)
+                     size_t max_len, double smooth)
+    : counter_(lrv_exp, max_len, smooth), max_iters_(max_iters)
 {
     // do nothing
 }
@@ -26,7 +26,7 @@ std::vector<std::vector<std::wstring>> segmenter::fit_and_segment(
     std::vector<std::wstring> const &sequences)
 {
     // pre-segment sequences by alphabets, numbers, and symbols
-    std::vector<std::wstring> tokens;
+    encoded_multistring s;
     for (auto const &sequence : sequences)
     {
         tokenizer tok(sequence);
@@ -35,45 +35,16 @@ std::vector<std::vector<std::wstring>> segmenter::fit_and_segment(
             auto token = tok.next();
             if (!ischs(token[0])) { continue; }
 
-            tokens.push_back(token);
+            s.append(token);
         }
     }
 
     // construct substring counter
-    counter_.fit(tokens);
-
-    auto m = tokens.size();
-    std::vector<segment> prev_segs(m), segs(m);
-    for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
-    {
-        // segment sequences
-        for (decltype(m) j = 0, p = 0; j < m; ++j)
-        {
-            auto n = tokens[j].size();
-            optimize_segment(segs[j], p, n);
-            p += n + 1;
-        }
-
-        if (prev_segs == segs) { break; }
-
-        // update substring counts
-        for (decltype(m) j = 0, p = 0; j < m; ++j)
-        {
-            auto n = tokens[j].size();
-            if (i > 0)
-            {
-                counter_.unset_pres(prev_segs[j], p, n);
-            }
-
-            counter_.set_pres(segs[j], p, n);
-            p += n + 1;
-        }
-
-        prev_segs.swap(segs);
-    }
+    counter_.fit(std::move(s));
+    auto segs = fit_and_segment();
 
     // generate segmented word lists
-    auto it = prev_segs.begin();
+    auto it = segs.begin();
     decltype(fit_and_segment(sequences)) words_list;
     words_list.reserve(sequences.size());
     for (auto const &sequence : sequences)
@@ -96,17 +67,81 @@ std::vector<std::vector<std::wstring>> segmenter::fit_and_segment(
 std::vector<std::vector<std::string>> segmenter::fit_and_segment(
     std::vector<std::string> const &sequences)
 {
-    auto ws_sequences = s2ws(sequences);
-    auto ws_words_list = fit_and_segment(ws_sequences);
-
-    decltype(fit_and_segment(sequences)) words_list;
-    words_list.reserve(ws_words_list.size());
-    for (auto const &ws_words : ws_words_list)
+    // pre-segment sequences by alphabets, numbers, and symbols
+    encoded_multistring s;
+    for (auto const &sequence : sequences)
     {
-        words_list.push_back(ws2s(ws_words));
+        auto ws_sequence = s2ws(sequence);
+        tokenizer tok(ws_sequence);
+        while (tok.has_next())
+        {
+            auto token = tok.next();
+            if (!ischs(token[0])) { continue; }
+
+            s.append(token);
+        }
+    }
+
+    // construct substring counter
+    counter_.fit(std::move(s));
+    auto segs = fit_and_segment();
+
+    // generate segmented word lists
+    auto it = segs.begin();
+    decltype(fit_and_segment(sequences)) words_list;
+    words_list.reserve(sequences.size());
+    for (auto const &sequence : sequences)
+    {
+        std::vector<std::wstring> words;
+
+        auto ws_sequence = s2ws(sequence);
+        tokenizer tok(ws_sequence);
+        while (tok.has_next())
+        {
+            auto token = tok.next();
+            if (ischs(token[0]))    { segment_sequence(words, token, *it++); }
+            else                    { words.push_back(token); }
+        }
+
+        words_list.push_back(ws2s(words));
     }
 
     return words_list;
+}
+
+std::vector<segmenter::segment> segmenter::fit_and_segment(void)
+{
+    auto m = counter_.raw_string_count();
+    std::vector<segment> prev_segs(m), segs(m);
+    for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
+    {
+        // segment sequences
+        for (decltype(m) j = 0, p = 0; j < m; ++j)
+        {
+            auto n = counter_.raw_string_length(j);
+            optimize_segment(segs[j], p, n);
+            p += n + 1;
+        }
+
+        if (prev_segs == segs) { break; }
+
+        // update substring counts
+        for (decltype(m) j = 0, p = 0; j < m; ++j)
+        {
+            auto n = counter_.raw_string_length(j);
+            if (i > 0)
+            {
+                counter_.unset_pres(prev_segs[j], p, n);
+            }
+
+            counter_.set_pres(segs[j], p, n);
+            p += n + 1;
+        }
+
+        prev_segs.swap(segs);
+    }
+
+    return prev_segs;
 }
 
 void segmenter::optimize_segment(segment &seg, size_t p, size_t n) const

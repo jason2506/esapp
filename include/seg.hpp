@@ -30,7 +30,7 @@ class segmenter
 {
 public: // Public Method(s)
     segmenter(double lrv_exp, size_t max_iters = 10,
-              size_t max_length = 30, double smooth = 0.0);
+              size_t max_len = 30, double smooth = 0.0);
 
     std::vector<std::vector<std::wstring>> fit_and_segment(
         std::vector<std::wstring> const &sequences);
@@ -42,6 +42,7 @@ private: // Private Type(s)
     typedef std::vector<index_type> segment;
 
 private: // Private Method(s)
+    std::vector<segment> fit_and_segment(void);
     void optimize_segment(segment &seg, size_t p, size_t n) const;
     void segment_sequence(std::vector<std::wstring> &words,
                           std::wstring const &sequence,

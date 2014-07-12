@@ -36,12 +36,15 @@ public: // Public Type(s)
 public: // Public Method(s)
     string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
 
-    void fit(std::vector<sequence> const &sequences);
+    void fit(encoded_multistring const &s);
 
     void set_pres(std::vector<index_type> pres, size_t p, size_t n);
     void unset_pres(std::vector<index_type> pres, size_t p, size_t n);
 
     double score(size_t i, size_t n) const;
+
+    size_t raw_string_count(void) const;
+    size_t raw_string_length(size_t i) const;
 
     void clear(void);
 
@@ -76,6 +79,16 @@ private: // Private Property(ies)
 /************************************************
  * Implementation: class string_counter
  ************************************************/
+
+inline size_t string_counter::raw_string_count(void) const
+{
+    return sa_.data().string_count();
+}
+
+inline size_t string_counter::raw_string_length(size_t i) const
+{
+    return sa_.data().size(i);
+}
 
 inline void string_counter::clear(void)
 {

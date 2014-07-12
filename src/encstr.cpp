@@ -31,9 +31,6 @@ encoded_multistring::encoded_multistring(sequence const &s)
 
 void encoded_multistring::append(sequence const &s)
 {
-    auto n = id_sequence_.size();
-    offsets_.push_back(n);
-
     value_type i = char_id_map_.size();
     for (auto const &c : s)
     {
@@ -46,6 +43,7 @@ void encoded_multistring::append(sequence const &s)
     }
 
     id_sequence_.push_back(BOUNDARY_);
+    offsets_.push_back(id_sequence_.size());
 }
 
 } // namespace esapp

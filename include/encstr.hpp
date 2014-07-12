@@ -46,6 +46,7 @@ public: // Public Method(s)
     size_t offset(size_t i) const;
 
     size_t size(void) const;
+    size_t size(size_t i) const;
     size_t alphabet_count(void) const;
     size_t string_count(void) const;
 
@@ -114,6 +115,11 @@ inline size_t encoded_multistring::offset(size_t i) const
 inline size_t encoded_multistring::size(void) const
 {
     return id_sequence_.size();
+}
+
+inline size_t encoded_multistring::size(size_t i) const
+{
+    return (i > 0 ? offsets_[i] - offsets_[i - 1] : offsets_[i]) - 1;
 }
 
 inline size_t encoded_multistring::alphabet_count(void) const
