@@ -42,7 +42,9 @@ private: // Private Type(s)
     typedef std::vector<index_type> segment;
 
 private: // Private Method(s)
-    std::vector<segment> fit_and_segment(void);
+    template <typename T, typename F, typename G>
+    std::vector<std::vector<T>> fit_and_segment(
+        std::vector<T> const &sequences, F const &f, G const &g);
     void optimize_segment(segment &seg, size_t p, size_t n) const;
     void segment_sequence(std::vector<std::wstring> &words,
                           std::wstring const &sequence,
