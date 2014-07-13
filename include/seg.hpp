@@ -38,7 +38,8 @@ public: // Public Method(s)
         std::vector<std::string> const &sequences);
 
 private: // Private Type(s)
-    typedef std::vector<size_t> Seg;
+    typedef StringCounter::Index Index;
+    typedef std::vector<Index> Seg;
 
 private: // Private Method(s)
     void optimize_segment(Seg &seg, size_t p, size_t n) const;
@@ -49,7 +50,6 @@ private: // Private Method(s)
 
 private: // Private Property(ies)
     StringCounter counter_;
-    double lrv_exp_;
     size_t max_iters_;
 }; // class Segmenter
 

@@ -12,8 +12,8 @@
 #include <cmath>
 #include <algorithm>
 #include <stack>
-#include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "sufarr.hpp"
@@ -29,41 +29,37 @@ namespace esapp
 class StringCounter
 {
 public: // Public Type(s)
+    typedef SuffixArray::Index Index;
     typedef wchar_t Term;
     typedef std::basic_string<Term> Sequence;
 
 public: // Public Method(s)
-    StringCounter(size_t max_len = 30, double smooth = 0.0, Term boundary = 0);
+    StringCounter(double lrv_exp, size_t max_len = 30, double smooth = 0.0,
+                  Term boundary = 0);
 
     void fit(std::vector<Sequence> const &sequences);
 
-    void set_pres(std::vector<size_t> pres, size_t p, size_t n);
-    void unset_pres(std::vector<size_t> pres, size_t p, size_t n);
+    void set_pres(std::vector<Index> pres, size_t p, size_t n);
+    void unset_pres(std::vector<Index> pres, size_t p, size_t n);
 
-    double get_iv(size_t i, size_t n) const;
-    double get_hl(size_t i, size_t n) const;
-    double get_hr(size_t i, size_t n) const;
+    double score(size_t i, size_t n) const;
 
     void clear(void);
 
 private: // Private Type(s)
     typedef SuffixArray::Term TermId;
     typedef std::vector<TermId> IdSequence;
-    typedef std::unordered_map<TermId, size_t> TermCounts;
-    typedef std::tuple<size_t, size_t, size_t, TermCounts> StackItem;
+    typedef std::unordered_map<TermId, Index> TermCounts;
 
 private: // Private Method(s)
     IdSequence init_char_id_map(Sequence const &s);
     IdSequence to_char_ids(Sequence const &s) const;
 
-    void acc_stats(std::stack<StackItem> &lcp_stack,
-                   std::vector<TermCounts> &sp1r_vec,
-                   size_t i, size_t lcp);
     void calc_avg(void);
-
     double entropy(TermCounts const &counts) const;
 
 private: // Private Property(ies)
+    double lrv_exp_;
     size_t max_len_;
     double smooth_;
     Term boundary_;
@@ -72,9 +68,9 @@ private: // Private Property(ies)
     std::vector<double> f_avgs_;
     std::vector<double> hl_avgs_;
     std::vector<double> hr_avgs_;
-    std::vector<size_t> str_nums_;
+    std::vector<Index> str_nums_;
 
-    std::vector<size_t> count_min_lens_;
+    std::vector<Index> count_min_lens_;
     std::unordered_map<Term, TermId> char_id_map_;
 
     FreqTrie trie_;

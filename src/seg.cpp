@@ -17,13 +17,9 @@ namespace esapp
 
 Segmenter::Segmenter(double lrv_exp, size_t max_iters,
                      size_t max_length, double smooth)
-    : counter_(max_length, smooth), lrv_exp_(lrv_exp), max_iters_(max_iters)
+    : counter_(lrv_exp, max_length, smooth), max_iters_(max_iters)
 {
-    if (lrv_exp_ < 0)
-    {
-        throw std::invalid_argument("The exponent parameter of LRV must be " \
-                                    "greater than or equal to 0.");
-    }
+    // do nothing
 }
 
 std::vector<std::vector<std::wstring>> Segmenter::fit_and_segment(
@@ -117,41 +113,30 @@ void Segmenter::optimize_segment(Seg &seg, size_t p, size_t n) const
 {
     if (n == 0) { return; }
 
-    auto *fs = new size_t[n];
-    auto *fv = new double[n];
-    auto *fr = new double[n];
+    std::vector<size_t> fs(n);
+    std::vector<double> fv(n);
     for (decltype(n) i = 0; i < n; ++i)
     {
         fs[i] = 0;
-        fv[i] = counter_.get_iv(p, i + 1);
-        fr[i] = counter_.get_hr(p, i + 1);
+        fv[i] = counter_.score(p, i + 1);
         for (decltype(i) j = 0; j < i; ++j)
         {
-            auto hr = counter_.get_hr(p + fs[j], j - fs[j] + 1),
-                 hl = counter_.get_hl(p + j + 1, i - j),
-                 iv = counter_.get_iv(p + j + 1, i - j),
-                 lrv = pow(hr * hl, lrv_exp_),
-                 cv = fv[j] * iv * lrv;
-            if (cv > fv[i] || (cv == fv[i] && hr > fr[i]))
+            auto cv = fv[j] * counter_.score(p + j + 1, i - j);
+            if (cv > fv[i])
             {
                 fv[i] = cv;
                 fs[i] = j + 1;
-                fr[i] = hr;
             }
         }
     }
 
     seg.clear();
-    for (size_t i = fs[n - 1]; i > 0; i = fs[i - 1])
+    for (auto i = fs[n - 1]; i > 0; i = fs[i - 1])
     {
         seg.push_back(i);
     }
 
     std::reverse(seg.begin(), seg.end());
-
-    delete [] fs;
-    delete [] fv;
-    delete [] fr;
 }
 
 void Segmenter::segment_sequence(std::vector<std::wstring> &words,

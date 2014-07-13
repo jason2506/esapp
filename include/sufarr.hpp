@@ -25,11 +25,12 @@ namespace esapp
 class SuffixArray
 {
 public: // Public Type(s) - Part 1
-    typedef unsigned short Term;
+    typedef size_t Index;
+    typedef uint16_t Term;
     typedef std::vector<Term> Sequence;
 
-    typedef typename std::vector<size_t>::const_iterator Iterator;
-    typedef typename std::vector<size_t>::const_iterator ConstIterator;
+    typedef typename std::vector<Index>::const_iterator Iterator;
+    typedef typename std::vector<Index>::const_iterator ConstIterator;
 
 public: // Public Method(s)
     SuffixArray(void);
@@ -48,7 +49,7 @@ public: // Public Method(s)
     size_t rank(size_t i) const;
     size_t lcp(size_t i) const;
     size_t at(size_t i) const;
-    size_t operator[](size_t idx) const;
+    size_t operator[](size_t i) const;
 
     ConstIterator begin(void) const;
     ConstIterator end(void) const;
@@ -67,16 +68,16 @@ private: // Private Method(s)
     bool is_lms(std::vector<bool> const &suf_types, size_t i, size_t len_s);
 
     template <typename T>
-    void init_bkt(T const &s, std::vector<size_t> &bkt,
+    void init_bkt(T const &s, std::vector<Index> &bkt,
                   size_t num_chars, size_t num_alphas, bool end);
 
     template <typename T>
     void induce(T const &s, std::vector<bool> const &suf_types,
-                std::vector<size_t> &sa, std::vector<size_t> &bkt,
+                std::vector<Index> &sa, std::vector<Index> &bkt,
                 size_t num_chars, size_t num_alphas);
 
     template <typename T>
-    void gen_sa(T const &s, std::vector<size_t> &sa, std::vector<size_t> &bkt,
+    void gen_sa(T const &s, std::vector<Index> &sa, std::vector<Index> &bkt,
                 size_t num_chars, size_t num_alphas);
 
     void gen_isa(void);
@@ -84,9 +85,9 @@ private: // Private Method(s)
 
 private: // Private Property(ies)
     Sequence s_;
-    std::vector<size_t> sa_;
-    std::vector<size_t> isa_;
-    std::vector<size_t> lcpa_;
+    std::vector<Index> sa_;
+    std::vector<Index> isa_;
+    std::vector<Index> lcpa_;
 }; // class SuffixArray
 
 /************************************************
