@@ -29,8 +29,8 @@ std::vector<std::vector<std::wstring>> segmenter::fit_and_segment(
     typedef std::vector<std::wstring> words_type;
     return fit_and_segment(
         sequences,
-        [](std::wstring const &s) {return tokenizer(s); },
-        [](vec_type &v, words_type const &e) {v.push_back(e); });
+        [this](std::wstring const &s) { return create_generator(s); },
+        [](vec_type &v, words_type const &e) { v.push_back(e); });
 }
 
 std::vector<std::vector<std::string>> segmenter::fit_and_segment(
@@ -41,8 +41,17 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
     std::wstring ws;
     return fit_and_segment(
         sequences,
-        [&ws](std::string const &s) { ws = s2ws(s); return tokenizer(ws); },
+        [this, &ws](std::string const &s) { ws = s2ws(s);
+                                            return create_generator(ws); },
         [](vec_type &v, words_type const &e) { v.push_back(ws2s(e)); });
+}
+
+segmenter::generator segmenter::create_generator(std::wstring const &s)
+{
+    typedef decltype(s.cbegin()) sit;
+    return generator(s.cbegin(), s.cend(), &tokenize,
+                     [](sit &begin, sit const &end)
+                     { skip(begin, end, &std::iswspace); });
 }
 
 template <typename T, typename F, typename G>
@@ -53,10 +62,9 @@ std::vector<std::vector<T>> segmenter::fit_and_segment(
     encoded_multistring s;
     for (auto const &sequence : sequences)
     {
-        auto tok = f(sequence);
-        while (tok.has_next())
+        auto git = f(sequence);
+        for (auto const &token : git)
         {
-            auto token = tok.next();
             if (!ischs(token[0])) { continue; }
 
             s.append(token);
@@ -102,12 +110,10 @@ std::vector<std::vector<T>> segmenter::fit_and_segment(
     words_list.reserve(sequences.size());
     for (auto const &sequence : sequences)
     {
-        auto tok = f(sequence);
-
-        std::vector<decltype(tok.next())> words;
-        while (tok.has_next())
+        auto git = f(sequence);
+        std::vector<typename decltype(git)::value_type> words;
+        for (auto const &token : git)
         {
-            auto token = tok.next();
             if (ischs(token[0]))    { segment_sequence(words, token, *it++); }
             else                    { words.push_back(token); }
         }

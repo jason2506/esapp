@@ -31,85 +31,42 @@ inline int isfwalnum(std::wint_t c)
            (c >= u'０' && c <= u'９');
 }
 
-/************************************************
- * Declaration: class tokenizer
- ************************************************/
-
-class tokenizer
+template <typename Predicate>
+inline void skip(std::wstring::const_iterator &it,
+                 std::wstring::const_iterator const &end,
+                 Predicate pred)
 {
-public: // Public Type(s)
-    typedef std::wstring sequence;
-
-public: // Public Method(s)
-    tokenizer(sequence const &s);
-
-    void reset(void);
-    sequence next(void);
-    bool has_next(void) const;
-
-private: // Private Method(s)
-    template <typename Predicate>
-    void skip(Predicate pred);
-
-    template <typename Predicate>
-    bool scan(sequence &token, Predicate pred);
-
-private: // Private Property(ies)
-    sequence const &s_;
-    sequence::const_iterator it_;
-}; // class tokenizer
-
-/************************************************
- * Implementation: class tokenizer
- ************************************************/
-
-inline tokenizer::tokenizer(sequence const &s)
-    : s_(s), it_(s.begin())
-{
-    skip(&std::iswspace);
-}
-
-inline void tokenizer::reset(void)
-{
-    it_ = s_.begin();
-}
-
-inline tokenizer::sequence tokenizer::next(void)
-{
-    decltype(next()) token;
-    if (!scan(token, &ischs) &&
-        !scan(token, &isfwalnum) &&
-        !scan(token, &std::iswalnum))
-    {
-        token.assign(1, *it_);
-        ++it_;
-    }
-
-    skip(&std::iswspace);
-    return token;
-}
-
-inline bool tokenizer::has_next(void) const
-{
-    return it_ != s_.end();
+    for ( ; it != end && pred(*it); ++it) { /* do nothing */ }
 }
 
 template <typename Predicate>
-inline void tokenizer::skip(Predicate pred)
+inline bool scan(std::wstring::const_iterator &it,
+                 std::wstring::const_iterator const &end,
+                 std::wstring &token, Predicate pred)
 {
-    for ( ; has_next() && pred(*it_); ++it_) { /* do nothing */ }
-}
+    auto const begin = it;
+    skip(it, end, pred);
 
-template <typename Predicate>
-inline bool tokenizer::scan(sequence &token, Predicate pred)
-{
-    auto begin = it_;
-    skip(pred);
-
-    bool scanned = begin != it_;
-    if (scanned) { token.assign(begin, it_); }
+    bool scanned = begin != it;
+    if (scanned) { token.assign(begin, it); }
 
     return scanned;
+}
+
+inline std::wstring tokenize(std::wstring::const_iterator &it,
+                             std::wstring::const_iterator const &end)
+{
+    decltype(tokenize(it, end)) token;
+    if (!scan(it, end, token, &ischs) &&
+        !scan(it, end, token, &isfwalnum) &&
+        !scan(it, end, token, &std::iswalnum))
+    {
+        token.assign(1, *it);
+        ++it;
+    }
+
+    skip(it, end, &std::iswspace);
+    return token;
 }
 
 } // namespace esapp

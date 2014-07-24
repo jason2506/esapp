@@ -26,7 +26,7 @@ namespace esapp
 
 class suffix_array
 {
-public: // Public Type(s) - Part 1
+public: // Public Type(s)
     typedef size_t value_type;
     typedef encoded_multistring sequence;
     typedef encoded_multistring::value_type term_type;
