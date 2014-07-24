@@ -82,12 +82,12 @@ private: // Private Property(ies)
 
 inline size_t string_counter::raw_string_count(void) const
 {
-    return sa_.data().string_count();
+    return sa_.string_count();
 }
 
 inline size_t string_counter::raw_string_length(size_t i) const
 {
-    return sa_.data().size(i);
+    return sa_.size(i);
 }
 
 inline void string_counter::clear(void)

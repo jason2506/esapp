@@ -31,6 +31,7 @@ public: // Public Type(s)
     typedef encoded_multistring sequence;
     typedef encoded_multistring::value_type term_type;
 
+    typedef typename std::vector<term_type>::const_iterator data_iterator;
     typedef typename std::vector<value_type>::const_iterator iterator;
     typedef typename std::vector<value_type>::const_iterator const_iterator;
 
@@ -42,14 +43,20 @@ public: // Public Method(s)
     void clear(void);
 
     size_t size(void) const;
+    size_t size(size_t i) const;
     bool empty(void) const;
 
-    sequence const &data(void) const;
     term_type term(size_t i) const;
     value_type rank(size_t i) const;
     value_type lcp(size_t i) const;
     value_type at(size_t i) const;
     value_type operator[](size_t i) const;
+
+    size_t alphabet_count(void) const;
+    size_t string_count(void) const;
+
+    data_iterator data_begin(void) const;
+    data_iterator data_end(void) const;
 
     const_iterator begin(void) const;
     const_iterator end(void) const;
@@ -101,14 +108,14 @@ inline size_t suffix_array::size(void) const
     return sa_.size();
 }
 
+inline size_t suffix_array::size(size_t i) const
+{
+    return s_.size(i);
+}
+
 inline bool suffix_array::empty(void) const
 {
     return sa_.empty();
-}
-
-inline suffix_array::sequence const &suffix_array::data(void) const
-{
-    return s_;
 }
 
 inline suffix_array::term_type suffix_array::term(size_t i) const
@@ -134,6 +141,26 @@ inline suffix_array::value_type suffix_array::at(size_t i) const
 inline suffix_array::value_type suffix_array::operator[](size_t i) const
 {
     return sa_[i];
+}
+
+inline size_t suffix_array::alphabet_count(void) const
+{
+    return s_.alphabet_count();
+}
+
+inline size_t suffix_array::string_count(void) const
+{
+    return s_.string_count();
+}
+
+inline suffix_array::data_iterator suffix_array::data_begin(void) const
+{
+    return s_.begin();
+}
+
+inline suffix_array::data_iterator suffix_array::data_end(void) const
+{
+    return s_.end();
 }
 
 inline suffix_array::const_iterator suffix_array::begin(void) const

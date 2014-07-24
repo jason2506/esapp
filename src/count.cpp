@@ -64,15 +64,15 @@ void string_counter::set_pres(std::vector<index_type> pres, size_t p, size_t n)
     count_min_lens_[p] = len - 1;
 
     // update trie
-    auto &s = sa_.data();
+    auto it = sa_.data_begin();
     auto i = p;
     for (auto pos : pres)
     {
-        trie_.decrease(s.begin() + i, s.begin() + p + pos);
+        trie_.decrease(it + i, it + p + pos);
         i = p + pos;
     }
 
-    trie_.decrease(s.begin() + i, s.begin() + p + n);
+    trie_.decrease(it + i, it + p + n);
 }
 
 void string_counter::unset_pres(std::vector<index_type> pres, size_t p, size_t n)
@@ -81,15 +81,15 @@ void string_counter::unset_pres(std::vector<index_type> pres, size_t p, size_t n
     std::fill(count_min_lens_.begin() + p, count_min_lens_.begin() + p + n, 0);
 
     // update trie
-    auto &s = sa_.data();
+    auto it = sa_.data_begin();
     auto i = p;
     for (auto pos : pres)
     {
-        trie_.increase(s.begin() + i, s.begin() + p + pos);
+        trie_.increase(it + i, it + p + pos);
         i = p + pos;
     }
 
-    trie_.increase(s.begin() + i, s.begin() + p + n);
+    trie_.increase(it + i, it + p + n);
 }
 
 double string_counter::score(size_t i, size_t n) const
@@ -100,8 +100,8 @@ double string_counter::score(size_t i, size_t n) const
     auto j = sa_.rank(i);
     if (sa_.lcp(j) >= n || (j + 1 < sa_.size() && sa_.lcp(j + 1) >= n))
     {
-        auto &s = sa_.data();
-        auto node = trie_.find(s.begin() + i, s.begin() + i + n);
+        auto it = sa_.data_begin();
+        auto node = trie_.find(it + i, it + i + n);
         f = node->f;
         hl = node->hl;
         hr = node->hr;
@@ -131,21 +131,21 @@ void string_counter::calc_avg(void)
     std::fill(str_nums_.begin(), str_nums_.end(), 0);
 
     auto n = sa_.size();
-    auto &s = sa_.data();
+    auto it = sa_.data_begin();
     decltype(sa_.lcp(0)) prev_lcp = 0;
     for (decltype(n) i = 0; i < n; i++)
     {
         decltype(prev_lcp) lcp = 0;
         if (i + 1 < n)
         {
-            if (s[sa_[i + 1]] == BOUNDARY_) { continue; }
+            if (it[sa_[i + 1]] == BOUNDARY_) { continue; }
 
             lcp = std::min(sa_.lcp(i + 1), max_len_);
         }
 
         // count substrings occurring only once
         for (auto j = std::max(lcp, prev_lcp), idx = sa_[i] + j;
-             j < max_len_ && s[idx] != BOUNDARY_; j++, idx++)
+             j < max_len_ && it[idx] != BOUNDARY_; j++, idx++)
         {
             f_avgs_[j]++;
             hl_avgs_[j] += h1_;
@@ -166,7 +166,7 @@ void string_counter::calc_avg(void)
             term_counts sp1l;
             for (auto k = top.first; k <= i; k++)
             {
-                auto c = sa_[k] > 0 ? s[sa_[k] - 1] : BOUNDARY_;
+                auto c = sa_[k] > 0 ? it[sa_[k] - 1] : BOUNDARY_;
                 sp1l[c]++;
             }
 
@@ -179,7 +179,7 @@ void string_counter::calc_avg(void)
                 for (auto k = top.first; k <= i; k++)
                 {
                     auto idx = sa_[k] + j + 1;
-                    auto c = idx < n ? s[idx] : BOUNDARY_;
+                    auto c = idx < n ? it[idx] : BOUNDARY_;
                     sp1r[c]++;
                 }
 
@@ -189,8 +189,8 @@ void string_counter::calc_avg(void)
                 hr_avgs_[j] += hr;
                 str_nums_[j]++;
 
-                auto node = trie_.insert(s.begin() + sa_[i],
-                                         s.begin() + sa_[i] + j + 1);
+                auto node = trie_.insert(it + sa_[i],
+                                         it + sa_[i] + j + 1);
                 node->f = f;
                 node->hl = hl;
                 node->hr = hr;
@@ -218,7 +218,7 @@ void string_counter::calc_avg(void)
 
 double string_counter::entropy(term_counts const &counts) const
 {
-    auto num_events = sa_.data().alphabet_count();
+    auto num_events = sa_.alphabet_count();
     auto n = num_events * smooth_;
     for (auto const &count : counts)
     {
