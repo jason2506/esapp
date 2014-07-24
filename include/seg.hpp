@@ -42,7 +42,7 @@ private: // Private Type(s)
     typedef string_counter::index_type index_type;
     typedef std::vector<index_type> segment;
     typedef generator_iterator<std::wstring::const_iterator,
-                               decltype(&tokenize), std::wstring> generator;
+                               decltype(&tokenize)> generator;
 
 private: // Private Method(s)
     generator create_generator(std::wstring const &s);

@@ -10,6 +10,7 @@
 #define ESAPP_GEN_HPP_
 
 #include <iterator>
+#include <type_traits>
 #include <utility>
 
 namespace esapp
@@ -19,11 +20,16 @@ namespace esapp
  * Declaration: class generator_iterator
  ************************************************/
 
-template <typename I, typename G, typename T>
-class generator_iterator : public std::iterator<std::input_iterator_tag, T>
+template <typename I, typename G>
+class generator_iterator
+    : public std::iterator<std::input_iterator_tag,
+                           typename std::result_of<G(I &, I const &)>::type>
 {
 private: // Private Type(s)
-    typedef std::iterator<std::input_iterator_tag, T> base;
+    typedef std::iterator<
+        std::input_iterator_tag,
+        typename std::result_of<G(I &, I const &)>::type
+    > base;
 
 public: // Public Type(s)
     typedef typename base::iterator_category iterator_category;
@@ -64,67 +70,67 @@ private: // Private Property(ies)
  * Implementation: class generator_iterator
  ************************************************/
 
-template <typename I, typename G, typename T>
-inline generator_iterator<I, G, T>::generator_iterator(iterator const &begin,
-                                                       iterator const &end,
-                                                       generator const &g)
+template <typename I, typename G>
+inline generator_iterator<I, G>::generator_iterator(iterator const &begin,
+                                                    iterator const &end,
+                                                    generator const &g)
     : begin_(begin), end_(end), g_(g), has_val_(false)
 {
     // do nothing
 }
 
-template <typename I, typename G, typename T>
+template <typename I, typename G>
 template <typename Initializer>
-inline generator_iterator<I, G, T>::generator_iterator(iterator const &begin,
-                                                       iterator const &end,
-                                                       generator const &g,
-                                                       Initializer const &init)
+inline generator_iterator<I, G>::generator_iterator(iterator const &begin,
+                                                    iterator const &end,
+                                                    generator const &g,
+                                                    Initializer const &init)
     : begin_(begin), end_(end), g_(g), has_val_(false)
 {
     init(begin_, end_);
 }
 
-template <typename I, typename G, typename T>
-inline generator_iterator<I, G, T>::generator_iterator(generator_iterator const &g)
+template <typename I, typename G>
+inline generator_iterator<I, G>::generator_iterator(generator_iterator const &g)
     : generator_iterator(g.begin_, g.end_, g.g_)
 {
     // do nothing
 }
 
-template <typename I, typename G, typename T>
-inline typename generator_iterator<I, G, T>::generator_iterator
-generator_iterator<I, G, T>::begin(void) const
+template <typename I, typename G>
+inline typename generator_iterator<I, G>::generator_iterator
+generator_iterator<I, G>::begin(void) const
 {
     return *this;
 }
 
-template <typename I, typename G, typename T>
-inline typename generator_iterator<I, G, T>::generator_iterator
-generator_iterator<I, G, T>::end(void) const
+template <typename I, typename G>
+inline typename generator_iterator<I, G>::generator_iterator
+generator_iterator<I, G>::end(void) const
 {
     return generator_iterator(end_, end_, g_);
 }
 
-template <typename I, typename G, typename T>
-inline typename generator_iterator<I, G, T>::generator_iterator &
-generator_iterator<I, G, T>::operator++(void)
+template <typename I, typename G>
+inline typename generator_iterator<I, G>::generator_iterator &
+generator_iterator<I, G>::operator++(void)
 {
     has_val_ = false;
     return *this;
 }
 
-template <typename I, typename G, typename T>
-inline typename generator_iterator<I, G, T>::generator_iterator
-generator_iterator<I, G, T>::operator++(int)
+template <typename I, typename G>
+inline typename generator_iterator<I, G>::generator_iterator
+generator_iterator<I, G>::operator++(int)
 {
     generator_iterator it(*this);
     operator++();
     return it;
 }
 
-template <typename I, typename G, typename T>
-inline typename generator_iterator<I, G, T>::value_type &
-generator_iterator<I, G, T>::operator*(void)
+template <typename I, typename G>
+inline typename generator_iterator<I, G>::value_type &
+generator_iterator<I, G>::operator*(void)
 {
     if (!has_val_) { val_ = g_(begin_, end_); }
 
@@ -132,21 +138,21 @@ generator_iterator<I, G, T>::operator*(void)
     return val_;
 }
 
-template <typename I, typename G, typename T>
-inline typename generator_iterator<I, G, T>::value_type *
-generator_iterator<I, G, T>::operator->(void) const
+template <typename I, typename G>
+inline typename generator_iterator<I, G>::value_type *
+generator_iterator<I, G>::operator->(void) const
 {
     return &val_;
 }
 
-template <typename I, typename G, typename T>
-inline bool generator_iterator<I, G, T>::operator==(generator_iterator const &it) const
+template <typename I, typename G>
+inline bool generator_iterator<I, G>::operator==(generator_iterator const &it) const
 {
     return begin_ == it.begin_ && end_ == it.end_;
 }
 
-template <typename I, typename G, typename T>
-inline bool generator_iterator<I, G, T>::operator!=(generator_iterator const &it) const
+template <typename I, typename G>
+inline bool generator_iterator<I, G>::operator!=(generator_iterator const &it) const
 {
     return !(*this == it);
 }
