@@ -11,7 +11,6 @@
 
 #include <iterator>
 #include <type_traits>
-#include <utility>
 
 namespace esapp
 {
@@ -47,7 +46,7 @@ public: // Public Method(s)
     template <typename Initializer>
     generator_iterator(iterator const &begin, iterator const &end,
                        generator const &g, Initializer const &init);
-    generator_iterator(generator_iterator const &g);
+    generator_iterator(generator_iterator const &it);
 
     generator_iterator begin(void) const;
     generator_iterator end(void) const;
@@ -74,9 +73,9 @@ template <typename I, typename G>
 inline generator_iterator<I, G>::generator_iterator(iterator const &begin,
                                                     iterator const &end,
                                                     generator const &g)
-    : begin_(begin), end_(end), g_(g), has_val_(false)
+    : begin_(begin), end_(end), g_(g)
 {
-    // do nothing
+    operator++();
 }
 
 template <typename I, typename G>
@@ -85,14 +84,16 @@ inline generator_iterator<I, G>::generator_iterator(iterator const &begin,
                                                     iterator const &end,
                                                     generator const &g,
                                                     Initializer const &init)
-    : begin_(begin), end_(end), g_(g), has_val_(false)
+    : begin_(begin), end_(end), g_(g)
 {
     init(begin_, end_);
+    operator++();
 }
 
 template <typename I, typename G>
-inline generator_iterator<I, G>::generator_iterator(generator_iterator const &g)
-    : generator_iterator(g.begin_, g.end_, g.g_)
+inline generator_iterator<I, G>::generator_iterator(generator_iterator const &it)
+    : begin_(it.begin_), end_(it.end_), g_(it.g_),
+      val_(it.val_), has_val_(it.has_val_)
 {
     // do nothing
 }
@@ -115,7 +116,9 @@ template <typename I, typename G>
 inline typename generator_iterator<I, G>::generator_iterator &
 generator_iterator<I, G>::operator++(void)
 {
-    has_val_ = false;
+    has_val_ = begin_ != end_;
+    val_ = has_val_ ? g_(begin_, end_) : decltype(val_)();
+
     return *this;
 }
 
@@ -132,9 +135,6 @@ template <typename I, typename G>
 inline typename generator_iterator<I, G>::value_type &
 generator_iterator<I, G>::operator*(void)
 {
-    if (!has_val_) { val_ = g_(begin_, end_); }
-
-    has_val_ = true;
     return val_;
 }
 
@@ -148,7 +148,8 @@ generator_iterator<I, G>::operator->(void) const
 template <typename I, typename G>
 inline bool generator_iterator<I, G>::operator==(generator_iterator const &it) const
 {
-    return begin_ == it.begin_ && end_ == it.end_;
+    return begin_ == it.begin_ && end_ == it.end_ && g_ == it.g_ &&
+           val_ == it.val_ && has_val_ == it.has_val_;
 }
 
 template <typename I, typename G>
