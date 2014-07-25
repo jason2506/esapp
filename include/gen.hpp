@@ -37,29 +37,12 @@ class generator_iterator
         >::type
     >
 {
-private: // Private Type(s)
-    typedef std::iterator<
-        std::input_iterator_tag,
-        typename std::result_of<G(I &, I const &)>::type,
-        ptrdiff_t,
-        typename std::add_pointer<
-            typename std::add_const<
-                typename std::result_of<G(I &, I const &)>::type
-            >::type
-        >::type,
-        typename std::add_lvalue_reference<
-            typename std::add_const<
-                typename std::result_of<G(I &, I const &)>::type
-            >::type
-        >::type
-    > base;
-
 public: // Public Type(s)
-    typedef typename base::iterator_category iterator_category;
-    typedef typename base::value_type value_type;
-    typedef typename base::reference reference;
-    typedef typename base::pointer pointer;
-    typedef typename base::difference_type difference_type;
+    typedef std::input_iterator_tag iterator_category;
+    typedef typename std::result_of<G(I &, I const &)>::type value_type;
+    typedef value_type const &reference;
+    typedef value_type const *pointer;
+    typedef ptrdiff_t difference_type;
 
     typedef I iterator;
     typedef G generator;
