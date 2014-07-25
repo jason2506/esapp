@@ -46,16 +46,17 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
         [](vec_type &v, words_type const &e) { v.push_back(ws2s(e)); });
 }
 
-template <typename T, typename F, typename G>
+template <typename T, typename Tokenize, typename Append>
 std::vector<std::vector<T>> segmenter::fit_and_segment(
-    std::vector<T> const &sequences, F const &f, G const &g)
+    std::vector<T> const &sequences,
+    Tokenize const &tokenize, Append const &append)
 {
     // pre-segment sequences by alphabets, numbers, and symbols
     encoded_multistring s;
     for (auto const &sequence : sequences)
     {
-        auto git = f(sequence);
-        for (auto const &token : git)
+        auto tokens = tokenize(sequence);
+        for (auto const &token : tokens)
         {
             if (!ischs(token[0])) { continue; }
 
@@ -98,19 +99,19 @@ std::vector<std::vector<T>> segmenter::fit_and_segment(
 
     // generate segmented word lists
     auto it = prev_segs.begin();
-    decltype(fit_and_segment(sequences, f, g)) words_list;
+    decltype(fit_and_segment(sequences, tokenize, append)) words_list;
     words_list.reserve(sequences.size());
     for (auto const &sequence : sequences)
     {
-        auto git = f(sequence);
-        std::vector<typename decltype(git)::value_type> words;
-        for (auto const &token : git)
+        auto tokens = tokenize(sequence);
+        std::vector<typename decltype(tokens)::value_type> words;
+        for (auto const &token : tokens)
         {
             if (ischs(token[0]))    { segment_sequence(words, token, *it++); }
             else                    { words.push_back(token); }
         }
 
-        g(words_list, words);
+        append(words_list, words);
     }
 
     return words_list;
