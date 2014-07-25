@@ -42,7 +42,6 @@ private: // Private Type(s)
     typedef std::vector<index_type> segment;
 
 private: // Private Method(s)
-    tokenize_iterator create_generator(std::wstring const &s);
     template <typename T, typename F, typename G>
     std::vector<std::vector<T>> fit_and_segment(
         std::vector<T> const &sequences, F const &f, G const &g);

@@ -12,6 +12,8 @@
 #include <cwctype>
 #include <string>
 
+#include "gen.hpp"
+
 namespace esapp
 {
 
@@ -54,6 +56,7 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     tokenize_iterator(input_iterator const &begin, input_iterator const &end);
+    tokenize_iterator(std::wstring const &s);
     tokenize_iterator(tokenize_iterator const &it);
 
     template <typename Predicate>
@@ -80,6 +83,12 @@ inline tokenize_iterator::tokenize_iterator(input_iterator const &begin,
 {
     skip(&std::iswspace);
     next();
+}
+
+inline tokenize_iterator::tokenize_iterator(std::wstring const &s)
+    : tokenize_iterator(s.begin(), s.end())
+{
+    // do nothing
 }
 
 inline tokenize_iterator::tokenize_iterator(tokenize_iterator const &it)
