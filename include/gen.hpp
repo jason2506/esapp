@@ -10,159 +10,141 @@
 #define ESAPP_GEN_HPP_
 
 #include <iterator>
-#include <type_traits>
 
 namespace esapp
 {
 
 /************************************************
- * Declaration: class generator_iterator
+ * Declaration: class generator
  ************************************************/
 
-template <typename I, typename G>
-class generator_iterator
-    : public std::iterator<
-        std::input_iterator_tag,
-        typename std::result_of<G(I &, I const &)>::type,
-        ptrdiff_t,
-        typename std::add_pointer<
-            typename std::add_const<
-                typename std::result_of<G(I &, I const &)>::type
-            >::type
-        >::type,
-        typename std::add_lvalue_reference<
-            typename std::add_const<
-                typename std::result_of<G(I &, I const &)>::type
-            >::type
-        >::type
-    >
+template <typename D, typename I, typename T = typename I::value_type>
+class generator : public std::iterator<std::input_iterator_tag, T,
+                                       ptrdiff_t, T const *, T const &>
 {
-public: // Public Type(s)
-    typedef std::input_iterator_tag iterator_category;
-    typedef typename std::result_of<G(I &, I const &)>::type value_type;
-    typedef value_type const &reference;
-    typedef value_type const *pointer;
-    typedef ptrdiff_t difference_type;
+private: // Private Type(s)
+    typedef D subcls_t;
+    typedef std::iterator<std::input_iterator_tag, T,
+                          ptrdiff_t, T const *, T const &> supercls_t;
 
-    typedef I iterator;
-    typedef G generator;
+public: // Public Type(s)
+    typedef typename supercls_t::iterator_category iterator_category;
+    typedef typename supercls_t::value_type value_type;
+    typedef typename supercls_t::reference reference;
+    typedef typename supercls_t::pointer pointer;
+    typedef typename supercls_t::difference_type difference_type;
+
+    typedef I input_iterator;
 
 public: // Public Method(s)
-    generator_iterator(iterator const &begin, iterator const &end,
-                       generator const &g);
-    template <typename Initializer>
-    generator_iterator(iterator const &begin, iterator const &end,
-                       generator const &g, Initializer const &init);
-    generator_iterator(generator_iterator const &it);
+    generator(input_iterator const &begin, input_iterator const &end);
+    generator(generator const &g);
 
-    generator_iterator begin(void) const;
-    generator_iterator end(void) const;
+    subcls_t begin(void) const;
+    subcls_t end(void) const;
 
-    generator_iterator &operator++(void);
-    generator_iterator operator++(int);
+    subcls_t &operator++(void);
+    subcls_t operator++(int);
     reference operator*(void) const;
     pointer operator->(void) const;
-    bool operator==(generator_iterator const &it) const;
-    bool operator!=(generator_iterator const &it) const;
+    bool operator==(subcls_t const &it) const;
+    bool operator!=(subcls_t const &it) const;
 
-private: // Private Property(ies)
-    iterator begin_, end_;
-    generator g_;
-    value_type val_;
-    bool has_val_;
-}; // class generator_iterator
+private: // Private Method(s)
+    subcls_t &subcls(void);
+    subcls_t const &subcls(void) const;
+
+protected: // Protected Property(ies)
+    input_iterator it_, end_;
+}; // class generator
 
 /************************************************
- * Implementation: class generator_iterator
+ * Implementation: class generator
  ************************************************/
 
-template <typename I, typename G>
-inline generator_iterator<I, G>::generator_iterator(iterator const &begin,
-                                                    iterator const &end,
-                                                    generator const &g)
-    : begin_(begin), end_(end), g_(g)
-{
-    operator++();
-}
-
-template <typename I, typename G>
-template <typename Initializer>
-inline generator_iterator<I, G>::generator_iterator(iterator const &begin,
-                                                    iterator const &end,
-                                                    generator const &g,
-                                                    Initializer const &init)
-    : begin_(begin), end_(end), g_(g)
-{
-    init(begin_, end_);
-    operator++();
-}
-
-template <typename I, typename G>
-inline generator_iterator<I, G>::generator_iterator(generator_iterator const &it)
-    : begin_(it.begin_), end_(it.end_), g_(it.g_),
-      val_(it.val_), has_val_(it.has_val_)
+template <typename D, typename I, typename T>
+inline generator<D, I, T>::generator(input_iterator const &begin,
+                                     input_iterator const &end)
+    : it_(begin), end_(end)
 {
     // do nothing
 }
 
-template <typename I, typename G>
-inline typename generator_iterator<I, G>::generator_iterator
-generator_iterator<I, G>::begin(void) const
+template <typename D, typename I, typename T>
+inline generator<D, I, T>::generator(generator const &g)
+    : it_(g.it_), end_(g.end_)
 {
-    return *this;
+    // do nothing
 }
 
-template <typename I, typename G>
-inline typename generator_iterator<I, G>::generator_iterator
-generator_iterator<I, G>::end(void) const
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::subcls_t
+generator<D, I, T>::begin(void) const
 {
-    return generator_iterator(end_, end_, g_);
+    return subcls();
 }
 
-template <typename I, typename G>
-inline typename generator_iterator<I, G>::generator_iterator &
-generator_iterator<I, G>::operator++(void)
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::subcls_t
+generator<D, I, T>::end(void) const
 {
-    has_val_ = begin_ != end_;
-    val_ = has_val_ ? g_(begin_, end_) : decltype(val_)();
-
-    return *this;
+    return subcls_t(end_, end_);
 }
 
-template <typename I, typename G>
-inline typename generator_iterator<I, G>::generator_iterator
-generator_iterator<I, G>::operator++(int)
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::subcls_t &
+generator<D, I, T>::operator++(void)
 {
-    generator_iterator it(*this);
+    auto &that = subcls();
+    that.next();
+    return that;
+}
+
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::subcls_t
+generator<D, I, T>::operator++(int)
+{
+    generator it(subcls());
     operator++();
     return it;
 }
 
-template <typename I, typename G>
-inline typename generator_iterator<I, G>::reference
-generator_iterator<I, G>::operator*(void) const
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::reference
+generator<D, I, T>::operator*(void) const
 {
-    return val_;
+    return subcls().dereference();
 }
 
-template <typename I, typename G>
-inline typename generator_iterator<I, G>::pointer
-generator_iterator<I, G>::operator->(void) const
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::pointer
+generator<D, I, T>::operator->(void) const
 {
-    return &val_;
+    return &(subcls().dereference());
 }
 
-template <typename I, typename G>
-inline bool generator_iterator<I, G>::operator==(generator_iterator const &it) const
+template <typename D, typename I, typename T>
+inline bool generator<D, I, T>::operator==(subcls_t const &it) const
 {
-    return begin_ == it.begin_ && end_ == it.end_ && g_ == it.g_ &&
-           val_ == it.val_ && has_val_ == it.has_val_;
+    return subcls().equal(it);
 }
 
-template <typename I, typename G>
-inline bool generator_iterator<I, G>::operator!=(generator_iterator const &it) const
+template <typename D, typename I, typename T>
+inline bool generator<D, I, T>::operator!=(subcls_t const &it) const
 {
-    return !(*this == it);
+    return !subcls().equal(it);
+}
+
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::subcls_t &generator<D, I, T>::subcls(void)
+{
+    return *static_cast<subcls_t *>(this);
+}
+
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::subcls_t const &generator<D, I, T>::subcls(void) const
+{
+    return *static_cast<subcls_t const *>(this);
 }
 
 } // namespace esapp

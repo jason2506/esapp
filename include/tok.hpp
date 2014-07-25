@@ -31,42 +31,109 @@ inline int isfwalnum(std::wint_t c)
            (c >= u'０' && c <= u'９');
 }
 
-template <typename Predicate>
-inline void skip(std::wstring::const_iterator &it,
-                 std::wstring::const_iterator const &end,
-                 Predicate pred)
+/************************************************
+ * Declaration: class tokenize_iterator
+ ************************************************/
+
+class tokenize_iterator : public generator<tokenize_iterator,
+                                           std::wstring::const_iterator,
+                                           std::wstring>
 {
-    for ( ; it != end && pred(*it); ++it) { /* do nothing */ }
+private: // Private Type(s)
+    typedef generator<tokenize_iterator,
+                      std::wstring::const_iterator,
+                      std::wstring> supercls_t;
+
+public: // Public Type(s)
+    typedef typename supercls_t::iterator_category iterator_category;
+    typedef typename supercls_t::value_type value_type;
+    typedef typename supercls_t::reference reference;
+    typedef typename supercls_t::pointer pointer;
+    typedef typename supercls_t::difference_type difference_type;
+    typedef typename supercls_t::input_iterator input_iterator;
+
+public: // Public Method(s)
+    tokenize_iterator(input_iterator const &begin, input_iterator const &end);
+    tokenize_iterator(tokenize_iterator const &it);
+
+    template <typename Predicate>
+    void skip(Predicate pred);
+    template <typename Predicate>
+    bool scan(Predicate pred);
+
+    void next(void);
+    reference dereference(void) const;
+    bool equal(tokenize_iterator const &it) const;
+
+private: // Private Property(ies)
+    value_type token_;
+    bool has_next_;
+}; // class tokenize_iterator
+
+/************************************************
+ * Implementation: class tokenize_iterator
+ ************************************************/
+
+inline tokenize_iterator::tokenize_iterator(input_iterator const &begin,
+                                            input_iterator const &end)
+    : supercls_t(begin, end)
+{
+    skip(&std::iswspace);
+    next();
+}
+
+inline tokenize_iterator::tokenize_iterator(tokenize_iterator const &it)
+    : supercls_t(it.it_, it.end_), token_(it.token_), has_next_(it.has_next_)
+{
+    // do nothing
 }
 
 template <typename Predicate>
-inline bool scan(std::wstring::const_iterator &it,
-                 std::wstring::const_iterator const &end,
-                 std::wstring &token, Predicate pred)
+inline void tokenize_iterator::skip(Predicate pred)
 {
-    auto const begin = it;
-    skip(it, end, pred);
+    for ( ; it_ != end_ && pred(*it_); ++it_) { /* do nothing */ }
+}
 
-    bool scanned = begin != it;
-    if (scanned) { token.assign(begin, it); }
+template <typename Predicate>
+inline bool tokenize_iterator::scan(Predicate pred)
+{
+    auto const begin = it_;
+    skip(pred);
+
+    bool scanned = begin != it_;
+    if (scanned) { token_.assign(begin, it_); }
 
     return scanned;
 }
 
-inline std::wstring tokenize(std::wstring::const_iterator &it,
-                             std::wstring::const_iterator const &end)
+inline void tokenize_iterator::next(void)
 {
-    decltype(tokenize(it, end)) token;
-    if (!scan(it, end, token, &ischs) &&
-        !scan(it, end, token, &isfwalnum) &&
-        !scan(it, end, token, &std::iswalnum))
+    has_next_ = this->it_ != this->end_;
+    if (!has_next_)
     {
-        token.assign(1, *it);
-        ++it;
+        token_.clear();
+        return;
     }
 
-    skip(it, end, &std::iswspace);
-    return token;
+    if (!scan(&ischs) && !scan(&isfwalnum) && !scan(&std::iswalnum))
+    {
+        token_.assign(1, *it_);
+        ++it_;
+    }
+
+    skip(&std::iswspace);
+}
+
+inline typename tokenize_iterator::reference
+tokenize_iterator::dereference(void) const
+{
+    return token_;
+}
+
+inline bool tokenize_iterator::equal(tokenize_iterator const &it) const
+{
+    return this->it_ == it.it_ && this->end_ == it.end_ &&
+           token_ == it.token_ && has_next_ == it.has_next_;
 }
 
 } // namespace esapp

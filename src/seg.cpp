@@ -46,12 +46,9 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
         [](vec_type &v, words_type const &e) { v.push_back(ws2s(e)); });
 }
 
-segmenter::generator segmenter::create_generator(std::wstring const &s)
+tokenize_iterator segmenter::create_generator(std::wstring const &s)
 {
-    typedef decltype(s.cbegin()) sit;
-    return generator(s.cbegin(), s.cend(), &tokenize,
-                     [](sit &begin, sit const &end)
-                     { skip(begin, end, &std::iswspace); });
+    return tokenize_iterator(s.cbegin(), s.cend());
 }
 
 template <typename T, typename F, typename G>

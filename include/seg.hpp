@@ -15,7 +15,6 @@
 #include <string>
 #include <vector>
 
-#include "gen.hpp"
 #include "tok.hpp"
 #include "count.hpp"
 #include "conv.hpp"
@@ -41,11 +40,9 @@ public: // Public Method(s)
 private: // Private Type(s)
     typedef string_counter::index_type index_type;
     typedef std::vector<index_type> segment;
-    typedef generator_iterator<std::wstring::const_iterator,
-                               decltype(&tokenize)> generator;
 
 private: // Private Method(s)
-    generator create_generator(std::wstring const &s);
+    tokenize_iterator create_generator(std::wstring const &s);
     template <typename T, typename F, typename G>
     std::vector<std::vector<T>> fit_and_segment(
         std::vector<T> const &sequences, F const &f, G const &g);
