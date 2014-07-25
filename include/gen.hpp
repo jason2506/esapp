@@ -21,13 +21,37 @@ namespace esapp
 
 template <typename I, typename G>
 class generator_iterator
-    : public std::iterator<std::input_iterator_tag,
-                           typename std::result_of<G(I &, I const &)>::type>
+    : public std::iterator<
+        std::input_iterator_tag,
+        typename std::result_of<G(I &, I const &)>::type,
+        ptrdiff_t,
+        typename std::add_pointer<
+            typename std::add_const<
+                typename std::result_of<G(I &, I const &)>::type
+            >::type
+        >::type,
+        typename std::add_lvalue_reference<
+            typename std::add_const<
+                typename std::result_of<G(I &, I const &)>::type
+            >::type
+        >::type
+    >
 {
 private: // Private Type(s)
     typedef std::iterator<
         std::input_iterator_tag,
-        typename std::result_of<G(I &, I const &)>::type
+        typename std::result_of<G(I &, I const &)>::type,
+        ptrdiff_t,
+        typename std::add_pointer<
+            typename std::add_const<
+                typename std::result_of<G(I &, I const &)>::type
+            >::type
+        >::type,
+        typename std::add_lvalue_reference<
+            typename std::add_const<
+                typename std::result_of<G(I &, I const &)>::type
+            >::type
+        >::type
     > base;
 
 public: // Public Type(s)
@@ -53,8 +77,8 @@ public: // Public Method(s)
 
     generator_iterator &operator++(void);
     generator_iterator operator++(int);
-    value_type &operator*(void);
-    value_type *operator->(void) const;
+    reference operator*(void) const;
+    pointer operator->(void) const;
     bool operator==(generator_iterator const &it) const;
     bool operator!=(generator_iterator const &it) const;
 
@@ -132,14 +156,14 @@ generator_iterator<I, G>::operator++(int)
 }
 
 template <typename I, typename G>
-inline typename generator_iterator<I, G>::value_type &
-generator_iterator<I, G>::operator*(void)
+inline typename generator_iterator<I, G>::reference
+generator_iterator<I, G>::operator*(void) const
 {
     return val_;
 }
 
 template <typename I, typename G>
-inline typename generator_iterator<I, G>::value_type *
+inline typename generator_iterator<I, G>::pointer
 generator_iterator<I, G>::operator->(void) const
 {
     return &val_;
