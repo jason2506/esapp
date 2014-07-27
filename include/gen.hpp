@@ -43,6 +43,10 @@ public: // Public Method(s)
     subcls_t begin(void) const;
     subcls_t end(void) const;
 
+    void next(void);
+    reference dereference(void) const;
+    bool equal(subcls_t const &it) const;
+
     subcls_t &operator++(void);
     subcls_t operator++(int);
     reference operator*(void) const;
@@ -89,6 +93,25 @@ inline typename generator<D, I, T>::subcls_t
 generator<D, I, T>::end(void) const
 {
     return subcls_t(end_, end_);
+}
+
+template <typename D, typename I, typename T>
+inline void generator<D, I, T>::next(void)
+{
+    ++it_;
+}
+
+template <typename D, typename I, typename T>
+inline typename generator<D, I, T>::reference
+generator<D, I, T>::dereference(void) const
+{
+    return *it_;
+}
+
+template <typename D, typename I, typename T>
+inline bool generator<D, I, T>::equal(subcls_t const &it) const
+{
+    return it_ == it.it_;
 }
 
 template <typename D, typename I, typename T>
