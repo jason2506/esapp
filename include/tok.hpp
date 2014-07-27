@@ -57,7 +57,7 @@ public: // Public Type(s)
 public: // Public Method(s)
     tokenize_iterator(input_iterator const &begin, input_iterator const &end);
     tokenize_iterator(std::wstring const &s);
-    tokenize_iterator(tokenize_iterator const &it);
+    tokenize_iterator(tokenize_iterator const &it) = default;
 
     template <typename Predicate>
     void skip(Predicate pred);
@@ -87,12 +87,6 @@ inline tokenize_iterator::tokenize_iterator(input_iterator const &begin,
 
 inline tokenize_iterator::tokenize_iterator(std::wstring const &s)
     : tokenize_iterator(s.begin(), s.end())
-{
-    // do nothing
-}
-
-inline tokenize_iterator::tokenize_iterator(tokenize_iterator const &it)
-    : supercls_t(it.it_, it.end_), token_(it.token_), has_next_(it.has_next_)
 {
     // do nothing
 }
@@ -141,8 +135,7 @@ tokenize_iterator::dereference(void) const
 
 inline bool tokenize_iterator::equal(tokenize_iterator const &it) const
 {
-    return this->it_ == it.it_ && this->end_ == it.end_ &&
-           token_ == it.token_ && has_next_ == it.has_next_;
+    return this->it_ == it.it_ && has_next_ == it.has_next_;
 }
 
 } // namespace esapp

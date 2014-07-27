@@ -38,7 +38,7 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     generator(input_iterator const &begin, input_iterator const &end);
-    generator(generator const &g);
+    generator(generator const &g) = default;
 
     subcls_t begin(void) const;
     subcls_t end(void) const;
@@ -70,13 +70,6 @@ template <typename D, typename I, typename T>
 inline generator<D, I, T>::generator(input_iterator const &begin,
                                      input_iterator const &end)
     : it_(begin), end_(end)
-{
-    // do nothing
-}
-
-template <typename D, typename I, typename T>
-inline generator<D, I, T>::generator(generator const &g)
-    : it_(g.it_), end_(g.end_)
 {
     // do nothing
 }
