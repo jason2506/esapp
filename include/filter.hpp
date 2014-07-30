@@ -69,6 +69,7 @@ public: // Public Type(s)
     typedef Predicate predicate;
 
 public: // Public Method(s)
+    filter_iterator(void) = default;
     filter_iterator(predicate const &pred,
                     input_iterator const &begin,
                     input_iterator const &end = input_iterator());

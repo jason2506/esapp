@@ -69,6 +69,7 @@ public: // Public Type(s)
     typedef decltype(std::declval<Iterator>()->begin()) value_iterator;
 
 public: // Public Method(s)
+    flatten_iterator(void) = default;
     flatten_iterator(input_iterator const &begin, input_iterator const &end);
     flatten_iterator(flatten_iterator const &it);
 

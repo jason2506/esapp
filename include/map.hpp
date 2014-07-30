@@ -65,6 +65,7 @@ public: // Public Type(s)
     typedef Transform transform;
 
 public: // Public Method(s)
+    map_iterator(void) = default;
     map_iterator(transform const &trans,
                  input_iterator const &begin,
                  input_iterator const &end = input_iterator());
@@ -87,9 +88,12 @@ template <typename T, typename I>
 inline map_iterator<T, I>::map_iterator(transform const &trans,
                                         input_iterator const &begin,
                                         input_iterator const &end)
-    : supercls_t(begin, end), trans_(trans), val_(trans_(*(this->it_)))
+    : supercls_t(begin, end), trans_(trans)
 {
-    // do nothing
+    if (this->it_ != this->end_)
+    {
+        val_ = trans_(*(this->it_));
+    }
 }
 
 template <typename T, typename I>

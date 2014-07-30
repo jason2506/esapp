@@ -55,6 +55,7 @@ public: // Public Type(s)
     typedef typename supercls_t::input_iterator input_iterator;
 
 public: // Public Method(s)
+    tokenize_iterator(void) = default;
     tokenize_iterator(input_iterator const &begin, input_iterator const &end);
     tokenize_iterator(std::wstring const &s);
     tokenize_iterator(tokenize_iterator const &it) = default;

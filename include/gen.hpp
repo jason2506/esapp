@@ -37,6 +37,7 @@ public: // Public Type(s)
     typedef I input_iterator;
 
 public: // Public Method(s)
+    generator(void) = default;
     generator(input_iterator const &begin, input_iterator const &end);
     generator(generator const &g) = default;
 
