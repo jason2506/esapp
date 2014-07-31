@@ -16,6 +16,9 @@
 #include <vector>
 
 #include "tok.hpp"
+#include "map.hpp"
+#include "filter.hpp"
+#include "flatten.hpp"
 #include "count.hpp"
 #include "conv.hpp"
 
