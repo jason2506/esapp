@@ -59,14 +59,8 @@ std::vector<std::vector<T>> segmenter::fit_and_segment(
         )
     );
 
-    encoded_multistring s;
-    for (auto const &token : tokens)
-    {
-        s.append(token);
-    }
-
     // construct substring counter
-    counter_.fit(std::move(s));
+    counter_.fit(tokens.begin(), tokens.end());
 
     auto m = counter_.raw_string_count();
     std::vector<segment> prev_segs(m), segs(m);

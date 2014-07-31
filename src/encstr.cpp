@@ -17,19 +17,7 @@ encoded_multistring::value_type const encoded_multistring::BOUNDARY_ = 0;
  * Implementation: class encoded_multistring
  ************************************************/
 
-encoded_multistring::encoded_multistring(void)
-    : char_id_map_({{0, BOUNDARY_}})
-{
-    // do nothing
-}
-
-encoded_multistring::encoded_multistring(sequence const &s)
-    : encoded_multistring()
-{
-    append(s);
-}
-
-void encoded_multistring::append(sequence const &s)
+void encoded_multistring::push_back(sequence const &s)
 {
     value_type i = char_id_map_.size();
     for (auto const &c : s)

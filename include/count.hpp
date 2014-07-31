@@ -31,12 +31,12 @@ class string_counter
 public: // Public Type(s)
     typedef suffix_array::value_type index_type;
     typedef wchar_t term_type;
-    typedef std::basic_string<term_type> sequence;
 
 public: // Public Method(s)
     string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
 
-    void fit(encoded_multistring const &s);
+    template <typename Iterator>
+    void fit(Iterator const &begin, Iterator const &end);
 
     void set_pres(std::vector<index_type> pres, size_t p, size_t n);
     void unset_pres(std::vector<index_type> pres, size_t p, size_t n);
@@ -79,6 +79,18 @@ private: // Private Property(ies)
 /************************************************
  * Implementation: class string_counter
  ************************************************/
+
+template <typename Iterator>
+inline void string_counter::fit(Iterator const &begin, Iterator const &end)
+{
+    // calculate average statistics of substrings
+    sa_.construct(begin, end);
+    calc_avg();
+
+    // initialize vector of preserve lengths
+    count_min_lens_.resize(sa_.size());
+    std::fill(count_min_lens_.begin(), count_min_lens_.end(), 0);
+}
 
 inline size_t string_counter::raw_string_count(void) const
 {

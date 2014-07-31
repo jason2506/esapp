@@ -26,20 +26,24 @@ namespace esapp
 
 class suffix_array
 {
+private: // Private Type(s)
+    typedef encoded_multistring sequence;
+
 public: // Public Type(s)
     typedef size_t value_type;
-    typedef encoded_multistring sequence;
-    typedef encoded_multistring::value_type term_type;
+    typedef sequence::value_type term_type;
 
     typedef typename std::vector<term_type>::const_iterator data_iterator;
     typedef typename std::vector<value_type>::const_iterator iterator;
     typedef typename std::vector<value_type>::const_iterator const_iterator;
 
 public: // Public Method(s)
-    suffix_array(void);
-    suffix_array(sequence const &s);
+    suffix_array(void) = default;
+    template <typename Iterator>
+    suffix_array(Iterator const &begin, Iterator const &end);
 
-    void construct(sequence const &s);
+    template <typename Iterator>
+    void construct(Iterator const &begin, Iterator const &end);
     void clear(void);
 
     size_t size(void) const;
@@ -94,6 +98,24 @@ private: // Private Property(ies)
 /************************************************
  * Implementation: class suffix_array
  ************************************************/
+
+template <typename Iterator>
+inline suffix_array::suffix_array(Iterator const &begin, Iterator const &end)
+    : s_(begin, end)
+{
+    construct();
+}
+
+template <typename Iterator>
+inline void suffix_array::construct(Iterator const &begin, Iterator const &end)
+{
+    for (auto it = begin; it != end; ++it)
+    {
+        s_.push_back(*it);
+    }
+
+    construct();
+}
 
 inline void suffix_array::clear(void)
 {

@@ -35,17 +35,6 @@ string_counter::string_counter(double lrv_exp, size_t max_len, double smooth)
     }
 }
 
-void string_counter::fit(encoded_multistring const &s)
-{
-    // calculate average statistics of substrings
-    sa_.construct(s);
-    calc_avg();
-
-    // initialize vector of preserve lengths
-    count_min_lens_.resize(sa_.size());
-    std::fill(count_min_lens_.begin(), count_min_lens_.end(), 0);
-}
-
 void string_counter::set_pres(std::vector<index_type> pres, size_t p, size_t n)
 {
     // update preserve lengths (for suffix array)

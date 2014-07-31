@@ -15,23 +15,6 @@ namespace esapp
  * Implementation: class suffix_array
  ************************************************/
 
-suffix_array::suffix_array(void)
-{
-    // do nothing
-}
-
-suffix_array::suffix_array(sequence const &s)
-    : s_(s)
-{
-    construct();
-}
-
-void suffix_array::construct(sequence const &s)
-{
-    s_ = s;
-    construct();
-}
-
 void suffix_array::construct()
 {
     auto num_alphas = s_.alphabet_count();

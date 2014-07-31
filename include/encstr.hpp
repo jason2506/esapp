@@ -32,7 +32,8 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     encoded_multistring(void);
-    encoded_multistring(sequence const &s);
+    template <typename Iterator>
+    encoded_multistring(Iterator const &begin, Iterator const &end);
 
     iterator begin(void);
     const_iterator begin(void) const;
@@ -50,7 +51,7 @@ public: // Public Method(s)
     size_t alphabet_count(void) const;
     size_t string_count(void) const;
 
-    void append(sequence const &s);
+    void push_back(sequence const &s);
     void clear(void);
 
 private: // Private Type(s)
@@ -68,6 +69,22 @@ private: // Private Property(ies)
 /************************************************
  * Implementation: class encoded_multistring
  ************************************************/
+
+inline encoded_multistring::encoded_multistring(void)
+    : char_id_map_({{0, BOUNDARY_}})
+{
+    // do nothing
+}
+
+template <typename Iterator>
+inline encoded_multistring::encoded_multistring(Iterator const &begin, Iterator const &end)
+    : encoded_multistring()
+{
+    for (auto it = begin; it != end; ++it)
+    {
+        push_back(it);
+    }
+}
 
 inline encoded_multistring::iterator encoded_multistring::begin(void)
 {
