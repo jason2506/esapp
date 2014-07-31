@@ -1,17 +1,17 @@
 /************************************************
- *  map.hpp
+ *  map_iterator.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_MAP_HPP_
-#define ESAPP_MAP_HPP_
+#ifndef ESAPP_MAP_ITERATOR_HPP_
+#define ESAPP_MAP_ITERATOR_HPP_
 
 #include <type_traits>
 
-#include "gen.hpp"
+#include "generator.hpp"
 
 namespace esapp
 {
@@ -117,4 +117,4 @@ map_iterator<T, I>::dereference(void) const
 
 } // namespace esapp
 
-#endif // ESAPP_MAP_HPP_
+#endif // ESAPP_MAP_ITERATOR_HPP_

@@ -12,7 +12,7 @@ SRCS=$(notdir $(wildcard $(SRC_PATH)/*.cpp))
 OBJS=$(SRCS:.cpp=.o)
 DEPS=$(SRCS:.cpp=.d)
 
-LIB=esa
+LIB=esapp
 TARGET=lib$(LIB).a
 EXAMPLE=example
 

@@ -1,12 +1,12 @@
 /************************************************
- *  count.cpp
+ *  string_counter.cpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include "count.hpp"
+#include "string_counter.hpp"
 
 namespace esapp
 {

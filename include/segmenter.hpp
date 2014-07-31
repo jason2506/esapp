@@ -1,13 +1,13 @@
 /************************************************
- *  seg.hpp
+ *  segmenter.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_SEG_HPP_
-#define ESAPP_SEG_HPP_
+#ifndef ESAPP_SEGMENTER_HPP_
+#define ESAPP_SEGMENTER_HPP_
 
 #include <cmath>
 #include <algorithm>
@@ -15,11 +15,11 @@
 #include <string>
 #include <vector>
 
-#include "tok.hpp"
-#include "map.hpp"
-#include "filter.hpp"
-#include "flatten.hpp"
-#include "count.hpp"
+#include "tokenize_iterator.hpp"
+#include "map_iterator.hpp"
+#include "filter_iterator.hpp"
+#include "flatten_iterator.hpp"
+#include "string_counter.hpp"
 #include "conv.hpp"
 
 namespace esapp
@@ -63,4 +63,4 @@ private: // Private Property(ies)
 
 } // namespace esapp
 
-#endif // ESAPP_SEG_HPP_
+#endif // ESAPP_SEGMENTER_HPP_

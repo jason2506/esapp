@@ -1,7 +1,7 @@
 PY=python
 
 TARGET=esa.so
-SRCS=cython/esa.pyx cython/seg.pxd
+SRCS=cython/esapp.pyx cython/segmenter.pxd
 
 all: $(TARGET)
 
@@ -11,5 +11,5 @@ $(TARGET): $(SRCS)
 .PHONY: clean
 clean:
 	$(RM) -r build
-	$(RM) cython/esa.cpp
+	$(RM) cython/esapp.cpp
 	$(RM) $(TARGET)

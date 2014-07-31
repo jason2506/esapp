@@ -1,12 +1,12 @@
 /************************************************
- *  encstr.cpp
+ *  encoded_multistring.cpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include "encstr.hpp"
+#include "encoded_multistring.hpp"
 
 namespace esapp
 {

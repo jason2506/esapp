@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "seg.hpp"
+#include "segmenter.hpp"
 
 using namespace std;
 using namespace esapp;

@@ -11,7 +11,7 @@
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 
-from seg cimport _Segmenter
+from segmenter cimport _Segmenter
 
 
 cdef vector[string] to_string_vector(objs):

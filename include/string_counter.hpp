@@ -1,13 +1,13 @@
 /************************************************
- *  count.hpp
+ *  string_counter.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_COUNT_HPP_
-#define ESAPP_COUNT_HPP_
+#ifndef ESAPP_STRING_COUNTER_HPP_
+#define ESAPP_STRING_COUNTER_HPP_
 
 #include <cmath>
 #include <algorithm>
@@ -16,8 +16,8 @@
 #include <utility>
 #include <vector>
 
-#include "sufarr.hpp"
-#include "trie.hpp"
+#include "suffix_array.hpp"
+#include "freq_trie.hpp"
 
 namespace esapp
 {
@@ -109,4 +109,4 @@ inline void string_counter::clear(void)
 
 } // namespace esapp
 
-#endif // ESAPP_COUNT_HPP_
+#endif // ESAPP_STRING_COUNTER_HPP_

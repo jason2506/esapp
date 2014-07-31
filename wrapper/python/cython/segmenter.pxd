@@ -10,7 +10,7 @@ from libcpp.vector cimport vector
 from libcpp.string cimport string
 
 
-cdef extern from 'seg.hpp':
+cdef extern from 'segmenter.hpp':
     cdef cppclass _Segmenter 'esapp::segmenter':
         _Segmenter(double, size_t, size_t, double) nogil except +
 

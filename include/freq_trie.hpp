@@ -1,13 +1,13 @@
 /************************************************
- *  trie.hpp
+ *  freq_trie.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_TRIE_HPP_
-#define ESAPP_TRIE_HPP_
+#ifndef ESAPP_FREQ_TRIE_HPP_
+#define ESAPP_FREQ_TRIE_HPP_
 
 #include <unordered_map>
 #include <utility>
@@ -198,4 +198,4 @@ inline void freq_trie::node::clear(void)
 
 } // namespace esapp
 
-#endif // ESAPP_TRIE_HPP_
+#endif // ESAPP_FREQ_TRIE_HPP_

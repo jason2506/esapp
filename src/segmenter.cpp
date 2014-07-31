@@ -1,12 +1,12 @@
 /************************************************
- *  seg.cpp
+ *  segmenter.cpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include "seg.hpp"
+#include "segmenter.hpp"
 
 namespace esapp
 {

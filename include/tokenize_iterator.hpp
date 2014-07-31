@@ -1,18 +1,18 @@
 /************************************************
- *  tok.hpp
+ *  tokenize_iterator.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_TOK_HPP_
-#define ESAPP_TOK_HPP_
+#ifndef ESAPP_TOKENIZE_ITERATOR_HPP_
+#define ESAPP_TOKENIZE_ITERATOR_HPP_
 
 #include <cwctype>
 #include <string>
 
-#include "gen.hpp"
+#include "generator.hpp"
 
 namespace esapp
 {
@@ -141,4 +141,4 @@ inline bool tokenize_iterator::equal(tokenize_iterator const &it) const
 
 } // namespace esapp
 
-#endif // ESAPP_TOK_HPP_
+#endif // ESAPP_TOKENIZE_ITERATOR_HPP_

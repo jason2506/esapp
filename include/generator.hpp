@@ -1,13 +1,13 @@
 /************************************************
- *  gen.hpp
+ *  generator.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_GEN_HPP_
-#define ESAPP_GEN_HPP_
+#ifndef ESAPP_GENERATOR_HPP_
+#define ESAPP_GENERATOR_HPP_
 
 #include <iterator>
 
@@ -166,4 +166,4 @@ inline typename generator<D, I, T>::subcls_t const &generator<D, I, T>::subcls(v
 
 } // namespace esapp
 
-#endif // ESAPP_GEN_HPP_
+#endif // ESAPP_GENERATOR_HPP_

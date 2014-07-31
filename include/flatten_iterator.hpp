@@ -1,19 +1,19 @@
 /************************************************
- *  flatten.hpp
+ *  flatten_iterator.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_FLATTEN_HPP_
-#define ESAPP_FLATTEN_HPP_
+#ifndef ESAPP_FLATTEN_ITERATOR_HPP_
+#define ESAPP_FLATTEN_ITERATOR_HPP_
 
 #include <memory>
 #include <type_traits>
 #include <utility>
 
-#include "gen.hpp"
+#include "generator.hpp"
 
 namespace esapp
 {
@@ -156,4 +156,4 @@ inline bool flatten_iterator<I>::equal(flatten_iterator const &it) const
 
 } // namespace esapp
 
-#endif // ESAPP_FLATTEN_HPP_
+#endif // ESAPP_FLATTEN_ITERATOR_HPP_

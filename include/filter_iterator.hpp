@@ -1,17 +1,17 @@
 /************************************************
- *  filter.hpp
+ *  filter_iterator.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_FILTER_HPP_
-#define ESAPP_FILTER_HPP_
+#ifndef ESAPP_FILTER_ITERATOR_HPP_
+#define ESAPP_FILTER_ITERATOR_HPP_
 
 #include <type_traits>
 
-#include "gen.hpp"
+#include "generator.hpp"
 
 namespace esapp
 {
@@ -117,4 +117,4 @@ inline void filter_iterator<P, I>::next(void)
 
 } // namespace esapp
 
-#endif // ESAPP_FILTER_HPP_
+#endif // ESAPP_FILTER_ITERATOR_HPP_

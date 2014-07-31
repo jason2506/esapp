@@ -1,13 +1,13 @@
 /************************************************
- *  encstr.hpp
+ *  encoded_multistring.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_ENCSTR_HPP_
-#define ESAPP_ENCSTR_HPP_
+#ifndef ESAPP_ENCODED_MULTISTRING_HPP_
+#define ESAPP_ENCODED_MULTISTRING_HPP_
 
 #include <string>
 #include <unordered_map>
@@ -159,4 +159,4 @@ inline void encoded_multistring::clear(void)
 
 } // namespace esapp
 
-#endif // ESAPP_ENCSTR_HPP_
+#endif // ESAPP_ENCODED_MULTISTRING_HPP_

@@ -1,13 +1,13 @@
 /************************************************
- *  sufarr.hpp
+ *  suffix_array.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_SUFARR_HPP_
-#define ESAPP_SUFARR_HPP_
+#ifndef ESAPP_SUFFIX_ARRAY_HPP_
+#define ESAPP_SUFFIX_ARRAY_HPP_
 
 #include <cstdlib>
 #include <limits>
@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "encstr.hpp"
+#include "encoded_multistring.hpp"
 
 namespace esapp
 {
@@ -197,4 +197,4 @@ inline suffix_array::const_iterator suffix_array::end(void) const
 
 } // namespace esapp
 
-#endif // ESAPP_SUFARR_HPP_
+#endif // ESAPP_SUFFIX_ARRAY_HPP_
