@@ -117,9 +117,9 @@ inline flatten_iterator<I>::flatten_iterator(flatten_iterator const &it)
 }
 
 template <typename I>
-inline flatten_iterator<I>::flatten_iterator(input_iterator const &begin,
-                                         input_iterator const &end,
-                                         std::unique_ptr<value_iterator> &&val_it_ptr)
+inline flatten_iterator<I>::flatten_iterator(
+    input_iterator const &begin, input_iterator const &end,
+    std::unique_ptr<value_iterator> &&val_it_ptr)
     : supercls_t(begin, end), val_it_ptr_(std::move(val_it_ptr))
 {
     // do nothing
@@ -129,7 +129,7 @@ template <typename I>
 inline flatten_iterator<I> flatten_iterator<I>::end(void) const
 {
     return flatten_iterator(this->end_, this->end_,
-                          decltype(val_it_ptr_)(nullptr));
+                            decltype(val_it_ptr_)(nullptr));
 }
 
 template <typename I>
