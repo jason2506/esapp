@@ -137,7 +137,7 @@ inline void flatten_iterator<I>::next(void)
 {
     if (++(*val_it_ptr_) == this->it_->end())
     {
-        if (++this->it_ == this->end_)  { val_it_ptr_.release(); }
+        if (++this->it_ == this->end_)  { val_it_ptr_.reset(); }
         else                            { *val_it_ptr_ = this->it_->begin(); }
     }
 }
