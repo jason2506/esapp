@@ -106,9 +106,13 @@ template <typename I>
 inline flatten_iterator<I>::flatten_iterator(flatten_iterator const &it)
     : supercls_t(it.it_, it.end_)
 {
-    if (it.val_it_ptr_ != nullptr)
+    if (it.val_it_ptr_.get() != nullptr)
     {
         val_it_ptr_.reset(new value_iterator(*(it.val_it_ptr_)));
+    }
+    else
+    {
+        val_it_ptr_.reset();
     }
 }
 
