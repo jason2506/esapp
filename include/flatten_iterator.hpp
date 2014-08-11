@@ -110,10 +110,6 @@ inline flatten_iterator<I>::flatten_iterator(flatten_iterator const &it)
     {
         val_it_ptr_.reset(new value_iterator(*(it.val_it_ptr_)));
     }
-    else
-    {
-        val_it_ptr_.reset();
-    }
 }
 
 template <typename I>
