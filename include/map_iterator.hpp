@@ -74,10 +74,12 @@ public: // Public Method(s)
     map_iterator end(void) const;
     void next(void);
     reference dereference(void) const;
+    bool equal(map_iterator const &it) const;
 
 private: // Private Property(ies)
     transform trans_;
     value_type val_;
+    bool has_next_;
 }; // class map_iterator
 
 /************************************************
@@ -90,10 +92,7 @@ inline map_iterator<T, I>::map_iterator(transform const &trans,
                                         input_iterator const &end)
     : supercls_t(begin, end), trans_(trans)
 {
-    if (this->it_ != this->end_)
-    {
-        val_ = trans_(*(this->it_));
-    }
+    next();
 }
 
 template <typename T, typename I>
@@ -105,7 +104,11 @@ inline map_iterator<T, I> map_iterator<T, I>::end(void) const
 template <typename T, typename I>
 inline void map_iterator<T, I>::next(void)
 {
-    val_ = trans_(*(++(this->it_)));
+    has_next_ = this->it_ != this->end_;
+    if (!has_next_) { return; }
+
+    val_ = trans_(*(this->it_));
+    this->it_++;
 }
 
 template <typename T, typename I>
@@ -113,6 +116,12 @@ inline typename map_iterator<T, I>::reference
 map_iterator<T, I>::dereference(void) const
 {
     return val_;
+}
+
+template <typename T, typename I>
+inline bool map_iterator<T, I>::equal(map_iterator const &it) const
+{
+    return this->it_ == it.it_ && has_next_ == it.has_next_;
 }
 
 } // namespace esapp
