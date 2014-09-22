@@ -1,13 +1,13 @@
 /************************************************
- *  tokenize_iterator.hpp
+ *  token_iterator.hpp
  *  ESA++
  *
  *  Copyright (c) 2014, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_TOKENIZE_ITERATOR_HPP_
-#define ESAPP_TOKENIZE_ITERATOR_HPP_
+#ifndef ESAPP_TOKEN_ITERATOR_HPP_
+#define ESAPP_TOKEN_ITERATOR_HPP_
 
 #include <cwctype>
 #include <string>
@@ -34,15 +34,15 @@ inline int isfwalnum(std::wint_t c)
 }
 
 /************************************************
- * Declaration: class tokenize_iterator
+ * Declaration: class token_iterator
  ************************************************/
 
-class tokenize_iterator : public generator<tokenize_iterator,
-                                           std::wstring::const_iterator,
-                                           std::wstring>
+class token_iterator : public generator<token_iterator,
+                                        std::wstring::const_iterator,
+                                        std::wstring>
 {
 private: // Private Type(s)
-    typedef generator<tokenize_iterator,
+    typedef generator<token_iterator,
                       std::wstring::const_iterator,
                       std::wstring> base_t;
 
@@ -55,11 +55,11 @@ public: // Public Type(s)
     typedef typename base_t::input_iterator input_iterator;
 
 public: // Public Method(s)
-    tokenize_iterator(void) = default;
-    tokenize_iterator(input_iterator const &begin,
-                      input_iterator const &end = input_iterator());
-    tokenize_iterator(std::wstring const &s);
-    tokenize_iterator(tokenize_iterator const &it) = default;
+    token_iterator(void) = default;
+    token_iterator(input_iterator const &begin,
+                   input_iterator const &end = input_iterator());
+    token_iterator(std::wstring const &s);
+    token_iterator(token_iterator const &it) = default;
 
     template <typename Predicate>
     void skip(Predicate pred);
@@ -68,40 +68,40 @@ public: // Public Method(s)
 
     void next(void);
     reference get(void) const;
-    bool equal(tokenize_iterator const &it) const;
+    bool equal(token_iterator const &it) const;
     bool ended(void) const;
 
 private: // Private Property(ies)
     value_type token_;
     bool has_next_;
-}; // class tokenize_iterator
+}; // class token_iterator
 
 /************************************************
- * Implementation: class tokenize_iterator
+ * Implementation: class token_iterator
  ************************************************/
 
-inline tokenize_iterator::tokenize_iterator(input_iterator const &begin,
-                                            input_iterator const &end)
+inline token_iterator::token_iterator(input_iterator const &begin,
+                                      input_iterator const &end)
     : base_t(begin, end)
 {
     skip(&std::iswspace);
     next();
 }
 
-inline tokenize_iterator::tokenize_iterator(std::wstring const &s)
-    : tokenize_iterator(s.begin(), s.end())
+inline token_iterator::token_iterator(std::wstring const &s)
+    : token_iterator(s.begin(), s.end())
 {
     // do nothing
 }
 
 template <typename Predicate>
-inline void tokenize_iterator::skip(Predicate pred)
+inline void token_iterator::skip(Predicate pred)
 {
     for ( ; it_ != end_ && pred(*it_); ++it_) { /* do nothing */ }
 }
 
 template <typename Predicate>
-inline bool tokenize_iterator::scan(Predicate pred)
+inline bool token_iterator::scan(Predicate pred)
 {
     auto const begin = it_;
     skip(pred);
@@ -112,7 +112,7 @@ inline bool tokenize_iterator::scan(Predicate pred)
     return scanned;
 }
 
-inline void tokenize_iterator::next(void)
+inline void token_iterator::next(void)
 {
     has_next_ = this->it_ != this->end_;
     if (!has_next_)
@@ -130,18 +130,18 @@ inline void tokenize_iterator::next(void)
     skip(&std::iswspace);
 }
 
-inline typename tokenize_iterator::reference
-tokenize_iterator::get(void) const
+inline typename token_iterator::reference
+token_iterator::get(void) const
 {
     return token_;
 }
 
-inline bool tokenize_iterator::equal(tokenize_iterator const &it) const
+inline bool token_iterator::equal(token_iterator const &it) const
 {
     return this->it_ == it.it_ && has_next_ == it.has_next_;
 }
 
-inline bool tokenize_iterator::ended(void) const
+inline bool token_iterator::ended(void) const
 {
     return !has_next_;
 }

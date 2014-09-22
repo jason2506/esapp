@@ -29,7 +29,7 @@ std::vector<std::vector<std::wstring>> segmenter::fit_and_segment(
     typedef std::vector<std::wstring> words_type;
     return fit_and_segment(
         sequences,
-        [](std::wstring const &s) { return tokenize_iterator(s); },
+        [](std::wstring const &s) { return token_iterator(s); },
         [](vec_type &v, words_type const &e) { v.push_back(e); });
 }
 
@@ -42,7 +42,7 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
     return fit_and_segment(
         sequences,
         [&ws](std::string const &s) { ws = s2ws(s);
-                                      return tokenize_iterator(ws); },
+                                      return token_iterator(ws); },
         [](vec_type &v, words_type const &e) { v.push_back(ws2s(e)); });
 }
 

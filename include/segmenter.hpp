@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "tokenize_iterator.hpp"
+#include "token_iterator.hpp"
 #include "map_iterator.hpp"
 #include "filter_iterator.hpp"
 #include "flatten_iterator.hpp"
