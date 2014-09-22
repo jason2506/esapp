@@ -9,6 +9,7 @@
 #ifndef ESAPP_FILTER_ITERATOR_HPP_
 #define ESAPP_FILTER_ITERATOR_HPP_
 
+#include <iterator>
 #include <type_traits>
 
 #include "generator.hpp"
@@ -22,13 +23,14 @@ template <typename P, typename I> class filter_iterator;
  * Inline Helper Function(s)
  ************************************************/
 
-template <typename Predicate, typename Iterable>
+template <typename Predicate, typename Iterator>
 inline auto make_filter_iterator(Predicate const &predicate,
-                                 Iterable const &iterable)
-    -> filter_iterator<Predicate, decltype(iterable.begin())>
+                                 Iterator const &begin,
+                                 Iterator const &end)
+    -> filter_iterator<Predicate, Iterator>
 {
-    typedef decltype(make_filter_iterator(predicate, iterable)) it_t;
-    return it_t(predicate, iterable.begin(), iterable.end());
+    typedef decltype(make_filter_iterator(predicate, begin, end)) it_t;
+    return it_t(predicate, begin, end);
 }
 
 /************************************************
@@ -37,34 +39,18 @@ inline auto make_filter_iterator(Predicate const &predicate,
 
 template <typename Predicate, typename Iterator>
 class filter_iterator
-    : public generator<
-        filter_iterator<Predicate, Iterator>,
-        Iterator,
-        typename std::remove_const<
-            typename std::remove_reference<
-                decltype(*std::declval<Iterator>())
-            >::type
-        >::type
-    >
+    : public generator<filter_iterator<Predicate, Iterator>, Iterator>
 {
 private: // Private Type(s)
-    typedef generator<
-        filter_iterator,
-        Iterator,
-        typename std::remove_const<
-            typename std::remove_reference<
-                decltype(*std::declval<Iterator>())
-            >::type
-        >::type
-    > supercls_t;
+    typedef generator<filter_iterator<Predicate, Iterator>, Iterator> base_t;
 
 public: // Public Type(s)
-    typedef typename supercls_t::iterator_category iterator_category;
-    typedef typename supercls_t::value_type value_type;
-    typedef typename supercls_t::reference reference;
-    typedef typename supercls_t::pointer pointer;
-    typedef typename supercls_t::difference_type difference_type;
-    typedef typename supercls_t::input_iterator input_iterator;
+    typedef typename base_t::iterator_category iterator_category;
+    typedef typename base_t::value_type value_type;
+    typedef typename base_t::reference reference;
+    typedef typename base_t::pointer pointer;
+    typedef typename base_t::difference_type difference_type;
+    typedef typename base_t::input_iterator input_iterator;
 
     typedef Predicate predicate;
 
@@ -91,7 +77,7 @@ template <typename P, typename I>
 inline filter_iterator<P, I>::filter_iterator(predicate const &pred,
                                               input_iterator const &begin,
                                               input_iterator const &end)
-    : supercls_t(begin, end), pred_(pred)
+    : base_t(begin, end), pred_(pred)
 {
     find_next();
 }

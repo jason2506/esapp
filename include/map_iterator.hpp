@@ -9,6 +9,7 @@
 #ifndef ESAPP_MAP_ITERATOR_HPP_
 #define ESAPP_MAP_ITERATOR_HPP_
 
+#include <iterator>
 #include <type_traits>
 
 #include "generator.hpp"
@@ -22,13 +23,14 @@ template <typename T, typename I> class map_iterator;
  * Inline Helper Function(s)
  ************************************************/
 
-template <typename Transform, typename Iterable>
+template <typename Transform, typename Iterator>
 inline auto make_map_iterator(Transform const &transform,
-                              Iterable const &iterable)
-    -> map_iterator<Transform, decltype(iterable.begin())>
+                              Iterator const &begin,
+                              Iterator const &end)
+    -> map_iterator<Transform, Iterator>
 {
-    typedef decltype(make_map_iterator(transform, iterable)) it_t;
-    return it_t(transform, iterable.begin(), iterable.end());
+    typedef decltype(make_map_iterator(transform, begin, end)) it_t;
+    return it_t(transform, begin, end);
 }
 
 /************************************************
@@ -41,7 +43,7 @@ class map_iterator
         map_iterator<Transform, Iterator>,
         Iterator,
         typename std::result_of<
-            Transform(decltype(*std::declval<Iterator>()))
+            Transform(typename std::iterator_traits<Iterator>::value_type)
         >::type
     >
 {
@@ -52,15 +54,15 @@ private: // Private Type(s)
         typename std::result_of<
             Transform(decltype(*std::declval<Iterator>()))
         >::type
-    > supercls_t;
+    > base_t;
 
 public: // Public Type(s)
-    typedef typename supercls_t::iterator_category iterator_category;
-    typedef typename supercls_t::value_type value_type;
-    typedef typename supercls_t::reference reference;
-    typedef typename supercls_t::pointer pointer;
-    typedef typename supercls_t::difference_type difference_type;
-    typedef typename supercls_t::input_iterator input_iterator;
+    typedef typename base_t::iterator_category iterator_category;
+    typedef typename base_t::value_type value_type;
+    typedef typename base_t::reference reference;
+    typedef typename base_t::pointer pointer;
+    typedef typename base_t::difference_type difference_type;
+    typedef typename base_t::input_iterator input_iterator;
 
     typedef Transform transform;
 
@@ -73,8 +75,9 @@ public: // Public Method(s)
 
     map_iterator end(void) const;
     void next(void);
-    reference dereference(void) const;
+    reference get(void) const;
     bool equal(map_iterator const &it) const;
+    bool ended(void) const;
 
 private: // Private Property(ies)
     transform trans_;
@@ -90,7 +93,7 @@ template <typename T, typename I>
 inline map_iterator<T, I>::map_iterator(transform const &trans,
                                         input_iterator const &begin,
                                         input_iterator const &end)
-    : supercls_t(begin, end), trans_(trans)
+    : base_t(begin, end), trans_(trans)
 {
     next();
 }
@@ -113,7 +116,7 @@ inline void map_iterator<T, I>::next(void)
 
 template <typename T, typename I>
 inline typename map_iterator<T, I>::reference
-map_iterator<T, I>::dereference(void) const
+map_iterator<T, I>::get(void) const
 {
     return val_;
 }
@@ -122,6 +125,12 @@ template <typename T, typename I>
 inline bool map_iterator<T, I>::equal(map_iterator const &it) const
 {
     return this->it_ == it.it_ && has_next_ == it.has_next_;
+}
+
+template <typename T, typename I>
+inline bool map_iterator<T, I>::ended(void) const
+{
+    return !has_next_;
 }
 
 } // namespace esapp

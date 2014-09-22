@@ -44,19 +44,20 @@ class tokenize_iterator : public generator<tokenize_iterator,
 private: // Private Type(s)
     typedef generator<tokenize_iterator,
                       std::wstring::const_iterator,
-                      std::wstring> supercls_t;
+                      std::wstring> base_t;
 
 public: // Public Type(s)
-    typedef typename supercls_t::iterator_category iterator_category;
-    typedef typename supercls_t::value_type value_type;
-    typedef typename supercls_t::reference reference;
-    typedef typename supercls_t::pointer pointer;
-    typedef typename supercls_t::difference_type difference_type;
-    typedef typename supercls_t::input_iterator input_iterator;
+    typedef typename base_t::iterator_category iterator_category;
+    typedef typename base_t::value_type value_type;
+    typedef typename base_t::reference reference;
+    typedef typename base_t::pointer pointer;
+    typedef typename base_t::difference_type difference_type;
+    typedef typename base_t::input_iterator input_iterator;
 
 public: // Public Method(s)
     tokenize_iterator(void) = default;
-    tokenize_iterator(input_iterator const &begin, input_iterator const &end);
+    tokenize_iterator(input_iterator const &begin,
+                      input_iterator const &end = input_iterator());
     tokenize_iterator(std::wstring const &s);
     tokenize_iterator(tokenize_iterator const &it) = default;
 
@@ -66,8 +67,9 @@ public: // Public Method(s)
     bool scan(Predicate pred);
 
     void next(void);
-    reference dereference(void) const;
+    reference get(void) const;
     bool equal(tokenize_iterator const &it) const;
+    bool ended(void) const;
 
 private: // Private Property(ies)
     value_type token_;
@@ -80,7 +82,7 @@ private: // Private Property(ies)
 
 inline tokenize_iterator::tokenize_iterator(input_iterator const &begin,
                                             input_iterator const &end)
-    : supercls_t(begin, end)
+    : base_t(begin, end)
 {
     skip(&std::iswspace);
     next();
@@ -129,7 +131,7 @@ inline void tokenize_iterator::next(void)
 }
 
 inline typename tokenize_iterator::reference
-tokenize_iterator::dereference(void) const
+tokenize_iterator::get(void) const
 {
     return token_;
 }
@@ -137,6 +139,11 @@ tokenize_iterator::dereference(void) const
 inline bool tokenize_iterator::equal(tokenize_iterator const &it) const
 {
     return this->it_ == it.it_ && has_next_ == it.has_next_;
+}
+
+inline bool tokenize_iterator::ended(void) const
+{
+    return !has_next_;
 }
 
 } // namespace esapp

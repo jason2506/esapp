@@ -9,6 +9,7 @@
 #ifndef ESAPP_FLATTEN_ITERATOR_HPP_
 #define ESAPP_FLATTEN_ITERATOR_HPP_
 
+#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -24,12 +25,12 @@ template <typename I> class flatten_iterator;
  * Inline Helper Function(s)
  ************************************************/
 
-template <typename Iterable>
-inline auto make_flatten_iterator(Iterable const &iterable)
-    -> flatten_iterator<decltype(iterable.begin())>
+template <typename Iterator>
+inline auto make_flatten_iterator(Iterator const &begin, Iterator const &end)
+    -> flatten_iterator<Iterator>
 {
-    typedef decltype(make_flatten_iterator(iterable)) it_t;
-    return it_t(iterable.begin(), iterable.end());
+    typedef decltype(make_flatten_iterator(begin, end)) it_t;
+    return it_t(begin, end);
 }
 
 /************************************************
@@ -41,41 +42,38 @@ class flatten_iterator
     : public generator<
         flatten_iterator<Iterator>,
         Iterator,
-        typename std::remove_const<
-            typename std::remove_reference<
-                decltype(*(std::declval<Iterator>()->begin()))
-            >::type
-        >::type
+        typename std::iterator_traits<
+            typename std::iterator_traits<Iterator>::value_type
+        >::value_type
     >
 {
 private: // Private Type(s)
     typedef generator<
         flatten_iterator,
         Iterator,
-        typename std::remove_const<
-            typename std::remove_reference<
-                decltype(*(std::declval<Iterator>()->begin()))
-            >::type
-        >::type
-    > supercls_t;
+        typename std::iterator_traits<
+            typename std::iterator_traits<Iterator>::value_type
+        >::value_type
+    > base_t;
 
 public: // Public Type(s)
-    typedef typename supercls_t::iterator_category iterator_category;
-    typedef typename supercls_t::value_type value_type;
-    typedef typename supercls_t::reference reference;
-    typedef typename supercls_t::pointer pointer;
-    typedef typename supercls_t::difference_type difference_type;
-    typedef typename supercls_t::input_iterator input_iterator;
+    typedef typename base_t::iterator_category iterator_category;
+    typedef typename base_t::value_type value_type;
+    typedef typename base_t::reference reference;
+    typedef typename base_t::pointer pointer;
+    typedef typename base_t::difference_type difference_type;
+    typedef typename base_t::input_iterator input_iterator;
     typedef decltype(std::declval<Iterator>()->begin()) value_iterator;
 
 public: // Public Method(s)
     flatten_iterator(void) = default;
-    flatten_iterator(input_iterator const &begin, input_iterator const &end);
+    flatten_iterator(input_iterator const &begin,
+                     input_iterator const &end = input_iterator());
     flatten_iterator(flatten_iterator const &it);
 
     flatten_iterator end(void) const;
     void next(void);
-    reference dereference(void) const;
+    reference get(void) const;
     bool equal(flatten_iterator const &it) const;
 
 private: // Private Method(s)
@@ -94,7 +92,7 @@ private: // Private Property(ies)
 template <typename I>
 inline flatten_iterator<I>::flatten_iterator(input_iterator const &begin,
                                          input_iterator const &end)
-    : supercls_t(begin, end), val_it_ptr_(nullptr)
+    : base_t(begin, end), val_it_ptr_(nullptr)
 {
     if (this->it_ != this->end_)
     {
@@ -104,7 +102,7 @@ inline flatten_iterator<I>::flatten_iterator(input_iterator const &begin,
 
 template <typename I>
 inline flatten_iterator<I>::flatten_iterator(flatten_iterator const &it)
-    : supercls_t(it.it_, it.end_)
+    : base_t(it.it_, it.end_)
 {
     if (it.val_it_ptr_.get() != nullptr)
     {
@@ -116,7 +114,7 @@ template <typename I>
 inline flatten_iterator<I>::flatten_iterator(
     input_iterator const &begin, input_iterator const &end,
     std::unique_ptr<value_iterator> &&val_it_ptr)
-    : supercls_t(begin, end), val_it_ptr_(std::move(val_it_ptr))
+    : base_t(begin, end), val_it_ptr_(std::move(val_it_ptr))
 {
     // do nothing
 }
@@ -140,7 +138,7 @@ inline void flatten_iterator<I>::next(void)
 
 template <typename I>
 inline typename flatten_iterator<I>::reference
-flatten_iterator<I>::dereference(void) const
+flatten_iterator<I>::get(void) const
 {
     return **val_it_ptr_;
 }

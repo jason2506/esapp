@@ -52,12 +52,11 @@ std::vector<std::vector<T>> segmenter::fit_and_segment(
     Tokenize const &tokenize, Append const &append)
 {
     // pre-segment sequences by alphabets, numbers, and symbols
+    auto mit = make_map_iterator(tokenize, sequences.begin(), sequences.end());
+    auto fit = make_flatten_iterator(mit.begin(), mit.end());
     auto tokens = make_filter_iterator(
         [] (std::wstring const &token) { return ischs(token[0]); },
-        make_flatten_iterator(
-            make_map_iterator(tokenize, sequences)
-        )
-    );
+        fit.begin(), fit.end());
 
     // construct substring counter
     counter_.fit(tokens.begin(), tokens.end());
