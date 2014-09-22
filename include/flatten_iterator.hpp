@@ -63,7 +63,11 @@ public: // Public Type(s)
     typedef typename base_t::pointer pointer;
     typedef typename base_t::difference_type difference_type;
     typedef typename base_t::input_iterator input_iterator;
-    typedef decltype(std::declval<Iterator>()->begin()) value_iterator;
+    typedef decltype(
+        std::begin(
+            std::declval<typename std::iterator_traits<Iterator>::value_type>()
+        )
+    ) value_iterator;
 
 public: // Public Method(s)
     flatten_iterator(void) = default;
@@ -78,8 +82,8 @@ public: // Public Method(s)
 
 private: // Private Method(s)
     flatten_iterator(input_iterator const &begin,
-                   input_iterator const &end,
-                   std::unique_ptr<value_iterator> &&val_it_ptr);
+                     input_iterator const &end,
+                     std::unique_ptr<value_iterator> &&val_it_ptr);
 
 private: // Private Property(ies)
     std::unique_ptr<value_iterator> val_it_ptr_;
@@ -91,12 +95,12 @@ private: // Private Property(ies)
 
 template <typename I>
 inline flatten_iterator<I>::flatten_iterator(input_iterator const &begin,
-                                         input_iterator const &end)
+                                             input_iterator const &end)
     : base_t(begin, end), val_it_ptr_(nullptr)
 {
     if (this->it_ != this->end_)
     {
-        val_it_ptr_.reset(new value_iterator(this->it_->begin()));
+        val_it_ptr_.reset(new value_iterator(std::begin(*(this->it_))));
     }
 }
 
@@ -132,7 +136,7 @@ inline void flatten_iterator<I>::next(void)
     if (++(*val_it_ptr_) == this->it_->end())
     {
         if (++this->it_ == this->end_)  { val_it_ptr_.reset(); }
-        else                            { *val_it_ptr_ = this->it_->begin(); }
+        else                            { *val_it_ptr_ = std::begin(*(this->it_)); }
     }
 }
 

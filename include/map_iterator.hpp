@@ -52,7 +52,7 @@ private: // Private Type(s)
         map_iterator,
         Iterator,
         typename std::result_of<
-            Transform(decltype(*std::declval<Iterator>()))
+            Transform(typename std::iterator_traits<Iterator>::value_type)
         >::type
     > base_t;
 

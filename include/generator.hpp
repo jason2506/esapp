@@ -28,6 +28,9 @@ private: // Private Type(s)
     typedef std::iterator<std::input_iterator_tag, Value,
                           ptrdiff_t, Value const *, Value const &> base_t;
 
+    friend derived_t const &begin(generator const &g);
+    friend derived_t &begin(generator &g);
+
 public: // Public Type(s)
     typedef typename base_t::iterator_category iterator_category;
     typedef typename base_t::value_type value_type;
