@@ -52,14 +52,17 @@ std::vector<std::vector<T>> segmenter::fit_and_segment(
     Tokenize const &tokenize, Append const &append)
 {
     // pre-segment sequences by alphabets, numbers, and symbols
-    auto mit = make_map_iterator(tokenize, sequences.begin(), sequences.end());
-    auto fit = make_flatten_iterator(mit.begin(), mit.end());
     auto tokens = make_filter_iterator(
         [] (std::wstring const &token) { return ischs(token[0]); },
-        fit.begin(), fit.end());
+        make_flatten_iterator(
+            make_map_iterator(tokenize,
+                make_generator_adaptor(sequences.begin(), sequences.end())
+            )
+        )
+    );
 
     // construct substring counter
-    counter_.fit(tokens.begin(), tokens.end());
+    counter_.fit(tokens);
 
     auto m = counter_.raw_string_count();
     std::vector<segment> prev_segs(m), segs(m);
@@ -97,10 +100,11 @@ std::vector<std::vector<T>> segmenter::fit_and_segment(
     words_list.reserve(sequences.size());
     for (auto const &sequence : sequences)
     {
-        auto tokens = tokenize(sequence);
-        std::vector<typename decltype(tokens)::value_type> words;
-        for (auto const &token : tokens)
+        auto tokens_it = tokenize(sequence);
+        std::vector<typename decltype(tokens_it)::value_type> words;
+        for ( ; tokens_it; ++tokens_it)
         {
+            auto const &token = *tokens_it;
             if (ischs(token[0]))    { segment_sequence(words, token, *it++); }
             else                    { words.push_back(token); }
         }

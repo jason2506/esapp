@@ -18,167 +18,106 @@ namespace esapp
  * Declaration: class generator
  ************************************************/
 
-template <typename Derived, typename Iterator,
-          typename Value = typename std::iterator_traits<Iterator>::value_type>
-class generator : public std::iterator<std::input_iterator_tag, Value,
-                                       ptrdiff_t, Value const *, Value const &>
+template <typename Derived, typename Value, typename Difference>
+class generator
 {
 private: // Private Type(s)
     typedef Derived derived_t;
-    typedef std::iterator<std::input_iterator_tag, Value,
-                          ptrdiff_t, Value const *, Value const &> base_t;
-
-    friend derived_t const &begin(generator const &g);
-    friend derived_t &begin(generator &g);
 
 public: // Public Type(s)
-    typedef typename base_t::iterator_category iterator_category;
-    typedef typename base_t::value_type value_type;
-    typedef typename base_t::reference reference;
-    typedef typename base_t::pointer pointer;
-    typedef typename base_t::difference_type difference_type;
-
-    typedef Iterator input_iterator;
+    typedef std::input_iterator_tag iterator_category;
+    typedef Value value_type;
+    typedef value_type const *pointer;
+    typedef value_type const &reference;
+    typedef Difference difference_type;
 
 public: // Public Method(s)
-    generator(void) = default;
-    generator(input_iterator const &begin,
-              input_iterator const &end = input_iterator());
-    generator(generator const &g) = default;
-
-    derived_t begin(void) const;
-    derived_t end(void) const;
-
-    void next(void);
-    reference get(void) const;
-    bool equal(derived_t const &it) const;
-    bool ended(void) const;
+    // [NOTE] Derived classes must implement those methods
+    // void next(void);
+    // reference dereference(void) const;
+    // bool equal(derived_t const &g) const;
+    // bool valid(void) const;
 
     derived_t &operator++(void);
     derived_t operator++(int);
     reference operator*(void) const;
     pointer operator->(void) const;
-    bool operator==(derived_t const &it) const;
-    bool operator!=(derived_t const &it) const;
+    bool operator==(derived_t const &g) const;
+    bool operator!=(derived_t const &g) const;
     operator bool(void) const;
 
-private: // Private Method(s)
-    derived_t &subcls(void);
-    derived_t const &subcls(void) const;
+protected: // Protected Method(s)
+    generator(void) = default;
 
-protected: // Protected Property(ies)
-    input_iterator it_, end_;
+private: // Private Method(s)
+    derived_t &derived(void);
+    derived_t const &derived(void) const;
 }; // class generator
 
 /************************************************
  * Implementation: class generator
  ************************************************/
 
-template <typename D, typename I, typename T>
-inline generator<D, I, T>::generator(input_iterator const &begin,
-                                     input_iterator const &end)
-    : it_(begin), end_(end)
+template <typename D, typename T, typename X>
+inline typename generator<D, T, X>::derived_t &
+generator<D, T, X>::operator++(void)
 {
-    // do nothing
-}
-
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::derived_t
-generator<D, I, T>::begin(void) const
-{
-    return subcls();
-}
-
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::derived_t
-generator<D, I, T>::end(void) const
-{
-    return derived_t(end_, end_);
-}
-
-template <typename D, typename I, typename T>
-inline void generator<D, I, T>::next(void)
-{
-    ++it_;
-}
-
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::reference
-generator<D, I, T>::get(void) const
-{
-    return *it_;
-}
-
-template <typename D, typename I, typename T>
-inline bool generator<D, I, T>::equal(derived_t const &it) const
-{
-    return it_ == it.it_;
-}
-
-template <typename D, typename I, typename T>
-inline bool generator<D, I, T>::ended(void) const
-{
-    return it_ == end_;
-}
-
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::derived_t &
-generator<D, I, T>::operator++(void)
-{
-    auto &that = subcls();
+    auto &that = derived();
     that.next();
     return that;
 }
 
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::derived_t
-generator<D, I, T>::operator++(int)
+template <typename D, typename T, typename X>
+inline typename generator<D, T, X>::derived_t
+generator<D, T, X>::operator++(int)
 {
-    generator it(subcls());
+    generator it(derived());
     operator++();
     return it;
 }
 
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::reference
-generator<D, I, T>::operator*(void) const
+template <typename D, typename T, typename X>
+inline typename generator<D, T, X>::reference
+generator<D, T, X>::operator*(void) const
 {
-    return subcls().get();
+    return derived().dereference();
 }
 
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::pointer
-generator<D, I, T>::operator->(void) const
+template <typename D, typename T, typename X>
+inline typename generator<D, T, X>::pointer
+generator<D, T, X>::operator->(void) const
 {
-    return &(subcls().get());
+    return &(derived().dereference());
 }
 
-template <typename D, typename I, typename T>
-inline bool generator<D, I, T>::operator==(derived_t const &it) const
+template <typename D, typename T, typename X>
+inline bool generator<D, T, X>::operator==(derived_t const &g) const
 {
-    return subcls().equal(it);
+    return derived().equal(g);
 }
 
-template <typename D, typename I, typename T>
-inline bool generator<D, I, T>::operator!=(derived_t const &it) const
+template <typename D, typename T, typename X>
+inline bool generator<D, T, X>::operator!=(derived_t const &g) const
 {
-    return !subcls().equal(it);
+    return !derived().equal(g);
 }
 
-template <typename D, typename I, typename T>
-inline generator<D, I, T>::operator bool(void) const
+template <typename D, typename T, typename X>
+inline generator<D, T, X>::operator bool(void) const
 {
-    return !subcls().ended();
+    return derived().valid();
 }
 
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::derived_t &generator<D, I, T>::subcls(void)
+template <typename D, typename T, typename X>
+inline typename generator<D, T, X>::derived_t &
+generator<D, T, X>::derived(void)
 {
     return *static_cast<derived_t *>(this);
 }
 
-template <typename D, typename I, typename T>
-inline typename generator<D, I, T>::derived_t const &generator<D, I, T>::subcls(void) const
+template <typename D, typename T, typename X>
+inline typename generator<D, T, X>::derived_t const &
+generator<D, T, X>::derived(void) const
 {
     return *static_cast<derived_t const *>(this);
 }

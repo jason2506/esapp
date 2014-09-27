@@ -12,37 +12,42 @@
 #include <iterator>
 #include <type_traits>
 
-#include "generator.hpp"
+#include "nested_generator.hpp"
 
 namespace esapp
 {
 
-template <typename P, typename I> class filter_iterator;
+template <typename P, typename G> class filter_iterator;
 
 /************************************************
  * Inline Helper Function(s)
  ************************************************/
 
-template <typename Predicate, typename Iterator>
-inline auto make_filter_iterator(Predicate const &predicate,
-                                 Iterator const &begin,
-                                 Iterator const &end)
-    -> filter_iterator<Predicate, Iterator>
+template <typename Predicate, typename Generator>
+inline filter_iterator<Predicate, Generator>
+make_filter_iterator(Predicate const &predicate, Generator const &generator)
 {
-    typedef decltype(make_filter_iterator(predicate, begin, end)) it_t;
-    return it_t(predicate, begin, end);
+    typedef decltype(make_filter_iterator(predicate, generator)) it_t;
+    return it_t(predicate, generator);
 }
 
 /************************************************
  * Declaration: class filter_iterator
  ************************************************/
 
-template <typename Predicate, typename Iterator>
-class filter_iterator
-    : public generator<filter_iterator<Predicate, Iterator>, Iterator>
+template <typename Predicate, typename Generator>
+class filter_iterator : public nested_generator
+    <
+        filter_iterator<Predicate, Generator>,
+        Generator
+    >
 {
 private: // Private Type(s)
-    typedef generator<filter_iterator<Predicate, Iterator>, Iterator> base_t;
+    typedef nested_generator
+        <
+            filter_iterator<Predicate, Generator>,
+            Generator
+        > base_t;
 
 public: // Public Type(s)
     typedef typename base_t::iterator_category iterator_category;
@@ -50,18 +55,15 @@ public: // Public Type(s)
     typedef typename base_t::reference reference;
     typedef typename base_t::pointer pointer;
     typedef typename base_t::difference_type difference_type;
-    typedef typename base_t::input_iterator input_iterator;
+
+    typedef typename base_t::inner_generator inner_generator;
 
     typedef Predicate predicate;
 
 public: // Public Method(s)
     filter_iterator(void) = default;
-    filter_iterator(predicate const &pred,
-                    input_iterator const &begin,
-                    input_iterator const &end = input_iterator());
-    filter_iterator(filter_iterator const &it) = default;
+    filter_iterator(predicate const &pred, inner_generator const &g);
 
-    filter_iterator end(void) const;
     void find_next(void);
     void next(void);
 
@@ -73,31 +75,24 @@ private: // Private Property(ies)
  * Implementation: class filter_iterator
  ************************************************/
 
-template <typename P, typename I>
-inline filter_iterator<P, I>::filter_iterator(predicate const &pred,
-                                              input_iterator const &begin,
-                                              input_iterator const &end)
-    : base_t(begin, end), pred_(pred)
+template <typename P, typename G>
+inline filter_iterator<P, G>::filter_iterator(predicate const &pred,
+                                              inner_generator const &g)
+    : base_t(g), pred_(pred)
 {
     find_next();
 }
 
-template <typename P, typename I>
-inline filter_iterator<P, I> filter_iterator<P, I>::end(void) const
+template <typename P, typename G>
+inline void filter_iterator<P, G>::find_next(void)
 {
-    return filter_iterator(pred_, this->end_, this->end_);
+    while (base_t::valid() && !pred_(*base_t::base())) { base_t::next(); }
 }
 
-template <typename P, typename I>
-inline void filter_iterator<P, I>::find_next(void)
+template <typename P, typename G>
+inline void filter_iterator<P, G>::next(void)
 {
-    while (this->it_ != this->end_ && !pred_(*(this->it_))) { ++(this->it_); }
-}
-
-template <typename P, typename I>
-inline void filter_iterator<P, I>::next(void)
-{
-    ++(this->it_);
+    base_t::next();
     find_next();
 }
 

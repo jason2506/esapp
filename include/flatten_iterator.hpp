@@ -14,47 +14,48 @@
 #include <type_traits>
 #include <utility>
 
-#include "generator.hpp"
+#include "nested_generator.hpp"
 
 namespace esapp
 {
 
-template <typename I> class flatten_iterator;
+template <typename G> class flatten_iterator;
 
 /************************************************
  * Inline Helper Function(s)
  ************************************************/
 
-template <typename Iterator>
-inline auto make_flatten_iterator(Iterator const &begin, Iterator const &end)
-    -> flatten_iterator<Iterator>
+template <typename Generator>
+inline flatten_iterator<Generator>
+make_flatten_iterator(Generator const &generator)
 {
-    typedef decltype(make_flatten_iterator(begin, end)) it_t;
-    return it_t(begin, end);
+    typedef decltype(make_flatten_iterator(generator)) it_t;
+    return it_t(generator);
 }
 
 /************************************************
  * Declaration: class flatten_iterator
  ************************************************/
 
-template <typename Iterator>
-class flatten_iterator
-    : public generator<
-        flatten_iterator<Iterator>,
-        Iterator,
+template <typename Generator>
+class flatten_iterator : public nested_generator
+    <
+        flatten_iterator<Generator>,
+        Generator,
         typename std::iterator_traits<
-            typename std::iterator_traits<Iterator>::value_type
+            typename std::iterator_traits<Generator>::value_type
         >::value_type
     >
 {
 private: // Private Type(s)
-    typedef generator<
-        flatten_iterator,
-        Iterator,
-        typename std::iterator_traits<
-            typename std::iterator_traits<Iterator>::value_type
-        >::value_type
-    > base_t;
+    typedef nested_generator
+        <
+            flatten_iterator<Generator>,
+            Generator,
+            typename std::iterator_traits<
+                typename std::iterator_traits<Generator>::value_type
+            >::value_type
+        > base_t;
 
 public: // Public Type(s)
     typedef typename base_t::iterator_category iterator_category;
@@ -62,98 +63,56 @@ public: // Public Type(s)
     typedef typename base_t::reference reference;
     typedef typename base_t::pointer pointer;
     typedef typename base_t::difference_type difference_type;
-    typedef typename base_t::input_iterator input_iterator;
-    typedef decltype(
-        std::begin(
-            std::declval<typename std::iterator_traits<Iterator>::value_type>()
-        )
-    ) value_iterator;
+
+    typedef typename base_t::inner_generator inner_generator;
+    typedef typename std::iterator_traits<Generator>::value_type value_generator;
 
 public: // Public Method(s)
     flatten_iterator(void) = default;
-    flatten_iterator(input_iterator const &begin,
-                     input_iterator const &end = input_iterator());
-    flatten_iterator(flatten_iterator const &it);
+    explicit flatten_iterator(inner_generator const &g);
 
-    flatten_iterator end(void) const;
     void next(void);
-    reference get(void) const;
+    reference dereference(void) const;
     bool equal(flatten_iterator const &it) const;
 
-private: // Private Method(s)
-    flatten_iterator(input_iterator const &begin,
-                     input_iterator const &end,
-                     std::unique_ptr<value_iterator> &&val_it_ptr);
-
 private: // Private Property(ies)
-    std::unique_ptr<value_iterator> val_it_ptr_;
+    value_generator val_g_;
 }; // class flatten_iterator
 
 /************************************************
  * Implementation: class flatten_iterator
  ************************************************/
 
-template <typename I>
-inline flatten_iterator<I>::flatten_iterator(input_iterator const &begin,
-                                             input_iterator const &end)
-    : base_t(begin, end), val_it_ptr_(nullptr)
+template <typename G>
+inline flatten_iterator<G>::flatten_iterator(inner_generator const &g)
+    : base_t(g)
 {
-    if (this->it_ != this->end_)
+    if (base_t::valid()) { val_g_ = *base_t::base(); }
+}
+
+template <typename G>
+inline void flatten_iterator<G>::next(void)
+{
+    if (!(++val_g_))
     {
-        val_it_ptr_.reset(new value_iterator(std::begin(*(this->it_))));
+        base_t::next();
+        if (base_t::valid()) { val_g_ = *base_t::base(); }
     }
 }
 
-template <typename I>
-inline flatten_iterator<I>::flatten_iterator(flatten_iterator const &it)
-    : base_t(it.it_, it.end_)
+template <typename G>
+inline typename flatten_iterator<G>::reference
+flatten_iterator<G>::dereference(void) const
 {
-    if (it.val_it_ptr_.get() != nullptr)
-    {
-        val_it_ptr_.reset(new value_iterator(*(it.val_it_ptr_)));
-    }
+    return *val_g_;
 }
 
-template <typename I>
-inline flatten_iterator<I>::flatten_iterator(
-    input_iterator const &begin, input_iterator const &end,
-    std::unique_ptr<value_iterator> &&val_it_ptr)
-    : base_t(begin, end), val_it_ptr_(std::move(val_it_ptr))
+template <typename G>
+inline bool flatten_iterator<G>::equal(flatten_iterator const &it) const
 {
-    // do nothing
-}
-
-template <typename I>
-inline flatten_iterator<I> flatten_iterator<I>::end(void) const
-{
-    return flatten_iterator(this->end_, this->end_,
-                            decltype(val_it_ptr_)(nullptr));
-}
-
-template <typename I>
-inline void flatten_iterator<I>::next(void)
-{
-    if (++(*val_it_ptr_) == this->it_->end())
-    {
-        if (++this->it_ == this->end_)  { val_it_ptr_.reset(); }
-        else                            { *val_it_ptr_ = std::begin(*(this->it_)); }
-    }
-}
-
-template <typename I>
-inline typename flatten_iterator<I>::reference
-flatten_iterator<I>::get(void) const
-{
-    return **val_it_ptr_;
-}
-
-template <typename I>
-inline bool flatten_iterator<I>::equal(flatten_iterator const &it) const
-{
-    if (val_it_ptr_)            { return (bool) it.val_it_ptr_; }
-    else if (it.val_it_ptr_)    { return false; }
-
-    return *val_it_ptr_ == *(it.val_it_ptr_);
+    return base_t::equal(it) &&
+        base_t::valid() == it.valid() &&
+        (!base_t::valid() || val_g_ == it.val_g_);
 }
 
 } // namespace esapp

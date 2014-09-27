@@ -39,11 +39,11 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     suffix_array(void) = default;
-    template <typename Iterator>
-    suffix_array(Iterator const &begin, Iterator const &end);
+    template <typename Generator>
+    suffix_array(Generator const &g);
 
-    template <typename Iterator>
-    void construct(Iterator const &begin, Iterator const &end);
+    template <typename Generator>
+    void construct(Generator const &g);
     void clear(void);
 
     size_t size(void) const;
@@ -99,17 +99,17 @@ private: // Private Property(ies)
  * Implementation: class suffix_array
  ************************************************/
 
-template <typename Iterator>
-inline suffix_array::suffix_array(Iterator const &begin, Iterator const &end)
-    : s_(begin, end)
+template <typename Generator>
+inline suffix_array::suffix_array(Generator const &g)
+    : s_(g)
 {
     construct();
 }
 
-template <typename Iterator>
-inline void suffix_array::construct(Iterator const &begin, Iterator const &end)
+template <typename Generator>
+inline void suffix_array::construct(Generator const &g)
 {
-    for (auto it = begin; it != end; ++it)
+    for (auto it = g; it; ++it)
     {
         s_.push_back(*it);
     }

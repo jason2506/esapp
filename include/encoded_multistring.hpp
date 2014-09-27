@@ -32,8 +32,8 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     encoded_multistring(void);
-    template <typename Iterator>
-    encoded_multistring(Iterator const &begin, Iterator const &end);
+    template <typename Generator>
+    encoded_multistring(Generator const &g);
 
     iterator begin(void);
     const_iterator begin(void) const;
@@ -76,11 +76,11 @@ inline encoded_multistring::encoded_multistring(void)
     // do nothing
 }
 
-template <typename Iterator>
-inline encoded_multistring::encoded_multistring(Iterator const &begin, Iterator const &end)
+template <typename Generator>
+inline encoded_multistring::encoded_multistring(Generator const &g)
     : encoded_multistring()
 {
-    for (auto it = begin; it != end; ++it)
+    for (auto it = g; it; ++it)
     {
         push_back(it);
     }

@@ -19,6 +19,7 @@
 #include "map_iterator.hpp"
 #include "filter_iterator.hpp"
 #include "flatten_iterator.hpp"
+#include "generator_adaptor.hpp"
 #include "string_counter.hpp"
 #include "conv.hpp"
 

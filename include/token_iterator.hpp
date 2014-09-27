@@ -12,7 +12,8 @@
 #include <cwctype>
 #include <string>
 
-#include "generator.hpp"
+#include "nested_generator.hpp"
+#include "generator_adaptor.hpp"
 
 namespace esapp
 {
@@ -37,14 +38,20 @@ inline int isfwalnum(std::wint_t c)
  * Declaration: class token_iterator
  ************************************************/
 
-class token_iterator : public generator<token_iterator,
-                                        std::wstring::const_iterator,
-                                        std::wstring>
+class token_iterator : public nested_generator
+    <
+        token_iterator,
+        generator_adaptor<std::wstring::const_iterator>,
+        std::wstring
+    >
 {
 private: // Private Type(s)
-    typedef generator<token_iterator,
-                      std::wstring::const_iterator,
-                      std::wstring> base_t;
+    typedef nested_generator
+        <
+            token_iterator,
+            generator_adaptor<std::wstring::const_iterator>,
+            std::wstring
+        > base_t;
 
 public: // Public Type(s)
     typedef typename base_t::iterator_category iterator_category;
@@ -52,28 +59,28 @@ public: // Public Type(s)
     typedef typename base_t::reference reference;
     typedef typename base_t::pointer pointer;
     typedef typename base_t::difference_type difference_type;
-    typedef typename base_t::input_iterator input_iterator;
+
+    typedef typename base_t::inner_generator inner_generator;
+    typedef typename inner_generator::input_iterator input_iterator;
 
 public: // Public Method(s)
     token_iterator(void) = default;
-    token_iterator(input_iterator const &begin,
-                   input_iterator const &end = input_iterator());
-    token_iterator(std::wstring const &s);
-    token_iterator(token_iterator const &it) = default;
+    token_iterator(input_iterator const &begin, input_iterator const &end);
+    explicit token_iterator(std::wstring const &s);
 
+    void next(void);
+    reference dereference(void) const;
+    bool equal(token_iterator const &it) const;
+    bool valid(void) const;
+
+private: // Private Method(s)
     template <typename Predicate>
     void skip(Predicate pred);
     template <typename Predicate>
     bool scan(Predicate pred);
 
-    void next(void);
-    reference get(void) const;
-    bool equal(token_iterator const &it) const;
-    bool ended(void) const;
-
 private: // Private Property(ies)
     value_type token_;
-    bool has_next_;
 }; // class token_iterator
 
 /************************************************
@@ -82,9 +89,8 @@ private: // Private Property(ies)
 
 inline token_iterator::token_iterator(input_iterator const &begin,
                                       input_iterator const &end)
-    : base_t(begin, end)
+    : base_t(inner_generator(begin, end))
 {
-    skip(&std::iswspace);
     next();
 }
 
@@ -97,25 +103,27 @@ inline token_iterator::token_iterator(std::wstring const &s)
 template <typename Predicate>
 inline void token_iterator::skip(Predicate pred)
 {
-    for ( ; it_ != end_ && pred(*it_); ++it_) { /* do nothing */ }
+    for ( ; base_t::valid() && pred(*base_t::base()); base_t::next())
+        { /* do nothing */ }
 }
 
 template <typename Predicate>
 inline bool token_iterator::scan(Predicate pred)
 {
-    auto const begin = it_;
+    auto const &current = base();
+    auto const begin(current);
     skip(pred);
 
-    bool scanned = begin != it_;
-    if (scanned) { token_.assign(begin, it_); }
+    bool scanned = begin != current;
+    if (scanned) { token_.assign(begin, current); }
 
     return scanned;
 }
 
 inline void token_iterator::next(void)
 {
-    has_next_ = this->it_ != this->end_;
-    if (!has_next_)
+    skip(&std::iswspace);
+    if (!base_t::valid())
     {
         token_.clear();
         return;
@@ -123,27 +131,25 @@ inline void token_iterator::next(void)
 
     if (!scan(&ischs) && !scan(&isfwalnum) && !scan(&std::iswalnum))
     {
-        token_.assign(1, *it_);
-        ++it_;
+        token_.assign(1, *base_t::base());
+        base_t::next();
     }
-
-    skip(&std::iswspace);
 }
 
 inline typename token_iterator::reference
-token_iterator::get(void) const
+token_iterator::dereference(void) const
 {
     return token_;
 }
 
 inline bool token_iterator::equal(token_iterator const &it) const
 {
-    return this->it_ == it.it_ && has_next_ == it.has_next_;
+    return base_t::equal(it) && token_ == it.token_;
 }
 
-inline bool token_iterator::ended(void) const
+inline bool token_iterator::valid(void) const
 {
-    return !has_next_;
+    return base_t::valid() || !token_.empty();
 }
 
 } // namespace esapp
