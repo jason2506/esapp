@@ -96,7 +96,7 @@ inline bool nested_generator<D, G, T>::equal(derived_t const &g) const
 template <typename D, typename G, typename T>
 inline bool nested_generator<D, G, T>::valid(void) const
 {
-    return g_;
+    return static_cast<bool>(g_);
 }
 
 template <typename D, typename G, typename T>

@@ -44,7 +44,7 @@ public: // Public Method(s)
     pointer operator->(void) const;
     bool operator==(derived_t const &g) const;
     bool operator!=(derived_t const &g) const;
-    operator bool(void) const;
+    explicit operator bool(void) const;
 
 protected: // Protected Method(s)
     generator(void) = default;
