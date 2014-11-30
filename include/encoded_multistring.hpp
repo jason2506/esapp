@@ -23,9 +23,9 @@ namespace esapp
 class encoded_multistring
 {
 public: // Public Type(s)
-    typedef wchar_t char_type;
+    typedef uint32_t char_type;
     typedef uint16_t value_type;
-    typedef std::basic_string<char_type> sequence;
+    typedef std::vector<char_type> sequence;
 
     typedef typename std::vector<value_type>::const_iterator iterator;
     typedef typename std::vector<value_type>::const_iterator const_iterator;

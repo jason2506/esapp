@@ -11,9 +11,10 @@
 
 #include <cwctype>
 #include <string>
+#include <vector>
 
 #include "nested_generator.hpp"
-#include "generator_adaptor.hpp"
+#include "utf8_decode_iterator.hpp"
 
 namespace esapp
 {
@@ -41,16 +42,16 @@ inline int isfwalnum(std::wint_t c)
 class token_iterator : public nested_generator
     <
         token_iterator,
-        generator_adaptor<std::wstring::const_iterator>,
-        std::wstring
+        utf8_decode_iterator,
+        std::vector<utf8_decode_iterator::value_type>
     >
 {
 private: // Private Type(s)
     typedef nested_generator
         <
             token_iterator,
-            generator_adaptor<std::wstring::const_iterator>,
-            std::wstring
+            utf8_decode_iterator,
+            std::vector<utf8_decode_iterator::value_type>
         > base_t;
 
 public: // Public Type(s)
@@ -65,13 +66,14 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     token_iterator(void) = default;
-    token_iterator(input_iterator const &begin, input_iterator const &end);
-    explicit token_iterator(std::wstring const &s);
+    explicit token_iterator(std::string const &s);
 
     void next(void);
     reference dereference(void) const;
     bool equal(token_iterator const &it) const;
     bool valid(void) const;
+
+    input_iterator position(void) const;
 
 private: // Private Method(s)
     template <typename Predicate>
@@ -81,30 +83,26 @@ private: // Private Method(s)
 
 private: // Private Property(ies)
     value_type token_;
+    input_iterator it_;
 }; // class token_iterator
 
 /************************************************
  * Implementation: class token_iterator
  ************************************************/
 
-inline token_iterator::token_iterator(input_iterator const &begin,
-                                      input_iterator const &end)
-    : base_t(inner_generator(begin, end))
+inline token_iterator::token_iterator(std::string const &s)
+    : base_t(inner_generator(s))
 {
     next();
-}
-
-inline token_iterator::token_iterator(std::wstring const &s)
-    : token_iterator(s.begin(), s.end())
-{
-    // do nothing
 }
 
 template <typename Predicate>
 inline void token_iterator::skip(Predicate pred)
 {
     for ( ; base_t::valid() && pred(*base_t::base()); base_t::next())
-        { /* do nothing */ }
+    {
+        it_ = base().base().base();
+    }
 }
 
 template <typename Predicate>
@@ -122,16 +120,17 @@ inline bool token_iterator::scan(Predicate pred)
 
 inline void token_iterator::next(void)
 {
-    skip(&std::iswspace);
     if (!base_t::valid())
     {
         token_.clear();
         return;
     }
 
-    if (!scan(&ischs) && !scan(&isfwalnum) && !scan(&std::iswalnum))
+    if (!scan(&ischs) && !scan(&isfwalnum) &&
+        !scan(&std::iswalnum) && !scan(&std::iswspace))
     {
         token_.assign(1, *base_t::base());
+        it_ = base().base().base();
         base_t::next();
     }
 }
@@ -150,6 +149,11 @@ inline bool token_iterator::equal(token_iterator const &it) const
 inline bool token_iterator::valid(void) const
 {
     return base_t::valid() || !token_.empty();
+}
+
+inline token_iterator::input_iterator token_iterator::position(void) const
+{
+    return it_;
 }
 
 } // namespace esapp
