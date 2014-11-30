@@ -17,11 +17,15 @@ TARGET=lib$(LIB).a
 EXAMPLE=example
 
 vpath %.cpp $(SRC_PATH)
-vpath %.hpp $(INC_PATH)
+vpath %.hpp $(SRC_PATH)
 vpath %.o $(OBJ_PATH)
 vpath %.a $(LIB_PATH)
 
-all: $(TARGET) $(EXAMPLE)
+all: build $(EXAMPLE)
+
+build: $(TARGET) $(SRC_PATH)/esapp.hpp
+	@mkdir -p $(INC_PATH)
+	@cp $(SRC_PATH)/esapp.hpp $(INC_PATH)/
 
 $(EXAMPLE): $(TARGET) $(EXAMPLE).o
 	$(CXX) $(EX_PATH)/$@.cpp -I$(INC_PATH) -L$(LIB_PATH) -l$(LIB) $(CXXFLAGS) -o $(EX_PATH)/$@
@@ -36,17 +40,18 @@ $(TARGET): $(OBJS)
 
 %.o: %.cpp %.hpp
 	@mkdir -p $(OBJ_PATH)
-	$(CXX) $< -I$(INC_PATH) $(CXXFLAGS) -c -o $(OBJ_PATH)/$@
+	$(CXX) $< $(CXXFLAGS) -c -o $(OBJ_PATH)/$@
 
 $(DEP_PATH)/%.d: %.cpp %.hpp
 	@mkdir -p $(DEP_PATH)
-	@$(CXX) $< -I$(INC_PATH) $(CXXFLAGS) -MM > $@
+	@$(CXX) $< $(CXXFLAGS) -MM > $@
 
-.PHONY: clean
+.PHONY: build clean
 clean:
-	$(RM) $(DEP_PATH)/*.d
-	$(RM) $(OBJ_PATH)/*.o
-	$(RM) $(LIB_PATH)/$(TARGET)
+	$(RM) -r $(DEP_PATH)
+	$(RM) -r $(OBJ_PATH)
+	$(RM) -r $(LIB_PATH)
+	$(RM) -r $(INC_PATH)
 	$(RM) $(EX_PATH)/$(EXAMPLE)
 
 ifneq ($(MAKECMDGOALS),clean)

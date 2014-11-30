@@ -35,8 +35,8 @@ public: // Public Type(s)
 public: // Public Method(s)
     string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
 
-    template <typename Iterator>
-    void fit(Iterator const &begin, Iterator const &end);
+    template <typename Generator>
+    void fit(Generator const &g);
 
     void set_pres(std::vector<index_type> pres, size_t p, size_t n);
     void unset_pres(std::vector<index_type> pres, size_t p, size_t n);
@@ -80,11 +80,11 @@ private: // Private Property(ies)
  * Implementation: class string_counter
  ************************************************/
 
-template <typename Iterator>
-inline void string_counter::fit(Iterator const &begin, Iterator const &end)
+template <typename Generator>
+inline void string_counter::fit(Generator const &g)
 {
     // calculate average statistics of substrings
-    sa_.construct(begin, end);
+    sa_.construct(g);
     calc_avg();
 
     // initialize vector of preserve lengths

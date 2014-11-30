@@ -11,6 +11,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Implementation: class segmenter
  ************************************************/
@@ -22,48 +25,25 @@ segmenter::segmenter(double lrv_exp, size_t max_iters,
     // do nothing
 }
 
-std::vector<std::vector<std::wstring>> segmenter::fit_and_segment(
-    std::vector<std::wstring> const &sequences)
-{
-    typedef decltype(fit_and_segment(sequences)) vec_type;
-    typedef std::vector<std::wstring> words_type;
-    return fit_and_segment(
-        sequences,
-        [this](std::wstring const &s) { return tokenize_iterator(s); },
-        [](vec_type &v, words_type const &e) { v.push_back(e); });
-}
-
 std::vector<std::vector<std::string>> segmenter::fit_and_segment(
     std::vector<std::string> const &sequences)
 {
-    typedef decltype(fit_and_segment(sequences)) vec_type;
-    typedef std::vector<std::wstring> words_type;
-    std::wstring ws;
-    return fit_and_segment(
-        sequences,
-        [this, &ws](std::string const &s) { ws = s2ws(s);
-                                            return tokenize_iterator(ws); },
-        [](vec_type &v, words_type const &e) { v.push_back(ws2s(e)); });
-}
-
-template <typename T, typename Tokenize, typename Append>
-std::vector<std::vector<T>> segmenter::fit_and_segment(
-    std::vector<T> const &sequences,
-    Tokenize const &tokenize, Append const &append)
-{
     // pre-segment sequences by alphabets, numbers, and symbols
     auto tokens = make_filter_iterator(
-        [] (std::wstring const &token) { return ischs(token[0]); },
+        [] (std::vector<uint32_t> const &token) { return ischs(token[0]); },
         make_flatten_iterator(
-            make_map_iterator(tokenize, sequences)
+            make_map_iterator(
+                [](std::string const &s) { return token_iterator(s); },
+                make_generator_adaptor(sequences.begin(), sequences.end())
+            )
         )
     );
 
     // construct substring counter
-    counter_.fit(tokens.begin(), tokens.end());
+    counter_.fit(tokens);
 
     auto m = counter_.raw_string_count();
-    std::vector<segment> prev_segs(m), segs(m);
+    std::vector<seg_pos_list> prev_segs(m), segs(m);
     for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
     {
         // segment sequences
@@ -94,25 +74,35 @@ std::vector<std::vector<T>> segmenter::fit_and_segment(
 
     // generate segmented word lists
     auto it = prev_segs.begin();
-    decltype(fit_and_segment(sequences, tokenize, append)) words_list;
+    decltype(fit_and_segment(sequences)) words_list;
     words_list.reserve(sequences.size());
     for (auto const &sequence : sequences)
     {
-        auto tokens = tokenize(sequence);
-        std::vector<typename decltype(tokens)::value_type> words;
-        for (auto const &token : tokens)
+        typename decltype(words_list)::value_type words;
+        auto begin = sequence.begin();
+        for (auto tokens_it = token_iterator(sequence); tokens_it; ++tokens_it)
         {
-            if (ischs(token[0]))    { segment_sequence(words, token, *it++); }
-            else                    { words.push_back(token); }
+            auto end = tokens_it.position();
+            auto ch = (*tokens_it)[0];
+            if (ischs(ch))
+            {
+                segment_sequence(words, begin, end, *it++);
+            }
+            else if (!std::iswspace(ch))
+            {
+                words.emplace_back(begin, end);
+            }
+
+            begin = end;
         }
 
-        append(words_list, words);
+        words_list.push_back(words);
     }
 
     return words_list;
 }
 
-void segmenter::optimize_segment(segment &seg, size_t p, size_t n) const
+void segmenter::optimize_segment(seg_pos_list &seg, size_t p, size_t n) const
 {
     if (n == 0) { return; }
 
@@ -142,29 +132,21 @@ void segmenter::optimize_segment(segment &seg, size_t p, size_t n) const
     std::reverse(seg.begin(), seg.end());
 }
 
-void segmenter::segment_sequence(std::vector<std::wstring> &words,
-                                 std::wstring const &sequence,
-                                 segment const &seg) const
+void segmenter::segment_sequence(std::vector<std::string> &words,
+                                 std::string::const_iterator begin,
+                                 std::string::const_iterator end,
+                                 seg_pos_list const &seg) const
 {
-    segment::value_type start = 0;
+    seg_pos_list::value_type prev_pos = 0;
     for (auto const &pos : seg)
     {
-        auto word = sequence.substr(start, pos - start);
-        words.push_back(word);
-        start = pos;
+        words.emplace_back(begin + prev_pos * 3, begin + pos * 3);
+        prev_pos = pos;
     }
 
-    auto word = sequence.substr(start);
-    words.push_back(word);
+    words.emplace_back(begin + prev_pos * 3, end);
 }
 
-std::vector<std::wstring> segmenter::segment_sequence(
-    std::wstring const &sequence, segment const &seg) const
-{
-    decltype(segment_sequence(sequence, seg)) words;
-    words.reserve(seg.size() + 1);
-    segment_sequence(words, sequence, seg);
-    return words;
-}
+} // namespace impl
 
 } // namespace esapp
