@@ -25,6 +25,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Declaration: class segmenter
  ************************************************/
@@ -52,6 +55,8 @@ private: // Private Property(ies)
     string_counter counter_;
     size_t max_iters_;
 }; // class segmenter
+
+} // namespace impl
 
 } // namespace esapp
 

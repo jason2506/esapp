@@ -11,6 +11,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Implementation: class segmenter
  ************************************************/
@@ -143,5 +146,7 @@ void segmenter::segment_sequence(std::vector<std::string> &words,
 
     words.emplace_back(begin + prev_pos * 3, end);
 }
+
+} // namespace impl
 
 } // namespace esapp
