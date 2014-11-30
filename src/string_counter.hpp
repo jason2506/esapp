@@ -12,6 +12,7 @@
 #include <cmath>
 #include <algorithm>
 #include <stack>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 #include <vector>
