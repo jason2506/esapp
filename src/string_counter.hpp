@@ -40,8 +40,8 @@ public: // Public Method(s)
     template <typename Generator>
     void fit(Generator const &g);
 
-    void set_pres(std::vector<index_type> pres, size_t p, size_t n);
-    void unset_pres(std::vector<index_type> pres, size_t p, size_t n);
+    void set_pres(std::vector<index_type> const &pres, size_t p, size_t n);
+    void unset_pres(std::vector<index_type> const &pres, size_t p, size_t n);
 
     double score(size_t i, size_t n) const;
 
