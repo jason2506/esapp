@@ -114,7 +114,9 @@ void segmenter::optimize_segment(seg_pos_list &seg, size_t p, size_t n) const
         fv[i] = counter_.score(p, i + 1);
         for (decltype(i) j = 0; j < i; ++j)
         {
-            auto cv = fv[j] * counter_.score(p + j + 1, i - j);
+            if (fv[j] == -std::numeric_limits<double>::infinity()) { continue; }
+
+            auto cv = fv[j] + counter_.score(p + j + 1, i - j);
             if (cv > fv[i])
             {
                 fv[i] = cv;

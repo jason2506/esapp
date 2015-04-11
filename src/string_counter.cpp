@@ -83,7 +83,10 @@ void string_counter::unset_pres(std::vector<index_type> pres, size_t p, size_t n
 
 double string_counter::score(size_t i, size_t n) const
 {
-    if (n > max_len_ || f_avgs_[n - 1] == 0.0) { return 0.0; }
+    if (n > max_len_ || f_avgs_[n - 1] == 0.0)
+    {
+        return -std::numeric_limits<double>::infinity();
+    }
 
     double f, hl, hr;
     auto j = sa_.rank(i);
@@ -95,16 +98,20 @@ double string_counter::score(size_t i, size_t n) const
         hl = node->hl;
         hr = node->hr;
     }
+    else if (n > count_min_lens_[i])
+    {
+        f = 1;
+        hl = hr = h1_;
+    }
     else
     {
-        f = n > count_min_lens_[i] ? 1 : 0;
-        hl = hr = h1_;
+        return -std::numeric_limits<double>::infinity();
     }
 
     f /= f_avgs_[n - 1];
     hl /= hl_avgs_[n - 1];
     hr /= hr_avgs_[n - 1];
-    return pow(f, n) * pow(hl * hr, lrv_exp_);
+    return n * log(f) + lrv_exp_ * log(hl * hr);
 }
 
 void string_counter::calc_avg(void)
