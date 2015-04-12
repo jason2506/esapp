@@ -46,7 +46,7 @@ public: // Public Method(s)
     template <typename Iterator>
     void decrease(Iterator const &begin, Iterator const &end);
 
-    freq_trie &operator=(freq_trie const &node);
+    freq_trie &operator=(freq_trie const &trie);
 
     void clear(void);
 
@@ -64,10 +64,13 @@ private: // Private Property(ies)
 struct freq_trie::node
 {
     node(void);
+    node(node const &n);
 
     freq_trie::node_ptr const get(term_type key) const;
     freq_trie::node_ptr get(term_type key, bool create = false);
     void clear(void);
+
+    node &operator=(node const &n);
 
     freq_trie::NodeCollection children;
     size_t f;
@@ -174,6 +177,15 @@ inline freq_trie::node::node(void)
     // do nothing
 }
 
+inline freq_trie::node::node(node const &n)
+    : f(n.f), hl(n.hl), hr(n.hr)
+{
+    for (auto const &child : n.children)
+    {
+        children.emplace(child.first, node_ptr(new node(*child.second)));
+    }
+}
+
 inline freq_trie::node_ptr const freq_trie::node::get(term_type key) const
 {
     auto it = children.find(key);
@@ -194,6 +206,21 @@ inline void freq_trie::node::clear(void)
 {
     children.clear();
     f = hl = hr = 0;
+}
+
+inline freq_trie::node &freq_trie::node::operator=(node const &n)
+{
+    f = n.f;
+    hl = n.hl;
+    hr = n.hr;
+
+    children.clear();
+    for (auto const &child : n.children)
+    {
+        children.emplace(child.first, node_ptr(new node(*child.second)));
+    }
+
+    return *this;
 }
 
 } // namespace esapp
