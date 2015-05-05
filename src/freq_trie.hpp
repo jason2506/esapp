@@ -32,7 +32,6 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     freq_trie(void);
-    freq_trie(freq_trie const &trie);
 
     template <typename Iterator>
     data_ptr insert(Iterator const &begin, Iterator const &end);
@@ -45,8 +44,6 @@ public: // Public Method(s)
 
     template <typename Iterator>
     void decrease(Iterator const &begin, Iterator const &end);
-
-    freq_trie &operator=(freq_trie const &trie);
 
     void clear(void);
 
@@ -68,7 +65,6 @@ private: // Private Property(ies)
 struct freq_trie::data
 {
     data(void);
-    data(data const &d);
 
     size_t f;
     double hl, hr;
@@ -81,13 +77,10 @@ struct freq_trie::data
 struct freq_trie::node
 {
     node(void);
-    node(node const &n);
 
     const_raw_node_ptr get(term_type key) const;
     raw_node_ptr get(term_type key, bool create = false);
     void clear(void);
-
-    node &operator=(node const &n);
 
     node_collection children;
     data data;
@@ -101,18 +94,6 @@ inline freq_trie::freq_trie(void)
     : root_(new node())
 {
     // do nothing
-}
-
-inline freq_trie::freq_trie(freq_trie const &trie)
-    : root_(new node(*(trie.root_)))
-{
-    // do nothing
-}
-
-inline freq_trie &freq_trie::operator=(freq_trie const &trie)
-{
-    *root_ = *(trie.root_);
-    return *this;
 }
 
 template <typename Iterator>
@@ -193,12 +174,6 @@ inline freq_trie::data::data(void)
     // do nothing
 }
 
-inline freq_trie::data::data(data const &d)
-    : f(d.f), hl(d.hl), hr(d.hr)
-{
-    // do nothing
-}
-
 /************************************************
  * Implementation: struct freq_trie::node
  ************************************************/
@@ -207,15 +182,6 @@ inline freq_trie::node::node(void)
     : data()
 {
     // do nothing
-}
-
-inline freq_trie::node::node(node const &n)
-    : data(n.data)
-{
-    for (auto const &child : n.children)
-    {
-        children.emplace(child.first, node_ptr(new node(*child.second)));
-    }
 }
 
 inline freq_trie::const_raw_node_ptr freq_trie::node::get(term_type key) const
@@ -238,19 +204,6 @@ inline void freq_trie::node::clear(void)
 {
     children.clear();
     data.f = data.hl = data.hr = 0;
-}
-
-inline freq_trie::node &freq_trie::node::operator=(node const &n)
-{
-    data = n.data;
-
-    children.clear();
-    for (auto const &child : n.children)
-    {
-        children.emplace(child.first, node_ptr(new node(*child.second)));
-    }
-
-    return *this;
 }
 
 } // namespace esapp
