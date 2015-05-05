@@ -10,6 +10,7 @@
 #define ESAPP_UTF8_DECODE_ITERATOR_HPP_
 
 #include <exception>
+#include <stdexcept>
 #include <string>
 
 #include "nested_generator.hpp"
