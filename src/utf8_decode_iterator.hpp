@@ -60,7 +60,7 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     utf8_decode_iterator(void) = default;
-    utf8_decode_iterator(std::string const &s);
+    explicit utf8_decode_iterator(std::string const &s);
 
     void next(void);
     reference dereference(void) const;

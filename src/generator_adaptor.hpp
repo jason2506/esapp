@@ -62,8 +62,8 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     generator_adaptor(void) = default;
-    generator_adaptor(input_iterator const &begin,
-                      input_iterator const &end = input_iterator());
+    explicit generator_adaptor(input_iterator const &begin,
+                               input_iterator const &end = input_iterator());
 
     void next(void);
     reference dereference(void) const;

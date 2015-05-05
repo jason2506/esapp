@@ -56,7 +56,7 @@ public: // Public Method(s)
     inner_generator const &base(void) const;
 
 protected: // Protected Method(s)
-    explicit nested_generator(void) = default;
+    nested_generator(void) = default;
     explicit nested_generator(inner_generator const &g);
 
 private: // Private Property(ies)

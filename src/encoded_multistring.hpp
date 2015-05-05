@@ -36,7 +36,7 @@ public: // Public Type(s)
 public: // Public Method(s)
     encoded_multistring(void);
     template <typename Generator>
-    encoded_multistring(Generator const &g);
+    explicit encoded_multistring(Generator const &g);
 
     iterator begin(void);
     const_iterator begin(void) const;

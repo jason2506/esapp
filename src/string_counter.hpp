@@ -38,7 +38,7 @@ public: // Public Type(s)
     typedef wchar_t term_type;
 
 public: // Public Method(s)
-    string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
+    explicit string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
 
     template <typename Generator>
     void fit(Generator const &g);
