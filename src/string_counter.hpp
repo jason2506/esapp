@@ -24,6 +24,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Declaration: class string_counter
  ************************************************/
@@ -108,6 +111,8 @@ inline void string_counter::clear(void)
 {
     sa_.clear();
 }
+
+} // namespace impl
 
 } // namespace esapp
 

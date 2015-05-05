@@ -18,6 +18,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Declaration: class utf8_decode_error
  ************************************************/
@@ -154,6 +157,8 @@ inline char utf8_decode_iterator::next_byte(void)
     base_t::next();
     return byte;
 }
+
+} // namespace impl
 
 } // namespace esapp
 

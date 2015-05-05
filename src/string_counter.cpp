@@ -11,6 +11,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 const string_counter::term_id string_counter::BOUNDARY_ = 0;
 
 /************************************************
@@ -237,5 +240,7 @@ double string_counter::entropy(term_counts const &counts) const
 
     return h;
 }
+
+} // namespace impl
 
 } // namespace esapp

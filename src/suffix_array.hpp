@@ -20,6 +20,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Declaration: class suffix_array
  ************************************************/
@@ -194,6 +197,8 @@ inline suffix_array::const_iterator suffix_array::end(void) const
 {
     return sa_.end();
 }
+
+} // namespace impl
 
 } // namespace esapp
 

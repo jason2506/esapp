@@ -16,6 +16,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Declaration: class encoded_multistring
  ************************************************/
@@ -156,6 +159,8 @@ inline void encoded_multistring::clear(void)
     offsets_.clear();
     char_id_map_[0] = BOUNDARY_;
 }
+
+} // namespace impl
 
 } // namespace esapp
 
