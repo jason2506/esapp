@@ -10,12 +10,16 @@
 #define ESAPP_UTF8_DECODE_ITERATOR_HPP_
 
 #include <exception>
+#include <stdexcept>
 #include <string>
 
 #include "nested_generator.hpp"
 #include "generator_adaptor.hpp"
 
 namespace esapp
+{
+
+namespace impl
 {
 
 /************************************************
@@ -56,7 +60,7 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     utf8_decode_iterator(void) = default;
-    utf8_decode_iterator(std::string const &s);
+    explicit utf8_decode_iterator(std::string const &s);
 
     void next(void);
     reference dereference(void) const;
@@ -154,6 +158,8 @@ inline char utf8_decode_iterator::next_byte(void)
     base_t::next();
     return byte;
 }
+
+} // namespace impl
 
 } // namespace esapp
 

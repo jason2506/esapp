@@ -11,6 +11,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 encoded_multistring::value_type const encoded_multistring::BOUNDARY_ = 0;
 
 /************************************************
@@ -33,5 +36,7 @@ void encoded_multistring::push_back(sequence const &s)
     id_sequence_.push_back(BOUNDARY_);
     offsets_.push_back(id_sequence_.size());
 }
+
+} // namespace impl
 
 } // namespace esapp

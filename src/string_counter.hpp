@@ -11,7 +11,9 @@
 
 #include <cmath>
 #include <algorithm>
+#include <limits>
 #include <stack>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -20,6 +22,9 @@
 #include "freq_trie.hpp"
 
 namespace esapp
+{
+
+namespace impl
 {
 
 /************************************************
@@ -33,13 +38,13 @@ public: // Public Type(s)
     typedef wchar_t term_type;
 
 public: // Public Method(s)
-    string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
+    explicit string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
 
     template <typename Generator>
     void fit(Generator const &g);
 
-    void set_pres(std::vector<index_type> pres, size_t p, size_t n);
-    void unset_pres(std::vector<index_type> pres, size_t p, size_t n);
+    void set_pres(std::vector<index_type> const &pres, size_t p, size_t n);
+    void unset_pres(std::vector<index_type> const &pres, size_t p, size_t n);
 
     double score(size_t i, size_t n) const;
 
@@ -106,6 +111,8 @@ inline void string_counter::clear(void)
 {
     sa_.clear();
 }
+
+} // namespace impl
 
 } // namespace esapp
 

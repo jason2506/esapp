@@ -11,6 +11,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Implementation: class suffix_array
  ************************************************/
@@ -229,5 +232,7 @@ void suffix_array::gen_lcpa(void)
         }
     }
 }
+
+} // namespace impl
 
 } // namespace esapp

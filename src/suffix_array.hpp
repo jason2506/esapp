@@ -20,6 +20,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Declaration: class suffix_array
  ************************************************/
@@ -40,7 +43,7 @@ public: // Public Type(s)
 public: // Public Method(s)
     suffix_array(void) = default;
     template <typename Generator>
-    suffix_array(Generator const &g);
+    explicit suffix_array(Generator const &g);
 
     template <typename Generator>
     void construct(Generator const &g);
@@ -194,6 +197,8 @@ inline suffix_array::const_iterator suffix_array::end(void) const
 {
     return sa_.end();
 }
+
+} // namespace impl
 
 } // namespace esapp
 

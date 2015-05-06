@@ -16,6 +16,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Declaration: class encoded_multistring
  ************************************************/
@@ -33,7 +36,7 @@ public: // Public Type(s)
 public: // Public Method(s)
     encoded_multistring(void);
     template <typename Generator>
-    encoded_multistring(Generator const &g);
+    explicit encoded_multistring(Generator const &g);
 
     iterator begin(void);
     const_iterator begin(void) const;
@@ -156,6 +159,8 @@ inline void encoded_multistring::clear(void)
     offsets_.clear();
     char_id_map_[0] = BOUNDARY_;
 }
+
+} // namespace impl
 
 } // namespace esapp
 

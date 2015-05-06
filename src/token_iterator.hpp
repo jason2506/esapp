@@ -19,6 +19,9 @@
 namespace esapp
 {
 
+namespace impl
+{
+
 /************************************************
  * Inline Helper Function(s)
  ************************************************/
@@ -155,6 +158,8 @@ inline token_iterator::input_iterator token_iterator::position(void) const
 {
     return it_;
 }
+
+} // namespace impl
 
 } // namespace esapp
 

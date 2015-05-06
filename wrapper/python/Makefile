@@ -1,6 +1,6 @@
 PY=python
 
-TARGET=esa.so
+TARGET=esapp.so
 SRCS=cython/esapp.pyx cython/segmenter.pxd
 
 all: $(TARGET)

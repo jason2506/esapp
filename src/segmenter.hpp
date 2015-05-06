@@ -35,8 +35,8 @@ namespace impl
 class segmenter
 {
 public: // Public Method(s)
-    segmenter(double lrv_exp, size_t max_iters = 10,
-              size_t max_len = 30, double smooth = 0.0);
+    explicit segmenter(double lrv_exp, size_t max_iters = 10,
+                       size_t max_len = 30, double smooth = 0.0);
     std::vector<std::vector<std::string>> fit_and_segment(
         std::vector<std::string> const &sequences);
 
