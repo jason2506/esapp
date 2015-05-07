@@ -40,8 +40,8 @@ class map_iterator : public nested_generator
     <
         map_iterator<Transform, Generator>,
         Generator,
-        typename std::result_of<
-            const Transform(typename std::iterator_traits<Generator>::value_type)
+        typename ::std::result_of<
+            const Transform(typename ::std::iterator_traits<Generator>::value_type)
         >::type
     >
 {
@@ -50,8 +50,8 @@ private: // Private Type(s)
         <
             map_iterator,
             Generator,
-            typename std::result_of<
-                const Transform(typename std::iterator_traits<Generator>::value_type)
+            typename ::std::result_of<
+                const Transform(typename ::std::iterator_traits<Generator>::value_type)
             >::type
         > base_t;
 

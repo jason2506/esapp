@@ -43,8 +43,8 @@ public: // Public Method(s)
     template <typename Generator>
     void fit(Generator const &g);
 
-    void set_pres(std::vector<index_type> const &pres, size_t p, size_t n);
-    void unset_pres(std::vector<index_type> const &pres, size_t p, size_t n);
+    void set_pres(::std::vector<index_type> const &pres, size_t p, size_t n);
+    void unset_pres(::std::vector<index_type> const &pres, size_t p, size_t n);
 
     double score(size_t i, size_t n) const;
 
@@ -55,8 +55,8 @@ public: // Public Method(s)
 
 private: // Private Type(s)
     typedef suffix_array::term_type term_id;
-    typedef std::vector<term_id> id_sequence;
-    typedef std::unordered_map<term_id, index_type> term_counts;
+    typedef ::std::vector<term_id> id_sequence;
+    typedef ::std::unordered_map<term_id, index_type> term_counts;
 
 private: // Private Method(s)
     void calc_avg(void);
@@ -68,12 +68,12 @@ private: // Private Property(ies)
     double smooth_;
     double h1_;
 
-    std::vector<double> f_avgs_;
-    std::vector<double> hl_avgs_;
-    std::vector<double> hr_avgs_;
-    std::vector<index_type> str_nums_;
+    ::std::vector<double> f_avgs_;
+    ::std::vector<double> hl_avgs_;
+    ::std::vector<double> hr_avgs_;
+    ::std::vector<index_type> str_nums_;
 
-    std::vector<index_type> count_min_lens_;
+    ::std::vector<index_type> count_min_lens_;
 
     freq_trie trie_;
     suffix_array sa_;
@@ -94,7 +94,7 @@ inline void string_counter::fit(Generator const &g)
 
     // initialize vector of preserve lengths
     count_min_lens_.resize(sa_.size());
-    std::fill(count_min_lens_.begin(), count_min_lens_.end(), 0);
+    ::std::fill(count_min_lens_.begin(), count_min_lens_.end(), 0);
 }
 
 inline size_t string_counter::raw_string_count(void) const

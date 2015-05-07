@@ -28,10 +28,10 @@ class encoded_multistring
 public: // Public Type(s)
     typedef uint32_t char_type;
     typedef uint16_t value_type;
-    typedef std::vector<char_type> sequence;
+    typedef ::std::vector<char_type> sequence;
 
-    typedef typename std::vector<value_type>::const_iterator iterator;
-    typedef typename std::vector<value_type>::const_iterator const_iterator;
+    typedef typename ::std::vector<value_type>::const_iterator iterator;
+    typedef typename ::std::vector<value_type>::const_iterator const_iterator;
 
 public: // Public Method(s)
     encoded_multistring(void);
@@ -58,13 +58,13 @@ public: // Public Method(s)
     void clear(void);
 
 private: // Private Type(s)
-    typedef std::vector<value_type> id_sequence;
-    typedef std::unordered_map<char_type, value_type> char_id_map;
+    typedef ::std::vector<value_type> id_sequence;
+    typedef ::std::unordered_map<char_type, value_type> char_id_map;
 
 private: // Private Property(ies)
     char_id_map char_id_map_;
     id_sequence id_sequence_;
-    std::vector<size_t> offsets_;
+    ::std::vector<size_t> offsets_;
 
     static value_type const BOUNDARY_;
 }; // class encoded_multistring

@@ -25,7 +25,7 @@ private: // Private Type(s)
     typedef Derived derived_t;
 
 public: // Public Type(s)
-    typedef std::input_iterator_tag iterator_category;
+    typedef ::std::input_iterator_tag iterator_category;
     typedef Value value_type;
     typedef value_type const *pointer;
     typedef value_type const &reference;

@@ -42,8 +42,8 @@ class flatten_iterator : public nested_generator
     <
         flatten_iterator<Generator>,
         Generator,
-        typename std::iterator_traits<
-            typename std::iterator_traits<Generator>::value_type
+        typename ::std::iterator_traits<
+            typename ::std::iterator_traits<Generator>::value_type
         >::value_type
     >
 {
@@ -52,8 +52,8 @@ private: // Private Type(s)
         <
             flatten_iterator<Generator>,
             Generator,
-            typename std::iterator_traits<
-                typename std::iterator_traits<Generator>::value_type
+            typename ::std::iterator_traits<
+                typename ::std::iterator_traits<Generator>::value_type
             >::value_type
         > base_t;
 
@@ -65,7 +65,7 @@ public: // Public Type(s)
     typedef typename base_t::difference_type difference_type;
 
     typedef typename base_t::inner_generator inner_generator;
-    typedef typename std::iterator_traits<Generator>::value_type value_generator;
+    typedef typename ::std::iterator_traits<Generator>::value_type value_generator;
 
 public: // Public Method(s)
     flatten_iterator(void) = default;

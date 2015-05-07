@@ -26,12 +26,12 @@ namespace impl
  * Inline Helper Function(s)
  ************************************************/
 
-inline int ischs(std::wint_t c)
+inline int ischs(::std::wint_t c)
 {
     return c >= u'\u4E00' && c <= u'\u9FFF';
 }
 
-inline int isfwalnum(std::wint_t c)
+inline int isfwalnum(::std::wint_t c)
 {
     return (c >= u'Ａ' && c <= u'Ｚ') ||
            (c >= u'ａ' && c <= u'ｚ') ||
@@ -46,7 +46,7 @@ class token_iterator : public nested_generator
     <
         token_iterator,
         utf8_decode_iterator,
-        std::vector<utf8_decode_iterator::value_type>
+        ::std::vector<utf8_decode_iterator::value_type>
     >
 {
 private: // Private Type(s)
@@ -54,7 +54,7 @@ private: // Private Type(s)
         <
             token_iterator,
             utf8_decode_iterator,
-            std::vector<utf8_decode_iterator::value_type>
+            ::std::vector<utf8_decode_iterator::value_type>
         > base_t;
 
 public: // Public Type(s)
@@ -69,7 +69,7 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     token_iterator(void) = default;
-    explicit token_iterator(std::string const &s);
+    explicit token_iterator(::std::string const &s);
 
     void next(void);
     reference dereference(void) const;
@@ -93,7 +93,7 @@ private: // Private Property(ies)
  * Implementation: class token_iterator
  ************************************************/
 
-inline token_iterator::token_iterator(std::string const &s)
+inline token_iterator::token_iterator(::std::string const &s)
     : base_t(inner_generator(s))
 {
     next();
@@ -130,7 +130,7 @@ inline void token_iterator::next(void)
     }
 
     if (!scan(&ischs) && !scan(&isfwalnum) &&
-        !scan(&std::iswalnum) && !scan(&std::iswspace))
+        !scan(&::std::iswalnum) && !scan(&::std::iswspace))
     {
         token_.assign(1, *base_t::base());
         it_ = base().base().base();

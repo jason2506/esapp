@@ -51,8 +51,8 @@ private: // Private Type(s)
     struct node;
     typedef node *raw_node_ptr;
     typedef node const *const_raw_node_ptr;
-    typedef std::unique_ptr<node> node_ptr;
-    typedef std::unordered_map<term_type, node_ptr> node_collection;
+    typedef ::std::unique_ptr<node> node_ptr;
+    typedef ::std::unordered_map<term_type, node_ptr> node_collection;
 
 private: // Private Property(ies)
     node_ptr root_;
