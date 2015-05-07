@@ -59,7 +59,7 @@ private: // Private Property(ies)
 }; // class freq_trie
 
 /************************************************
- * Declaration: struct freq_trie::node
+ * Declaration: struct freq_trie::data
  ************************************************/
 
 struct freq_trie::data
@@ -68,7 +68,7 @@ struct freq_trie::data
 
     size_t f;
     double hl, hr;
-}; // struct freq_trie::node
+}; // struct freq_trie::data
 
 /************************************************
  * Declaration: struct freq_trie::node
@@ -83,7 +83,7 @@ struct freq_trie::node
     void clear(void);
 
     node_collection children;
-    data data;
+    data node_data;
 }; // struct freq_trie::node
 
 /************************************************
@@ -106,7 +106,7 @@ freq_trie::data_ptr freq_trie::insert(Iterator const &begin,
         node = node->get(*it, true);
     }
 
-    return &node->data;
+    return &node->node_data;
 }
 
 template <typename Iterator>
@@ -120,7 +120,7 @@ freq_trie::const_data_ptr freq_trie::find(Iterator const &begin,
         if (!node) { return nullptr; }
     }
 
-    return &node->data;
+    return &node->node_data;
 }
 
 template <typename Iterator>
@@ -136,7 +136,7 @@ void freq_trie::increase(Iterator const &begin, Iterator const &end)
             node = node->get(*it);
             if (!node) { break; }
 
-            node->data.f++;
+            node->node_data.f++;
         }
     }
 }
@@ -154,7 +154,7 @@ void freq_trie::decrease(Iterator const &begin, Iterator const &end)
             node = node->get(*it);
             if (!node) { break; }
 
-            node->data.f--;
+            node->node_data.f--;
         }
     }
 }
@@ -179,7 +179,7 @@ inline freq_trie::data::data(void)
  ************************************************/
 
 inline freq_trie::node::node(void)
-    : data()
+    : node_data()
 {
     // do nothing
 }
@@ -203,7 +203,7 @@ inline freq_trie::raw_node_ptr freq_trie::node::get(term_type key, bool create)
 inline void freq_trie::node::clear(void)
 {
     children.clear();
-    data.f = data.hl = data.hr = 0;
+    node_data.f = node_data.hl = node_data.hr = 0;
 }
 
 } // namespace esapp
