@@ -28,7 +28,7 @@ public: // Public Type(s)
     struct data;
     typedef data *data_ptr;
     typedef data const *const_data_ptr;
-    typedef wchar_t term_type;
+    typedef uint16_t term_type;
 
 public: // Public Method(s)
     freq_trie(void);

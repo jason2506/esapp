@@ -35,7 +35,6 @@ class string_counter
 {
 public: // Public Type(s)
     typedef suffix_array::value_type index_type;
-    typedef wchar_t term_type;
 
 public: // Public Method(s)
     explicit string_counter(double lrv_exp, size_t max_len = 30, double smooth = 0.0);
@@ -54,6 +53,10 @@ public: // Public Method(s)
     void clear(void);
 
 private: // Private Type(s)
+    static_assert(::std::is_same<suffix_array::term_type,
+                                 freq_trie::term_type>::value,
+                  "suffix_array and freq_trie should have same term_type.");
+
     typedef suffix_array::term_type term_id;
     typedef ::std::vector<term_id> id_sequence;
     typedef ::std::unordered_map<term_id, index_type> term_counts;
