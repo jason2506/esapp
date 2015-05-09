@@ -1,6 +1,13 @@
 .DS_Store
-dep/
-obj/
+
+# binary
 lib/
 include/
 example/example
+
+# cmake
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
