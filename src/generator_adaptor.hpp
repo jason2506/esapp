@@ -2,7 +2,7 @@
  *  generator_adaptor.hpp
  *  ESA++
  *
- *  Copyright (c) 2014, Chi-En Wu
+ *  Copyright (c) 2014-2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -39,16 +39,16 @@ template <typename Iterator>
 class generator_adaptor : public generator
     <
         generator_adaptor<Iterator>,
-        typename std::iterator_traits<Iterator>::value_type,
-        typename std::iterator_traits<Iterator>::difference_type
+        typename ::std::iterator_traits<Iterator>::value_type,
+        typename ::std::iterator_traits<Iterator>::difference_type
     >
 {
 private: // Private Type(s)
     typedef generator
         <
             generator_adaptor<Iterator>,
-            typename std::iterator_traits<Iterator>::value_type,
-            typename std::iterator_traits<Iterator>::difference_type
+            typename ::std::iterator_traits<Iterator>::value_type,
+            typename ::std::iterator_traits<Iterator>::difference_type
         > base_t;
 
 public: // Public Type(s)

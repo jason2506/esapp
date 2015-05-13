@@ -2,7 +2,7 @@
  *  segmenter.cpp
  *  ESA++
  *
- *  Copyright (c) 2014, Chi-En Wu
+ *  Copyright (c) 2014-2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -25,15 +25,15 @@ segmenter::segmenter(double lrv_exp, size_t max_iters,
     // do nothing
 }
 
-std::vector<std::vector<std::string>> segmenter::fit_and_segment(
-    std::vector<std::string> const &sequences)
+::std::vector<::std::vector<::std::string>> segmenter::fit_and_segment(
+    ::std::vector<::std::string> const &sequences)
 {
     // pre-segment sequences by alphabets, numbers, and symbols
     auto tokens = make_filter_iterator(
-        [] (std::vector<uint32_t> const &token) { return ischs(token[0]); },
+        [] (::std::vector<uint32_t> const &token) { return ischs(token[0]); },
         make_flatten_iterator(
             make_map_iterator(
-                [](std::string const &s) { return token_iterator(s); },
+                [](::std::string const &s) { return token_iterator(s); },
                 make_generator_adaptor(sequences.begin(), sequences.end())
             )
         )
@@ -43,7 +43,7 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
     counter_.fit(tokens);
 
     auto m = counter_.raw_string_count();
-    std::vector<seg_pos_list> prev_segs(m), segs(m);
+    ::std::vector<seg_pos_list> prev_segs(m), segs(m);
     for (decltype(max_iters_) i = 0; i < max_iters_; ++i)
     {
         // segment sequences
@@ -88,7 +88,7 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
             {
                 segment_sequence(words, begin, end, *it++);
             }
-            else if (!std::iswspace(ch))
+            else if (!::std::iswspace(ch))
             {
                 words.emplace_back(begin, end);
             }
@@ -106,15 +106,15 @@ void segmenter::optimize_segment(seg_pos_list &seg, size_t p, size_t n) const
 {
     if (n == 0) { return; }
 
-    std::vector<size_t> fs(n);
-    std::vector<double> fv(n);
+    ::std::vector<size_t> fs(n);
+    ::std::vector<double> fv(n);
     for (decltype(n) i = 0; i < n; ++i)
     {
         fs[i] = 0;
         fv[i] = counter_.score(p, i + 1);
         for (decltype(i) j = 0; j < i; ++j)
         {
-            if (fv[j] == -std::numeric_limits<double>::infinity()) { continue; }
+            if (fv[j] == -::std::numeric_limits<double>::infinity()) { continue; }
 
             auto cv = fv[j] + counter_.score(p + j + 1, i - j);
             if (cv > fv[i])
@@ -131,12 +131,12 @@ void segmenter::optimize_segment(seg_pos_list &seg, size_t p, size_t n) const
         seg.push_back(i);
     }
 
-    std::reverse(seg.begin(), seg.end());
+    ::std::reverse(seg.begin(), seg.end());
 }
 
-void segmenter::segment_sequence(std::vector<std::string> &words,
-                                 std::string::const_iterator begin,
-                                 std::string::const_iterator end,
+void segmenter::segment_sequence(::std::vector<::std::string> &words,
+                                 ::std::string::const_iterator begin,
+                                 ::std::string::const_iterator end,
                                  seg_pos_list const &seg) const
 {
     seg_pos_list::value_type prev_pos = 0;

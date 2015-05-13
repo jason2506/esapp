@@ -2,7 +2,7 @@
  *  esapp.hpp
  *  ESA++
  *
- *  Copyright (c) 2014, Chi-En Wu
+ *  Copyright (c) 2014-2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -27,12 +27,12 @@ class segmenter
 public: // Public Method(s)
     explicit segmenter(double lrv_exp, size_t max_iters = 10,
                        size_t max_len = 30, double smooth = 0.0);
-    std::vector<std::vector<std::string>> fit_and_segment(
-        std::vector<std::string> const &sequences);
+    ::std::vector<::std::vector<::std::string>> fit_and_segment(
+        ::std::vector<::std::string> const &sequences);
     ~segmenter(void);
 
 private: // Private Property(ies)
-    std::unique_ptr<impl::segmenter> impl_;
+    ::std::unique_ptr<impl::segmenter> impl_;
 }; // class segmenter
 
 } // namespace esapp

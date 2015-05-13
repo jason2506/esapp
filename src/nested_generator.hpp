@@ -2,7 +2,7 @@
  *  nested_generator.hpp
  *  ESA++
  *
- *  Copyright (c) 2014, Chi-En Wu
+ *  Copyright (c) 2014-2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -21,12 +21,12 @@ namespace esapp
  ************************************************/
 
 template <typename Derived, typename Generator,
-          typename Value = typename std::iterator_traits<Generator>::value_type>
+          typename Value = typename ::std::iterator_traits<Generator>::value_type>
 class nested_generator : public generator
     <
         Derived,
         Value,
-        typename std::iterator_traits<Generator>::difference_type
+        typename ::std::iterator_traits<Generator>::difference_type
     >
 {
 private: // Private Type(s)
@@ -34,7 +34,7 @@ private: // Private Type(s)
         <
             Derived,
             Value,
-            typename std::iterator_traits<Generator>::difference_type
+            typename ::std::iterator_traits<Generator>::difference_type
         > base_t;
     typedef Derived derived_t;
 

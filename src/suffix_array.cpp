@@ -2,7 +2,7 @@
  *  suffix_array.cpp
  *  ESA++
  *
- *  Copyright (c) 2014, Chi-En Wu
+ *  Copyright (c) 2014-2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -24,20 +24,20 @@ void suffix_array::construct()
     auto len_s = s_.size();
     sa_.resize(len_s);
 
-    std::vector<value_type> bkt(num_alphas);
+    ::std::vector<value_type> bkt(num_alphas);
     gen_sa(s_.begin(), sa_, bkt, len_s, num_alphas);
     gen_isa();
     gen_lcpa();
 }
 
-inline bool suffix_array::is_lms(std::vector<bool> const &suf_types,
+inline bool suffix_array::is_lms(::std::vector<bool> const &suf_types,
                                  size_t i, size_t len_s)
 {
     return i > 0 && i < len_s && suf_types[i] && !suf_types[i - 1];
 }
 
 template <typename T>
-void suffix_array::init_bkt(T const &s, std::vector<value_type> &bkt,
+void suffix_array::init_bkt(T const &s, ::std::vector<value_type> &bkt,
                             size_t len_s, size_t num_alphas, bool end)
 {
     fill_n(bkt.begin(), num_alphas, 0);
@@ -46,7 +46,7 @@ void suffix_array::init_bkt(T const &s, std::vector<value_type> &bkt,
         bkt[s[i]]++;
     }
 
-    typedef std::remove_reference<decltype(bkt)>::type Bkt;
+    typedef ::std::remove_reference<decltype(bkt)>::type Bkt;
     Bkt::value_type sum = 0;
     for (decltype(num_alphas) i = 0; i < num_alphas; i++)
     {
@@ -56,9 +56,9 @@ void suffix_array::init_bkt(T const &s, std::vector<value_type> &bkt,
 }
 
 template <typename T>
-void suffix_array::induce(T const &s, std::vector<bool> const &suf_types,
-                          std::vector<value_type> &sa,
-                          std::vector<value_type> &bkt,
+void suffix_array::induce(T const &s, ::std::vector<bool> const &suf_types,
+                          ::std::vector<value_type> &sa,
+                          ::std::vector<value_type> &bkt,
                           size_t len_s, size_t num_alphas)
 {
     init_bkt(s, bkt, len_s, num_alphas, false);
@@ -85,12 +85,12 @@ void suffix_array::induce(T const &s, std::vector<bool> const &suf_types,
 }
 
 template <typename T>
-void suffix_array::gen_sa(T const &s, std::vector<value_type> &sa,
-                          std::vector<value_type> &bkt,
+void suffix_array::gen_sa(T const &s, ::std::vector<value_type> &sa,
+                          ::std::vector<value_type> &bkt,
                           size_t len_s, size_t num_alphas)
 {
     // LS-type array in bits
-    std::vector<bool> suf_types(len_s);
+    ::std::vector<bool> suf_types(len_s);
 
     // classify the type of each character
     suf_types[len_s - 1] = true;
@@ -102,7 +102,7 @@ void suffix_array::gen_sa(T const &s, std::vector<value_type> &sa,
 
     // stage 1: reduce the problem by at least 1/2 sort all the S-substrings
     init_bkt(s, bkt, len_s, num_alphas, true);
-    fill_n(sa.begin(), len_s, std::numeric_limits<value_type>::max());
+    fill_n(sa.begin(), len_s, ::std::numeric_limits<value_type>::max());
     for (decltype(len_s) i = 1; i < len_s; i++)
     {
         if (is_lms(suf_types, i, len_s))
@@ -127,7 +127,7 @@ void suffix_array::gen_sa(T const &s, std::vector<value_type> &sa,
     auto prev = sa[0];
     decltype(len_s) num_names = 1;
     fill_n(sa.begin() + num_lms, len_s - num_lms,
-           std::numeric_limits<value_type>::max());
+           ::std::numeric_limits<value_type>::max());
     sa[num_lms + (prev >> 1)] = 0;
     for (decltype(num_lms) i = 1; i < num_lms; i++)
     {
@@ -195,11 +195,11 @@ void suffix_array::gen_sa(T const &s, std::vector<value_type> &sa,
 
     init_bkt(s, bkt, len_s, num_alphas, true);
     fill_n(sa.begin() + num_lms, len_s - num_lms,
-           std::numeric_limits<value_type>::max());
+           ::std::numeric_limits<value_type>::max());
     for (decltype(num_lms) i = num_lms; i-- > 0; )
     {
         auto j = sa[i];
-        sa[i] = std::numeric_limits<decltype(j)>::max();
+        sa[i] = ::std::numeric_limits<decltype(j)>::max();
         sa[--bkt[s[j]]] = j;
     }
 

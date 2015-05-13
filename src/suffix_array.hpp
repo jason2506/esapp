@@ -2,7 +2,7 @@
  *  suffix_array.hpp
  *  ESA++
  *
- *  Copyright (c) 2014, Chi-En Wu
+ *  Copyright (c) 2014-2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -36,9 +36,9 @@ public: // Public Type(s)
     typedef size_t value_type;
     typedef sequence::value_type term_type;
 
-    typedef typename std::vector<term_type>::const_iterator data_iterator;
-    typedef typename std::vector<value_type>::const_iterator iterator;
-    typedef typename std::vector<value_type>::const_iterator const_iterator;
+    typedef typename ::std::vector<term_type>::const_iterator data_iterator;
+    typedef typename ::std::vector<value_type>::const_iterator iterator;
+    typedef typename ::std::vector<value_type>::const_iterator const_iterator;
 
 public: // Public Method(s)
     suffix_array(void) = default;
@@ -72,20 +72,20 @@ private: // Private Method(s)
     void construct(void);
     void construct(size_t num_alphas);
 
-    bool is_lms(std::vector<bool> const &suf_types, size_t i, size_t len_s);
+    bool is_lms(::std::vector<bool> const &suf_types, size_t i, size_t len_s);
 
     template <typename T>
-    void init_bkt(T const &s, std::vector<value_type> &bkt,
+    void init_bkt(T const &s, ::std::vector<value_type> &bkt,
                   size_t num_chars, size_t num_alphas, bool end);
 
     template <typename T>
-    void induce(T const &s, std::vector<bool> const &suf_types,
-                std::vector<value_type> &sa, std::vector<value_type> &bkt,
+    void induce(T const &s, ::std::vector<bool> const &suf_types,
+                ::std::vector<value_type> &sa, ::std::vector<value_type> &bkt,
                 size_t num_chars, size_t num_alphas);
 
     template <typename T>
-    void gen_sa(T const &s, std::vector<value_type> &sa,
-                std::vector<value_type> &bkt,
+    void gen_sa(T const &s, ::std::vector<value_type> &sa,
+                ::std::vector<value_type> &bkt,
                 size_t num_chars, size_t num_alphas);
 
     void gen_isa(void);
@@ -93,9 +93,9 @@ private: // Private Method(s)
 
 private: // Private Property(ies)
     sequence s_;
-    std::vector<value_type> sa_;
-    std::vector<value_type> isa_;
-    std::vector<value_type> lcpa_;
+    ::std::vector<value_type> sa_;
+    ::std::vector<value_type> isa_;
+    ::std::vector<value_type> lcpa_;
 }; // class suffix_array
 
 /************************************************

@@ -2,7 +2,7 @@
  *  utf8_decode_iterator.hpp
  *  ESA++
  *
- *  Copyright (c) 2014, Chi-En Wu
+ *  Copyright (c) 2014-2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -26,7 +26,7 @@ namespace impl
  * Declaration: class utf8_decode_error
  ************************************************/
 
-class invalid_byte_sequence : public std::exception { /* empty */ };
+class invalid_byte_sequence : public ::std::exception { /* empty */ };
 
 /************************************************
  * Declaration: class utf8_decode_iterator
@@ -36,7 +36,7 @@ class utf8_decode_iterator
     : public nested_generator
     <
         utf8_decode_iterator,
-        generator_adaptor<std::string::const_iterator>,
+        generator_adaptor<::std::string::const_iterator>,
         uint32_t
     >
 {
@@ -44,7 +44,7 @@ private: // Private Type(s)
     typedef nested_generator
         <
             utf8_decode_iterator,
-            generator_adaptor<std::string::const_iterator>,
+            generator_adaptor<::std::string::const_iterator>,
             uint32_t
         > base_t;
 
@@ -60,7 +60,7 @@ public: // Public Type(s)
 
 public: // Public Method(s)
     utf8_decode_iterator(void) = default;
-    explicit utf8_decode_iterator(std::string const &s);
+    explicit utf8_decode_iterator(::std::string const &s);
 
     void next(void);
     reference dereference(void) const;
@@ -78,7 +78,7 @@ private: // Private Property(ies)
  * Implementation: class utf8_decode_iterator
  ************************************************/
 
-inline utf8_decode_iterator::utf8_decode_iterator(std::string const &s)
+inline utf8_decode_iterator::utf8_decode_iterator(::std::string const &s)
     : base_t(inner_generator(s.begin(), s.end()))
 {
     next();
@@ -146,7 +146,7 @@ inline char utf8_decode_iterator::next_byte(void)
 {
     if (!base_t::valid())
     {
-        throw std::out_of_range("Input iterator out of range");
+        throw ::std::out_of_range("Input iterator out of range");
     }
 
     decltype(next_byte()) byte = *base_t::base();
