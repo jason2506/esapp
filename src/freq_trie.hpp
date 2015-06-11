@@ -25,19 +25,19 @@ namespace esapp
 class freq_trie
 {
 public: // Public Type(s)
-    struct data;
-    typedef data *data_ptr;
-    typedef data const *const_data_ptr;
+    struct node;
+    typedef node *raw_node_ptr;
+    typedef node const *const_raw_node_ptr;
     typedef uint16_t term_type;
 
 public: // Public Method(s)
     freq_trie(void);
 
-    template <typename Iterator>
-    data_ptr insert(Iterator const &begin, Iterator const &end);
+    raw_node_ptr get_root(void);
+    const_raw_node_ptr get_root(void) const;
 
     template <typename Iterator>
-    const_data_ptr find(Iterator const &begin, Iterator const &end) const;
+    const_raw_node_ptr find(Iterator const &begin, Iterator const &end) const;
 
     template <typename Iterator>
     void increase(Iterator const &begin, Iterator const &end);
@@ -48,27 +48,12 @@ public: // Public Method(s)
     void clear(void);
 
 private: // Private Type(s)
-    struct node;
-    typedef node *raw_node_ptr;
-    typedef node const *const_raw_node_ptr;
     typedef ::std::unique_ptr<node> node_ptr;
     typedef ::std::unordered_map<term_type, node_ptr> node_collection;
 
 private: // Private Property(ies)
     node_ptr root_;
 }; // class freq_trie
-
-/************************************************
- * Declaration: struct freq_trie::data
- ************************************************/
-
-struct freq_trie::data
-{
-    data(void);
-
-    size_t f;
-    double hl, hr;
-}; // struct freq_trie::data
 
 /************************************************
  * Declaration: struct freq_trie::node
@@ -83,7 +68,8 @@ struct freq_trie::node
     void clear(void);
 
     node_collection children;
-    data node_data;
+    size_t f;
+    double hl, hr;
 }; // struct freq_trie::node
 
 /************************************************
@@ -96,22 +82,19 @@ inline freq_trie::freq_trie(void)
     // do nothing
 }
 
-template <typename Iterator>
-freq_trie::data_ptr freq_trie::insert(Iterator const &begin,
-                                      Iterator const &end)
+inline freq_trie::raw_node_ptr freq_trie::get_root(void)
 {
-    auto node = root_.get();
-    for (auto it = begin; it != end; ++it)
-    {
-        node = node->get(*it, true);
-    }
+    return root_.get();
+}
 
-    return &node->node_data;
+inline freq_trie::const_raw_node_ptr freq_trie::get_root(void) const
+{
+    return root_.get();
 }
 
 template <typename Iterator>
-freq_trie::const_data_ptr freq_trie::find(Iterator const &begin,
-                                          Iterator const &end) const
+freq_trie::const_raw_node_ptr freq_trie::find(Iterator const &begin,
+                                              Iterator const &end) const
 {
     auto node = root_.get();
     for (auto it = begin; it != end; ++it)
@@ -120,7 +103,7 @@ freq_trie::const_data_ptr freq_trie::find(Iterator const &begin,
         if (!node) { return nullptr; }
     }
 
-    return &node->node_data;
+    return node;
 }
 
 template <typename Iterator>
@@ -136,7 +119,7 @@ void freq_trie::increase(Iterator const &begin, Iterator const &end)
             node = node->get(*it);
             if (!node) { break; }
 
-            node->node_data.f++;
+            node->f++;
         }
     }
 }
@@ -154,7 +137,7 @@ void freq_trie::decrease(Iterator const &begin, Iterator const &end)
             node = node->get(*it);
             if (!node) { break; }
 
-            node->node_data.f--;
+            node->f--;
         }
     }
 }
@@ -168,18 +151,8 @@ inline void freq_trie::clear(void)
  * Implementation: struct freq_trie::node
  ************************************************/
 
-inline freq_trie::data::data(void)
-    : f(0), hl(0), hr(0)
-{
-    // do nothing
-}
-
-/************************************************
- * Implementation: struct freq_trie::node
- ************************************************/
-
 inline freq_trie::node::node(void)
-    : node_data()
+    : f(0), hl(0), hr(0)
 {
     // do nothing
 }
@@ -203,7 +176,7 @@ inline freq_trie::raw_node_ptr freq_trie::node::get(term_type key, bool create)
 inline void freq_trie::node::clear(void)
 {
     children.clear();
-    node_data.f = node_data.hl = node_data.hr = 0;
+    f = hl = hr = 0;
 }
 
 } // namespace esapp
