@@ -2,7 +2,7 @@
  *  segmenter.hpp
  *  ESA++
  *
- *  Copyright (c) 2014-2015, Chi-En Wu
+ *  Copyright (c) 2014-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
