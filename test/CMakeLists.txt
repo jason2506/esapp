@@ -1,15 +1,20 @@
-FIND_PACKAGE (GTest REQUIRED)
-FIND_PACKAGE (Threads REQUIRED)
-INCLUDE_DIRECTORIES (${GTEST_INCLUDE_DIRS})
+find_package(GTest REQUIRED)
 
-FILE (GLOB test_SRCS "*_test.cpp")
+set(${PROJECT_NAME}_TESTS
+)
 
-FOREACH(file ${test_SRCS})
-    GET_FILENAME_COMPONENT (file_name ${file} NAME)
-    STRING (REPLACE ".cpp" "" test_BIN ${file_name} )
-    ADD_EXECUTABLE (${test_BIN} ${file})
-    SET_PROPERTY (TARGET ${test_BIN} PROPERTY CXX_STANDARD 11)
-    SET_PROPERTY (TARGET ${test_BIN} PROPERTY CXX_STANDARD_REQUIRED ON)
-    TARGET_LINK_LIBRARIES (${test_BIN} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-    ADD_TEST (${test_BIN} ${test_BIN} --gtest_color=yes)
-ENDFOREACH(file ${test_SRCS})
+include_directories(${GTEST_INCLUDE_DIRS})
+
+enable_testing()
+foreach(test ${${PROJECT_NAME}_TESTS})
+    add_executable(${test} ${test}.cpp)
+
+    target_link_libraries(${test}
+        ${GTEST_BOTH_LIBRARIES}
+        ${PROJECT_NAME}
+    )
+
+    add_test(NAME ${test}
+        COMMAND ${test} --gtest_color=yes
+    )
+endforeach(test ${test_SRCS})

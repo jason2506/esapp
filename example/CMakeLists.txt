@@ -1,5 +1,4 @@
-LINK_DIRECTORIES (${MAINFOLDER}/lib)
-ADD_EXECUTABLE (example example.cpp)
-SET_PROPERTY (TARGET example PROPERTY CXX_STANDARD 11)
-SET_PROPERTY (TARGET example PROPERTY CXX_STANDARD_REQUIRED ON)
-TARGET_LINK_LIBRARIES (example ${PROJECT_NAME})
+add_executable(example example.cpp)
+target_link_libraries(example
+    ${PROJECT_NAME}
+)
