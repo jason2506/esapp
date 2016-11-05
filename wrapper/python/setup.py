@@ -4,7 +4,7 @@ from Cython.Distutils import build_ext
 esapp = Extension(
     'esapp',
     sources=['cython/esapp.pyx'],
-    extra_compile_args=['-std=c++11'],
+    extra_compile_args=['-std=c++14'],
     libraries=['esapp'],
     language='C++'
 )
