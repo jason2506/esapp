@@ -28,7 +28,7 @@ int main(void)
         u8"小貓真可愛"
     };
 
-    segmenter seg(0.1, 10, 30, 10e-5);
+    segmenter seg(0.1, 10);
 
     auto words_list = seg.fit_and_segment(sequences);
     for (auto const &words : words_list)

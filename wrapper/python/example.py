@@ -20,7 +20,7 @@ def main():
                  '這是一隻花貓',
                  '小貓真可愛']
 
-    segmenter = Segmenter(0.1, 10, 30, 10e-5)
+    segmenter = Segmenter(0.1, 10)
 
     words_list = segmenter.fit_and_segment(sequences)
     for words in words_list:

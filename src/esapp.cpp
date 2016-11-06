@@ -16,9 +16,8 @@ namespace esapp
  * Implementation: class segmenter
  ************************************************/
 
-segmenter::segmenter(double lrv_exp, size_t max_iters,
-                     size_t max_len, double smooth)
-    : impl_(new impl::segmenter(lrv_exp, max_iters, max_len, smooth))
+segmenter::segmenter(double lrv_exp, size_t max_iters)
+    : impl_(new impl::segmenter(lrv_exp, max_iters))
 {
     // do nothing
 }

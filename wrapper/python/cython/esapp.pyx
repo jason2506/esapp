@@ -4,7 +4,7 @@
 # esa.pyx
 # ESA++
 #
-# Copyright (c) 2014, Chi-En Wu
+# Copyright (c) 2014-2016, Chi-En Wu
 # Distributed under The BSD 3-Clause License
 #################################################
 
@@ -27,8 +27,8 @@ cdef list from_string_vector(vector[string] &str_vector):
 cdef class Segmenter(object):
     cdef _Segmenter *_segmenter
 
-    def __cinit__(self, lrv_exp, max_iters=10, max_length=30, smooth=0.0):
-        self._segmenter = new _Segmenter(lrv_exp, max_iters, max_length, smooth);
+    def __cinit__(self, lrv_exp, max_iters=10):
+        self._segmenter = new _Segmenter(lrv_exp, max_iters);
 
     def __dealloc__(self):
         del self._segmenter

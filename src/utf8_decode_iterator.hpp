@@ -37,7 +37,7 @@ class utf8_decode_iterator
     <
         utf8_decode_iterator,
         generator_adaptor<::std::string::const_iterator>,
-        uint32_t
+        ::std::uint32_t
     >
 {
 private: // Private Type(s)
@@ -45,7 +45,7 @@ private: // Private Type(s)
         <
             utf8_decode_iterator,
             generator_adaptor<::std::string::const_iterator>,
-            uint32_t
+            ::std::uint32_t
         > base_t;
 
 public: // Public Type(s)

@@ -28,7 +28,8 @@ public: // Public Type(s)
     struct node;
     typedef node *raw_node_ptr;
     typedef node const *const_raw_node_ptr;
-    typedef uint16_t term_type;
+    typedef ::std::uint16_t term_type;
+    typedef ::std::size_t size_type;
 
 public: // Public Method(s)
     freq_trie(void);
@@ -68,8 +69,7 @@ struct freq_trie::node
     void clear(void);
 
     node_collection children;
-    size_t f;
-    double hl, hr;
+    size_type f, avl, avr;
 }; // struct freq_trie::node
 
 /************************************************
@@ -114,7 +114,7 @@ void freq_trie::increase(Iterator const &begin, Iterator const &end)
         auto node = root_.get();
         for (auto it = it_begin; it != end; ++it)
         {
-            if (it_begin == begin && it + 1 == end) { continue; }
+            if (it_begin == begin && it + 1 == end) { break; }
 
             node = node->get(*it);
             if (!node) { break; }
@@ -132,7 +132,7 @@ void freq_trie::decrease(Iterator const &begin, Iterator const &end)
         auto node = root_.get();
         for (auto it = it_begin; it != end; ++it)
         {
-            if (it_begin == begin && it + 1 == end) { continue; }
+            if (it_begin == begin && it + 1 == end) { break; }
 
             node = node->get(*it);
             if (!node) { break; }
@@ -152,7 +152,7 @@ inline void freq_trie::clear(void)
  ************************************************/
 
 inline freq_trie::node::node(void)
-    : f(0), hl(0), hr(0)
+    : f(1), avl(1), avr(1)
 {
     // do nothing
 }
@@ -176,7 +176,7 @@ inline freq_trie::raw_node_ptr freq_trie::node::get(term_type key, bool create)
 inline void freq_trie::node::clear(void)
 {
     children.clear();
-    f = hl = hr = 0;
+    f = avl = avr = 0;
 }
 
 } // namespace esapp
