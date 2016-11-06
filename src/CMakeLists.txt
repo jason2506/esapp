@@ -1,9 +1,11 @@
+find_package(desa CONFIG REQUIRED)
+
 add_library(${PROJECT_NAME}
-    encoded_multistring.cpp
-    suffix_array.cpp
     segmenter.cpp
     esapp.cpp
 )
+
+target_link_libraries(${PROJECT_NAME} desa)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
