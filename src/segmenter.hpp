@@ -66,8 +66,6 @@ private: // Private Property(ies)
 
     ::std::unordered_map<term_type, term_id> term_id_map_;
     text_index index_;
-
-    static term_id const BOUNDARY_;
 }; // class segmenter
 
 } // namespace impl

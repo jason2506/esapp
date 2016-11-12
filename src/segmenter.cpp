@@ -14,14 +14,12 @@ namespace esapp
 namespace impl
 {
 
-segmenter::term_id const segmenter::BOUNDARY_ = 0;
-
 /************************************************
  * Implementation: class segmenter
  ************************************************/
 
 segmenter::segmenter(double lrv_exp, size_type max_iters)
-    : lrv_exp_(lrv_exp), max_iters_(max_iters), term_id_map_({{0, BOUNDARY_}})
+    : lrv_exp_(lrv_exp), max_iters_(max_iters), term_id_map_({{0, 0}})
 {
     // do nothing
 }
