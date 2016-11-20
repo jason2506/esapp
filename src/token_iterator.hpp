@@ -10,10 +10,10 @@
 #define ESAPP_TOKEN_ITERATOR_HPP_
 
 #include <cwctype>
-#include <string>
 #include <vector>
 
-#include "nested_generator.hpp"
+#include <literator/iterator_adaptor.hpp>
+
 #include "utf8_decode_iterator.hpp"
 
 namespace esapp
@@ -21,6 +21,9 @@ namespace esapp
 
 namespace impl
 {
+
+// forward declaration
+class token_iterator;
 
 /************************************************
  * Inline Helper Function(s)
@@ -39,124 +42,101 @@ inline int isfwalnum(::std::wint_t c)
 }
 
 /************************************************
+ * Declaration: type token_iterator_base
+ ************************************************/
+
+using token_iterator_base = literator::iterator_adaptor
+    <
+        token_iterator,
+        utf8_decode_iterator::base_type,
+        ::std::vector<utf8_decode_iterator::value_type>,
+        ::std::forward_iterator_tag,
+        ::std::vector<utf8_decode_iterator::value_type> const &
+    >;
+
+/************************************************
  * Declaration: class token_iterator
  ************************************************/
 
-class token_iterator : public nested_generator
-    <
-        token_iterator,
-        utf8_decode_iterator,
-        ::std::vector<utf8_decode_iterator::value_type>
-    >
+class token_iterator : public token_iterator_base
 {
 private: // Private Type(s)
-    typedef nested_generator
-        <
-            token_iterator,
-            utf8_decode_iterator,
-            ::std::vector<utf8_decode_iterator::value_type>
-        > base_t;
+    friend literator::iterator_core_access;
+    using super_t = token_iterator_base;
 
 public: // Public Type(s)
-    typedef typename base_t::iterator_category iterator_category;
-    typedef typename base_t::value_type value_type;
-    typedef typename base_t::reference reference;
-    typedef typename base_t::pointer pointer;
-    typedef typename base_t::difference_type difference_type;
-
-    typedef typename base_t::inner_generator inner_generator;
-    typedef typename inner_generator::input_iterator input_iterator;
+    using base_type = super_t::base_type;
+    using value_type = super_t::value_type;
 
 public: // Public Method(s)
     token_iterator(void) = default;
-    explicit token_iterator(::std::string const &s);
-
-    void next(void);
-    reference dereference(void) const;
-    bool equal(token_iterator const &it) const;
-    bool valid(void) const;
-
-    input_iterator position(void) const;
+    token_iterator(base_type it, base_type end);
 
 private: // Private Method(s)
+    super_t::reference dereference(void) const;
+    void increment(void);
+
+    void next_token(void);
+
     template <typename Predicate>
-    void skip(Predicate pred);
-    template <typename Predicate>
-    bool scan(Predicate pred);
+    bool scan_while(Predicate pred);
 
 private: // Private Property(ies)
+    utf8_decode_iterator u8_it_;
+    utf8_decode_iterator u8_end_;
     value_type token_;
-    input_iterator it_;
 }; // class token_iterator
 
 /************************************************
  * Implementation: class token_iterator
  ************************************************/
 
-inline token_iterator::token_iterator(::std::string const &s)
-    : base_t(inner_generator(s))
+inline token_iterator::token_iterator(base_type it, base_type end)
+    : super_t(it), u8_it_(it, end), u8_end_(end, end), token_()
 {
-    next();
+    next_token();
 }
 
-template <typename Predicate>
-inline void token_iterator::skip(Predicate pred)
-{
-    for ( ; base_t::valid() && pred(*base_t::base()); base_t::next())
-    {
-        it_ = base().base().base();
-    }
-}
-
-template <typename Predicate>
-inline bool token_iterator::scan(Predicate pred)
-{
-    auto const &current = base();
-    auto const begin(current);
-    skip(pred);
-
-    bool scanned = begin != current;
-    if (scanned) { token_.assign(begin, current); }
-
-    return scanned;
-}
-
-inline void token_iterator::next(void)
-{
-    if (!base_t::valid())
-    {
-        token_.clear();
-        return;
-    }
-
-    if (!scan(&ischs) && !scan(&isfwalnum) &&
-        !scan(&::std::iswalnum) && !scan(&::std::iswspace))
-    {
-        token_.assign(1, *base_t::base());
-        it_ = base().base().base();
-        base_t::next();
-    }
-}
-
-inline typename token_iterator::reference
+inline typename token_iterator::super_t::reference
 token_iterator::dereference(void) const
 {
     return token_;
 }
 
-inline bool token_iterator::equal(token_iterator const &it) const
+inline void token_iterator::increment(void)
 {
-    return base_t::equal(it) && token_ == it.token_;
+    next_token();
 }
 
-inline bool token_iterator::valid(void) const
+inline void token_iterator::next_token(void)
 {
-    return base_t::valid() || !token_.empty();
+    token_.clear();
+    if (u8_it_ == u8_end_)
+    {
+        this->base_reference() = u8_it_.base();
+        return;
+    }
+
+    if (!scan_while(&ischs) && !scan_while(&isfwalnum) &&
+        !scan_while(&::std::iswalnum) && !scan_while(&::std::iswspace))
+    {
+        token_.push_back(*u8_it_);
+        this->base_reference() = u8_it_.base();
+        ++u8_it_;
+    }
 }
 
-inline token_iterator::input_iterator token_iterator::position(void) const
+template <typename Predicate>
+inline bool token_iterator::scan_while(Predicate pred)
 {
-    return it_;
+    while (u8_it_ != u8_end_ && pred(*u8_it_))
+    {
+        token_.push_back(*u8_it_);
+        this->base_reference() = u8_it_.base();
+        ++u8_it_;
+    }
+
+    return token_.size() > 0;
 }
 
 } // namespace impl

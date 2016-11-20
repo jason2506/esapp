@@ -9,18 +9,21 @@
 #ifndef ESAPP_UTF8_DECODE_ITERATOR_HPP_
 #define ESAPP_UTF8_DECODE_ITERATOR_HPP_
 
+#include <iterator>
 #include <exception>
 #include <stdexcept>
 #include <string>
 
-#include "nested_generator.hpp"
-#include "generator_adaptor.hpp"
+#include <literator/iterator_adaptor.hpp>
 
 namespace esapp
 {
 
 namespace impl
 {
+
+// forward declaration
+class utf8_decode_iterator;
 
 /************************************************
  * Declaration: class utf8_decode_error
@@ -29,90 +32,99 @@ namespace impl
 class invalid_byte_sequence : public ::std::exception { /* empty */ };
 
 /************************************************
+ * Declaration: type utf8_decode_iterator_base
+ ************************************************/
+
+using utf8_decode_iterator_base = literator::iterator_adaptor
+    <
+        utf8_decode_iterator,
+        ::std::string::const_iterator,
+        ::std::uint32_t,
+        ::std::forward_iterator_tag,
+        ::std::uint32_t const &
+    >;
+
+/************************************************
  * Declaration: class utf8_decode_iterator
  ************************************************/
 
-class utf8_decode_iterator
-    : public nested_generator
-    <
-        utf8_decode_iterator,
-        generator_adaptor<::std::string::const_iterator>,
-        ::std::uint32_t
-    >
+class utf8_decode_iterator : public utf8_decode_iterator_base
 {
 private: // Private Type(s)
-    typedef nested_generator
-        <
-            utf8_decode_iterator,
-            generator_adaptor<::std::string::const_iterator>,
-            ::std::uint32_t
-        > base_t;
+    friend literator::iterator_core_access;
+    using super_t = utf8_decode_iterator_base;
 
 public: // Public Type(s)
-    typedef typename base_t::iterator_category iterator_category;
-    typedef typename base_t::value_type value_type;
-    typedef typename base_t::reference reference;
-    typedef typename base_t::pointer pointer;
-    typedef typename base_t::difference_type difference_type;
-
-    typedef typename base_t::inner_generator inner_generator;
-    typedef typename inner_generator::input_iterator input_iterator;
+    using base_type = super_t::base_type;
+    using value_type = super_t::value_type;
 
 public: // Public Method(s)
     utf8_decode_iterator(void) = default;
-    explicit utf8_decode_iterator(::std::string const &s);
-
-    void next(void);
-    reference dereference(void) const;
-    bool equal(utf8_decode_iterator const &it) const;
-    bool valid(void) const;
+    utf8_decode_iterator(base_type it, base_type end);
 
 private: // Private Method(s)
-    char next_byte(void);
+    super_t::reference dereference(void) const;
+    void increment(void);
+
+    void next_codepoint(void);
+    typename base_type::value_type next_byte(void);
 
 private: // Private Property(ies)
-    value_type char_;
+    base_type end_;
+    value_type codepoint_;
 }; // class utf8_decode_iterator
 
 /************************************************
  * Implementation: class utf8_decode_iterator
  ************************************************/
 
-inline utf8_decode_iterator::utf8_decode_iterator(::std::string const &s)
-    : base_t(inner_generator(s.begin(), s.end()))
+inline utf8_decode_iterator::utf8_decode_iterator(base_type it, base_type end)
+    : super_t(it), end_(end), codepoint_(0)
 {
-    next();
+    next_codepoint();
 }
 
-inline void utf8_decode_iterator::next(void)
+inline typename utf8_decode_iterator::super_t::reference
+utf8_decode_iterator::dereference(void) const
 {
-    if (!base_t::valid())
+    return codepoint_;
+}
+
+inline void utf8_decode_iterator::increment(void)
+{
+    ++(this->base_reference());
+    next_codepoint();
+}
+
+inline void utf8_decode_iterator::next_codepoint(void)
+{
+    if (this->base_reference() == end_)
     {
-        char_ = 0;
+        codepoint_ = 0;
         return;
     }
 
-    int byte_needed = 0;
-    char_ = *base_t::base();
-    base_t::next();
-    if ((char_ & 0x80) == 0)
+    codepoint_ = *(this->base_reference());
+
+    ::std::size_t byte_needed = 0;
+    if ((codepoint_ & 0x80) == 0)
     {
         // do nothing
     }
-    else if ((char_ & 0xE0) == 0xC0)
+    else if ((codepoint_ & 0xE0) == 0xC0)
     {
         byte_needed = 1;
-        char_ &= 0x1F;
+        codepoint_ &= 0x1F;
     }
-    else if ((char_ & 0xF0) == 0xE0)
+    else if ((codepoint_ & 0xF0) == 0xE0)
     {
         byte_needed = 2;
-        char_ &= 0x0F;
+        codepoint_ &= 0x0F;
     }
-    else if ((char_ & 0xF8) == 0xF0)
+    else if ((codepoint_ & 0xF8) == 0xF0)
     {
         byte_needed = 3;
-        char_ &= 0x07;
+        codepoint_ &= 0x07;
     }
     else
     {
@@ -121,41 +133,26 @@ inline void utf8_decode_iterator::next(void)
 
     for ( ; byte_needed > 0; --byte_needed)
     {
-        char_ <<= 6;
-        char_ |= next_byte() & 0x3f;
+        codepoint_ <<= 6;
+        codepoint_ |= next_byte() & 0x3f;
     }
 }
 
-inline typename utf8_decode_iterator::reference
-utf8_decode_iterator::dereference(void) const
+inline typename utf8_decode_iterator::base_type::value_type
+utf8_decode_iterator::next_byte(void)
 {
-    return char_;
-}
-
-inline bool utf8_decode_iterator::equal(utf8_decode_iterator const &it) const
-{
-    return base_t::equal(it) && char_ == it.char_;
-}
-
-inline bool utf8_decode_iterator::valid(void) const
-{
-    return base_t::valid() || char_ != 0;
-}
-
-inline char utf8_decode_iterator::next_byte(void)
-{
-    if (!base_t::valid())
+    ++(this->base_reference());
+    if (this->base_reference() == end_)
     {
         throw ::std::out_of_range("Input iterator out of range");
     }
 
-    decltype(next_byte()) byte = *base_t::base();
+    auto byte = *(this->base_reference());
     if ((byte & 0xC0) != 0x80)
     {
         throw invalid_byte_sequence();
     }
 
-    base_t::next();
     return byte;
 }
 

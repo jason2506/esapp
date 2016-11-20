@@ -22,10 +22,6 @@
 #include <desa/with_lcp.hpp>
 
 #include "token_iterator.hpp"
-#include "map_iterator.hpp"
-#include "filter_iterator.hpp"
-#include "flatten_iterator.hpp"
-#include "generator_adaptor.hpp"
 #include "with_segments.hpp"
 
 namespace esapp

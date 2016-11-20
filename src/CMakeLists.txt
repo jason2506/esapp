@@ -1,3 +1,4 @@
+find_package(literator CONFIG REQUIRED)
 find_package(desa CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME}
@@ -5,7 +6,7 @@ add_library(${PROJECT_NAME}
     esapp.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} desa)
+target_link_libraries(${PROJECT_NAME} literator desa)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

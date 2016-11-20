@@ -9,7 +9,10 @@ class EsappConan(ConanFile):
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
 
-    requires = 'desa/0.1.0@jason2506/testing'
+    requires = (
+        'literator/0.1.0@jason2506/testing',
+        'desa/0.1.0@jason2506/testing'
+    )
 
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'cmake'
