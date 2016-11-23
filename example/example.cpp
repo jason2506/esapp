@@ -15,12 +15,8 @@
 
 #include <esapp/esapp.hpp>
 
-using namespace std;
-using namespace esapp;
-
-int main(void)
-{
-    vector<string> sequences = {
+int main(void) {
+    std::vector<std::string> sequences = {
         u8"這是一隻可愛的小花貓",
         u8"一隻貓",
         u8"真可愛的貓",
@@ -28,13 +24,12 @@ int main(void)
         u8"小貓真可愛"
     };
 
-    segmenter seg(0.1, 10);
+    esapp::segmenter seg(0.1, 10);
 
     auto words_list = seg.fit_and_segment(sequences);
-    for (auto const &words : words_list)
-    {
-        copy(words.begin(), words.end(), ostream_iterator<string>(cout, " "));
-        cout << endl;
+    for (auto const &words : words_list) {
+        copy(words.begin(), words.end(), std::ostream_iterator<std::string>(std::cout, " "));
+        std::cout << std::endl;
     }
 
     return EXIT_SUCCESS;

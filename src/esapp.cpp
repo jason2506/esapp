@@ -9,28 +9,24 @@
 #include <esapp/esapp.hpp>
 #include <esapp/segmenter.hpp>
 
-namespace esapp
-{
+namespace esapp {
 
 /************************************************
  * Implementation: class segmenter
  ************************************************/
 
 segmenter::segmenter(double lrv_exp, size_t max_iters)
-    : impl_(new impl::segmenter(lrv_exp, max_iters))
-{
+    : impl_(new internal::segmenter(lrv_exp, max_iters)) {
     // do nothing
 }
 
-segmenter::~segmenter(void)
-{
+segmenter::~segmenter() {
     // do nothing
 }
 
 std::vector<std::vector<std::string>> segmenter::fit_and_segment(
-    std::vector<std::string> const &sequences)
-{
+        std::vector<std::string> const &sequences) {
     return impl_->fit_and_segment(sequences);
 }
 
-} // namespace esapp
+}  // namespace esapp

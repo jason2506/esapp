@@ -13,27 +13,27 @@
 #include <vector>
 #include <string>
 
-namespace esapp
-{
+namespace esapp {
 
-namespace impl { class segmenter; }
+// forward declaration
+namespace internal { class segmenter; }
 
 /************************************************
  * Declaration: class segmenter
  ************************************************/
 
-class segmenter
-{
-public: // Public Method(s)
-    explicit segmenter(double lrv_exp, size_t max_iters = 10);
-    std::vector<std::vector<std::string>> fit_and_segment(
-        std::vector<std::string> const &sequences);
-    ~segmenter(void);
+class segmenter {
+ public:  // Public Method(s)
+    explicit segmenter(double lrv_exp, std::size_t max_iters = 10);
+    ~segmenter();
 
-private: // Private Property(ies)
-    std::unique_ptr<impl::segmenter> impl_;
-}; // class segmenter
+    std::vector<std::vector<std::string>>
+    fit_and_segment(std::vector<std::string> const &sequences);
 
-} // namespace esapp
+ private:  // Private Property(ies)
+    std::unique_ptr<internal::segmenter> impl_;
+};  // class segmenter
 
-#endif // ESAPP_ESAPP_HPP_
+}  // namespace esapp
+
+#endif  // ESAPP_ESAPP_HPP_
