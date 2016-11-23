@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_UTF8_DECODE_ITERATOR_HPP_
-#define ESAPP_UTF8_DECODE_ITERATOR_HPP_
+#ifndef ESAPP_INTERNAL_UTF8_DECODE_ITERATOR_HPP_
+#define ESAPP_INTERNAL_UTF8_DECODE_ITERATOR_HPP_
 
 #include <iterator>
 #include <exception>
@@ -138,4 +138,4 @@ utf8_decode_iterator::next_byte() {
 
 }  // namespace esapp
 
-#endif  // ESAPP_UTF8_DECODE_ITERATOR_HPP_
+#endif  // ESAPP_INTERNAL_UTF8_DECODE_ITERATOR_HPP_

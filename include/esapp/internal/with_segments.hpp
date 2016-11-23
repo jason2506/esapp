@@ -13,8 +13,8 @@
 
 #include "freq_trie.hpp"
 
-#ifndef ESAPP_WITH_SEGMENTS_HPP_
-#define ESAPP_WITH_SEGMENTS_HPP_
+#ifndef ESAPP_INTERNAL_WITH_SEGMENTS_HPP_
+#define ESAPP_INTERNAL_WITH_SEGMENTS_HPP_
 
 namespace esapp {
 
@@ -293,4 +293,4 @@ void with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runt
 
 }  // namespace esapp
 
-#endif  // ESAPP_WITH_SEGMENTS_HPP_
+#endif  // ESAPP_INTERNAL_WITH_SEGMENTS_HPP_

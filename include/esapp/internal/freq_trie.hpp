@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_FREQ_TRIE_HPP_
-#define ESAPP_FREQ_TRIE_HPP_
+#ifndef ESAPP_INTERNAL_FREQ_TRIE_HPP_
+#define ESAPP_INTERNAL_FREQ_TRIE_HPP_
 
 #include <unordered_map>
 #include <utility>
@@ -165,4 +165,4 @@ inline void freq_trie::node::clear() {
 
 }  // namespace esapp
 
-#endif  // ESAPP_FREQ_TRIE_HPP_
+#endif  // ESAPP_INTERNAL_FREQ_TRIE_HPP_

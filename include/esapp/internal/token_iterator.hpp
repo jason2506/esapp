@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_TOKEN_ITERATOR_HPP_
-#define ESAPP_TOKEN_ITERATOR_HPP_
+#ifndef ESAPP_INTERNAL_TOKEN_ITERATOR_HPP_
+#define ESAPP_INTERNAL_TOKEN_ITERATOR_HPP_
 
 #include <cwctype>
 #include <vector>
@@ -129,4 +129,4 @@ inline bool token_iterator::scan_while(Predicate pred) {
 
 }  // namespace esapp
 
-#endif  // ESAPP_TOKEN_ITERATOR_HPP_
+#endif  // ESAPP_INTERNAL_TOKEN_ITERATOR_HPP_

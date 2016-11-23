@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_SEGMENTER_HPP_
-#define ESAPP_SEGMENTER_HPP_
+#ifndef ESAPP_INTERNAL_SEGMENTER_HPP_
+#define ESAPP_INTERNAL_SEGMENTER_HPP_
 
 #include <cmath>
 
@@ -65,4 +65,4 @@ class segmenter {
 
 }  // namespace esapp
 
-#endif  // ESAPP_SEGMENTER_HPP_
+#endif  // ESAPP_INTERNAL_SEGMENTER_HPP_

@@ -6,7 +6,7 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include <esapp/segmenter.hpp>
+#include <esapp/internal/segmenter.hpp>
 
 namespace esapp {
 
