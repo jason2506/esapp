@@ -28,8 +28,8 @@ public: // Public Type(s)
     struct node;
     typedef node *raw_node_ptr;
     typedef node const *const_raw_node_ptr;
-    typedef ::std::uint16_t term_type;
-    typedef ::std::size_t size_type;
+    typedef std::uint16_t term_type;
+    typedef std::size_t size_type;
 
 public: // Public Method(s)
     freq_trie(void);
@@ -49,8 +49,8 @@ public: // Public Method(s)
     void clear(void);
 
 private: // Private Type(s)
-    typedef ::std::unique_ptr<node> node_ptr;
-    typedef ::std::unordered_map<term_type, node_ptr> node_collection;
+    typedef std::unique_ptr<node> node_ptr;
+    typedef std::unordered_map<term_type, node_ptr> node_collection;
 
 private: // Private Property(ies)
     node_ptr root_;

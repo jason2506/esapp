@@ -26,7 +26,7 @@ namespace impl
  * Declaration: struct with_segments<N>
  ************************************************/
 
-template <::std::size_t N = 30>
+template <std::size_t N = 30>
 struct with_segments
 {
     template <typename TextIndex, typename Trait>
@@ -37,7 +37,7 @@ struct with_segments
  * Declaration: class with_segments<N>::policy<LCP, T>
  ************************************************/
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename Trait>
 class with_segments<N>::policy
 {
@@ -61,8 +61,8 @@ protected: // Protected Method(s)
     void update(typename event::template after_inserting_lcp<Sequence> info);
 
 private: // Private Type(s)
-    using seg_pos_vec_type = ::std::vector<size_type>;
-    using seq_type = ::std::vector<term_type>;
+    using seg_pos_vec_type = std::vector<size_type>;
+    using seq_type = std::vector<term_type>;
 
 private: // Private Method(s)
     template <typename Sequence>
@@ -76,17 +76,17 @@ private: // Private Method(s)
 private: // Private Property(ies)
     size_type lcp_;
     freq_trie trie_;
-    ::std::array<size_type, N> sum_f_;
-    ::std::array<size_type, N> sum_av_;
-    ::std::array<size_type, N> num_str_;
-    ::std::vector<seg_pos_vec_type> seg_pos_vecs_;
+    std::array<size_type, N> sum_f_;
+    std::array<size_type, N> sum_av_;
+    std::array<size_type, N> num_str_;
+    std::vector<seg_pos_vec_type> seg_pos_vecs_;
 }; // class with_segments<N>::policy<LCP, T>
 
 /************************************************
  * Implementation: class with_segments<N>::policy<LCP, T>
  ************************************************/
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename T>
 with_segments<N>::policy<LCP, T>::policy(void)
     : lcp_(0)
@@ -96,7 +96,7 @@ with_segments<N>::policy<LCP, T>::policy(void)
     num_str_.fill(0);
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename T>
 template <typename Sequence>
 void with_segments<N>::policy<LCP, T>::update(typename event::template after_inserting_lcp<Sequence> info)
@@ -111,7 +111,7 @@ void with_segments<N>::policy<LCP, T>::update(typename event::template after_ins
         return;
     }
 
-    auto lcp_lf = ::std::max(info.lcp, info.lcp_next);
+    auto lcp_lf = std::max(info.lcp, info.lcp_next);
     update_counts(info.s, info.num_inserted - 1, lcp_lf);
     lcp_ = lcp_lf;
 
@@ -123,7 +123,7 @@ void with_segments<N>::policy<LCP, T>::update(typename event::template after_ins
     }
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename T>
 void with_segments<N>::policy<LCP, T>::optimize(double lrv_exp, size_type num_iters)
 {
@@ -143,7 +143,7 @@ void with_segments<N>::policy<LCP, T>::optimize(double lrv_exp, size_type num_it
     }
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename T>
 typename with_segments<N>::template policy<LCP, T>::size_type
 with_segments<N>::policy<LCP, T>::num_segs(size_type i) const
@@ -151,7 +151,7 @@ with_segments<N>::policy<LCP, T>::num_segs(size_type i) const
     return seg_pos_vecs_[i].size();
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename T>
 typename with_segments<N>::template policy<LCP, T>::size_type
 with_segments<N>::policy<LCP, T>::seg_pos(size_type i, size_type j) const
@@ -159,7 +159,7 @@ with_segments<N>::policy<LCP, T>::seg_pos(size_type i, size_type j) const
     return seg_pos_vecs_[i][j];
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename T>
 template <typename Sequence>
 void with_segments<N>::policy<LCP, T>::update_counts(Sequence const &s, size_type n, size_type lcp_lf)
@@ -169,7 +169,7 @@ void with_segments<N>::policy<LCP, T>::update_counts(Sequence const &s, size_typ
     {
         auto it = rbegin(s) + n - 1;
         auto node = trie_.get_root();
-        auto max_i = ::std::min(lcp_, N);
+        auto max_i = std::min(lcp_, N);
         for (decltype(max_i) i = 0; i < max_i; i++)
         {
             auto c = *it;
@@ -191,7 +191,7 @@ void with_segments<N>::policy<LCP, T>::update_counts(Sequence const &s, size_typ
         }
     }
 
-    auto max_i = ::std::min(n, N);
+    auto max_i = std::min(n, N);
     for (auto i = lcp_; i < max_i; i++)
     {
         sum_f_[i]++;
@@ -200,7 +200,7 @@ void with_segments<N>::policy<LCP, T>::update_counts(Sequence const &s, size_typ
     }
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename T>
 void with_segments<N>::policy<LCP, T>::recover_sequence(size_type &i, seq_type &inv_s) const
 {
@@ -219,7 +219,7 @@ void with_segments<N>::policy<LCP, T>::recover_sequence(size_type &i, seq_type &
     } while (c != 0);
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 template <typename LCP, typename T>
 void with_segments<N>::policy<LCP, T>::segment_sequence(
     seq_type const &inv_s,
@@ -227,10 +227,10 @@ void with_segments<N>::policy<LCP, T>::segment_sequence(
     double lrv_exp)
 {
     auto n = inv_s.size();
-    ::std::vector<size_type> fs(n);
-    ::std::vector<double> fv(n);
-    ::std::fill(fs.begin(), fs.end(), 0);
-    ::std::fill(fv.begin(), fv.end(), -::std::numeric_limits<double>::infinity());
+    std::vector<size_type> fs(n);
+    std::vector<double> fv(n);
+    std::fill(fs.begin(), fs.end(), 0);
+    std::fill(fv.begin(), fv.end(), -std::numeric_limits<double>::infinity());
 
     auto seg_pos_it = seg_pos_vec.begin();
     typename decltype(seg_pos_it)::value_type seg_pos = 0;
@@ -256,7 +256,7 @@ void with_segments<N>::policy<LCP, T>::segment_sequence(
 
         auto s_it = inv_s.rbegin() + i;
         auto node = trie_.get_root();
-        auto max_m = ::std::min(n - i, N);
+        auto max_m = std::min(n - i, N);
         for (decltype(i) m = 0; m < max_m; ++m)
         {
             if (node)
@@ -316,7 +316,7 @@ void with_segments<N>::policy<LCP, T>::segment_sequence(
         seg_pos_vec.push_back(i);
     }
 
-    ::std::reverse(seg_pos_vec.begin(), seg_pos_vec.end());
+    std::reverse(seg_pos_vec.begin(), seg_pos_vec.end());
 
     // decrease counts recorded in trie
     auto it = inv_s.rbegin();

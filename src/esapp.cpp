@@ -27,8 +27,8 @@ segmenter::~segmenter(void)
     // do nothing
 }
 
-::std::vector<::std::vector<::std::string>> segmenter::fit_and_segment(
-    ::std::vector<::std::string> const &sequences)
+std::vector<std::vector<std::string>> segmenter::fit_and_segment(
+    std::vector<std::string> const &sequences)
 {
     return impl_->fit_and_segment(sequences);
 }

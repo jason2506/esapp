@@ -29,7 +29,7 @@ class utf8_decode_iterator;
  * Declaration: class utf8_decode_error
  ************************************************/
 
-class invalid_byte_sequence : public ::std::exception { /* empty */ };
+class invalid_byte_sequence : public std::exception { /* empty */ };
 
 /************************************************
  * Declaration: type utf8_decode_iterator_base
@@ -38,10 +38,10 @@ class invalid_byte_sequence : public ::std::exception { /* empty */ };
 using utf8_decode_iterator_base = literator::iterator_adaptor
     <
         utf8_decode_iterator,
-        ::std::string::const_iterator,
-        ::std::uint32_t,
-        ::std::forward_iterator_tag,
-        ::std::uint32_t const &
+        std::string::const_iterator,
+        std::uint32_t,
+        std::forward_iterator_tag,
+        std::uint32_t const &
     >;
 
 /************************************************
@@ -106,7 +106,7 @@ inline void utf8_decode_iterator::next_codepoint(void)
 
     codepoint_ = *(this->base_reference());
 
-    ::std::size_t byte_needed = 0;
+    std::size_t byte_needed = 0;
     if ((codepoint_ & 0x80) == 0)
     {
         // do nothing
@@ -144,7 +144,7 @@ utf8_decode_iterator::next_byte(void)
     ++(this->base_reference());
     if (this->base_reference() == end_)
     {
-        throw ::std::out_of_range("Input iterator out of range");
+        throw std::out_of_range("Input iterator out of range");
     }
 
     auto byte = *(this->base_reference());

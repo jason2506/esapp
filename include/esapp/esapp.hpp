@@ -26,12 +26,12 @@ class segmenter
 {
 public: // Public Method(s)
     explicit segmenter(double lrv_exp, size_t max_iters = 10);
-    ::std::vector<::std::vector<::std::string>> fit_and_segment(
-        ::std::vector<::std::string> const &sequences);
+    std::vector<std::vector<std::string>> fit_and_segment(
+        std::vector<std::string> const &sequences);
     ~segmenter(void);
 
 private: // Private Property(ies)
-    ::std::unique_ptr<impl::segmenter> impl_;
+    std::unique_ptr<impl::segmenter> impl_;
 }; // class segmenter
 
 } // namespace esapp

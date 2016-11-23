@@ -24,8 +24,8 @@ segmenter::segmenter(double lrv_exp, size_type max_iters)
     // do nothing
 }
 
-::std::vector<::std::vector<::std::string>> segmenter::fit_and_segment(
-    ::std::vector<::std::string> const &sequences)
+std::vector<std::vector<std::string>> segmenter::fit_and_segment(
+    std::vector<std::string> const &sequences)
 {
     term_id id = 0;
     for (auto const &sequence : sequences)
@@ -39,7 +39,7 @@ segmenter::segmenter(double lrv_exp, size_type max_iters)
             if (!ischs(token[0])) { continue; }
 
             decltype(token.size()) i = 0;
-            ::std::vector<term_id> s(token.size());
+            std::vector<term_id> s(token.size());
             for (auto const &c : token)
             {
                 if (term_id_map_.find(c) == term_id_map_.end())
@@ -87,7 +87,7 @@ segmenter::segmenter(double lrv_exp, size_type max_iters)
 
                 i++;
             }
-            else if (!::std::iswspace(ch))
+            else if (!std::iswspace(ch))
             {
                 words.emplace_back(word_begin, word_end);
             }

@@ -29,12 +29,12 @@ class token_iterator;
  * Inline Helper Function(s)
  ************************************************/
 
-inline int ischs(::std::wint_t c)
+inline int ischs(std::wint_t c)
 {
     return c >= u'\u4E00' && c <= u'\u9FFF';
 }
 
-inline int isfwalnum(::std::wint_t c)
+inline int isfwalnum(std::wint_t c)
 {
     return (c >= u'Ａ' && c <= u'Ｚ') ||
            (c >= u'ａ' && c <= u'ｚ') ||
@@ -49,9 +49,9 @@ using token_iterator_base = literator::iterator_adaptor
     <
         token_iterator,
         utf8_decode_iterator::base_type,
-        ::std::vector<utf8_decode_iterator::value_type>,
-        ::std::forward_iterator_tag,
-        ::std::vector<utf8_decode_iterator::value_type> const &
+        std::vector<utf8_decode_iterator::value_type>,
+        std::forward_iterator_tag,
+        std::vector<utf8_decode_iterator::value_type> const &
     >;
 
 /************************************************
@@ -118,7 +118,7 @@ inline void token_iterator::next_token(void)
     }
 
     if (!scan_while(&ischs) && !scan_while(&isfwalnum) &&
-        !scan_while(&::std::iswalnum) && !scan_while(&::std::iswspace))
+        !scan_while(&std::iswalnum) && !scan_while(&std::iswspace))
     {
         token_.push_back(*u8_it_);
         this->base_reference() = u8_it_.base();
