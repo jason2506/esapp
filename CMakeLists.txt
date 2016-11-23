@@ -5,8 +5,11 @@ project(esapp
     LANGUAGES CXX
 )
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+option(ENABLE_CONAN "Enable conan package manager" OFF)
+if(ENABLE_CONAN)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup()
+endif(ENABLE_CONAN)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
