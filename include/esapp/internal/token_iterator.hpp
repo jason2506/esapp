@@ -10,6 +10,7 @@
 #define ESAPP_INTERNAL_TOKEN_ITERATOR_HPP_
 
 #include <cwctype>
+
 #include <vector>
 
 #include <literator/iterator_adaptor.hpp>

@@ -8,6 +8,12 @@
 
 #include <esapp/internal/segmenter.hpp>
 
+#include <cmath>
+#include <cwctype>
+
+#include <string>
+#include <vector>
+
 namespace esapp {
 
 namespace internal {

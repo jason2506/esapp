@@ -9,11 +9,8 @@
 #ifndef ESAPP_INTERNAL_FREQ_TRIE_HPP_
 #define ESAPP_INTERNAL_FREQ_TRIE_HPP_
 
-#include <unordered_map>
-#include <utility>
 #include <memory>
-#include <string>
-#include <vector>
+#include <unordered_map>
 
 namespace esapp {
 

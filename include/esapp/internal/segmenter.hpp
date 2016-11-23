@@ -9,14 +9,8 @@
 #ifndef ESAPP_INTERNAL_SEGMENTER_HPP_
 #define ESAPP_INTERNAL_SEGMENTER_HPP_
 
-#include <cmath>
-
-#include <algorithm>
-#include <limits>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 #include <desa/text_index.hpp>

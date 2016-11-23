@@ -6,6 +6,9 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
+#include <string>
+#include <vector>
+
 #include <esapp/internal/segmenter.hpp>
 #include <esapp/esapp.hpp>
 
