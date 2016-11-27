@@ -11,6 +11,8 @@ if(ENABLE_CONAN)
     conan_basic_setup()
 endif(ENABLE_CONAN)
 
+find_package(desa CONFIG REQUIRED)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
