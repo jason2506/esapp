@@ -22,6 +22,8 @@ install(DIRECTORY ${${PROJECT_NAME}_INCLUDE_DIR}/
 
 add_library(${PROJECT_NAME} INTERFACE)
 
+target_link_libraries(${PROJECT_NAME} INTERFACE desa)
+
 target_include_directories(${PROJECT_NAME}
     INTERFACE
         $<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIR}>
