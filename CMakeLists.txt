@@ -34,6 +34,7 @@ install(TARGETS ${PROJECT_NAME}
     EXPORT ${PROJECT_NAME}Targets
 )
 
+add_subdirectory(wrapper)
 add_subdirectory(example)
 
 include(CTest)

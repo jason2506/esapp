@@ -10,7 +10,7 @@
 
 from __future__ import print_function, unicode_literals
 
-from esapp import Segmenter
+from esapp_python import Segmenter
 
 
 def main():
