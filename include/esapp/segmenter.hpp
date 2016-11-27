@@ -9,6 +9,9 @@
 #ifndef ESAPP_SEGMENTER_HPP_
 #define ESAPP_SEGMENTER_HPP_
 
+#include <cwctype>
+
+#include <limits>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -16,8 +19,8 @@
 #include <desa/text_index.hpp>
 #include <desa/with_lcp.hpp>
 
-#include "internal/token_iterator.hpp"
 #include "internal/with_segments.hpp"
+#include "internal/decode_utf8.hpp"
 
 namespace esapp {
 
@@ -30,10 +33,13 @@ class segmenter {
     typedef std::size_t size_type;
 
  public:  // Public Method(s)
-    explicit segmenter(double lrv_exp, size_type max_iters = 10);
+    explicit segmenter(double lrv_exp);
 
-    std::vector<std::vector<std::string>>
-    fit_and_segment(std::vector<std::string> const &sequences);
+    template <typename ForwardIterator>
+    void fit(ForwardIterator begin, ForwardIterator end);
+    void optimize(size_type n_iters);
+    template <typename ForwardIterator>
+    std::vector<std::string> segment(ForwardIterator begin, ForwardIterator end) const;
 
  private:  // Private Type(s)
     typedef desa::text_index<
@@ -42,16 +48,131 @@ class segmenter {
         >::policy
     > text_index;
     typedef text_index::term_type term_id;
-    typedef internal::token_iterator::value_type::value_type term_type;
+    typedef std::wint_t term_type;
     typedef std::vector<size_type> seg_pos_list;
+
+ private:  // Private Static Method(s)
+    template <typename ForwardIterator, typename Predicate>  // NOLINTNEXTLINE(runtime/references)
+    static term_type scan_while(ForwardIterator &scanned_it, ForwardIterator &it,
+                                ForwardIterator end, Predicate f);
 
  private:  // Private Property(ies)
     double lrv_exp_;
-    size_type max_iters_;
-
     std::unordered_map<term_type, term_id> term_id_map_;
     text_index index_;
 };  // class segmenter
+
+/************************************************
+ * Inline Helper Function(s)
+ ************************************************/
+
+inline int ischs(std::wint_t c) {
+    return c >= u'\u4E00' && c <= u'\u9FFF';
+}
+
+inline int isfwalnum(std::wint_t c) {
+    return (c >= u'Ａ' && c <= u'Ｚ') ||
+           (c >= u'ａ' && c <= u'ｚ') ||
+           (c >= u'０' && c <= u'９');
+}
+
+/************************************************
+ * Implementation: class segmenter
+ ************************************************/
+
+inline segmenter::segmenter(double lrv_exp)
+    : lrv_exp_(lrv_exp), term_id_map_({{0, 0}}) {
+    // do nothing
+}
+
+template <typename ForwardIterator>
+void segmenter::fit(ForwardIterator it, ForwardIterator end) {
+    term_id id = term_id_map_.size();
+    std::vector<term_id> token;
+    while (it != end) {
+        auto term = internal::decode_utf8<term_type>(it, end);
+        if (ischs(term)) {
+            token.clear();
+            do {
+                if (term_id_map_.find(term) == term_id_map_.end()) {
+                    term_id_map_.emplace(term, id++);
+                }
+
+                token.push_back(term_id_map_[term]);
+            } while (it != end && ischs(term = internal::decode_utf8<term_type>(it, end)));
+
+            index_.insert(token);
+        }
+    }
+}
+
+inline void segmenter::optimize(size_type n_iters) {
+    index_.optimize(lrv_exp_, n_iters);
+}
+
+template <typename ForwardIterator>
+std::vector<std::string> segmenter::segment(ForwardIterator it, ForwardIterator end) const {
+    if (it == end) { return {}; }
+
+    decltype(segment(it, end)) words;
+    std::vector<term_id> token;
+
+    auto word_begin = it;
+    auto term = internal::decode_utf8<term_type>(it, end);
+    while (it != end) {
+        auto word_end = it;
+        if (ischs(term)) {
+            token.clear();
+            do {
+                word_end = it;
+                auto term_id_it = term_id_map_.find(term);
+                if (term_id_it == term_id_map_.end()) {
+                    token.push_back(std::numeric_limits<term_id>::max());
+                } else {
+                    token.push_back(term_id_it->second);
+                }
+            } while (it != end && ischs(term = internal::decode_utf8<term_type>(it, end)));
+
+            auto seg_pos_vec = index_.segment(token, lrv_exp_);
+            decltype(seg_pos_vec)::value_type prev_pos = 0;
+            for (auto pos : seg_pos_vec) {
+                words.emplace_back(word_begin + prev_pos * 3, word_begin + pos * 3);
+                prev_pos = pos;
+            }
+        } else {
+            if (isfwalnum(term)) {
+                term = scan_while(it, word_end, end, isfwalnum);
+            } else if (std::iswalnum(term)) {
+                term = scan_while(it, word_end, end, std::iswalnum);
+            } else if (std::iswspace(term)) {
+                term = scan_while(it, word_end, end, std::iswspace);
+            } else {
+                term = internal::decode_utf8<term_type>(it, end);
+            }
+
+            words.emplace_back(word_begin, word_end);
+        }
+
+        word_begin = word_end;
+    }
+
+    words.emplace_back(word_begin, it);
+    return words;
+}
+
+template <typename ForwardIterator, typename Predicate>
+segmenter::term_type segmenter::scan_while(ForwardIterator &scanned_it, ForwardIterator &it,
+                                           ForwardIterator end, Predicate f) {
+    assert(scanned_it == end);
+
+    term_type term;
+    while (f(term = internal::decode_utf8<term_type>(scanned_it, end))
+            && (it = scanned_it) != end) {
+        // do nothing
+    }
+
+    return term;
+}
 
 }  // namespace esapp
 

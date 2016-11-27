@@ -41,34 +41,37 @@ class with_segments<N>::policy {
     using host_type = LCP;
     using size_type = typename Trait::size_type;
     using term_type = freq_trie::term_type;
-
- private:  // Private Types(s)
-    using event = typename Trait::event;
+    using seg_pos_vec_type = std::vector<size_type>;
 
  public:  // Public Method(s)
     policy();
     void optimize(double lrv_exp, size_type num_iters);
 
-    size_type num_segs(size_type i) const;
-    size_type seg_pos(size_type i, size_type j) const;
+    template <typename Sequence>
+    seg_pos_vec_type segment(Sequence const &s, double lrv_exp) const;
+
+ private:  // Private Type(s)
+    using event = typename Trait::event;
+    using seq_type = std::vector<term_type>;
 
  protected:  // Protected Method(s)
     template <typename Sequence>
     void update(typename event::template after_inserting_lcp<Sequence> info);
-
- private:  // Private Type(s)
-    using seg_pos_vec_type = std::vector<size_type>;
-    using seq_type = std::vector<term_type>;
 
  private:  // Private Method(s)
     template <typename Sequence>
     void update_counts(Sequence const &s, size_type n, size_type lcp_lf);
 
     // NOLINTNEXTLINE(runtime/references)
-    void recover_sequence(size_type &i, seq_type &inv_s) const;
-    void segment_sequence(seq_type const &inv_s,
-                          seg_pos_vec_type &seg_pos_vec,  // NOLINT(runtime/references)
-                          double lrv_exp);
+    void recover_sequence(size_type &i, seq_type &s) const;
+    std::vector<size_type> segment_sequence(
+        seq_type const &s,
+        seg_pos_vec_type &seg_pos_vec,  // NOLINT(runtime/references)
+        double lrv_exp) const;
+    void increase_counts(seq_type const &s, seg_pos_vec_type const &seg_pos_vec);
+    void decrease_counts(seq_type const &s, seg_pos_vec_type const &seg_pos_vec);
+    void generate_seg_pos_vec(seg_pos_vec_type &seg_pos_vec,  // NOLINT(runtime/references)
+                              std::vector<size_type> const &fs) const;
 
  private:  // Private Property(ies)
     size_type lcp_;
@@ -121,13 +124,20 @@ template <std::size_t N>
 template <typename LCP, typename T>
 void with_segments<N>::policy<LCP, T>::optimize(double lrv_exp, size_type num_iters) {
     size_type i = 0;
-    seq_type inv_s;
+    seq_type s;
 
     auto n = seg_pos_vecs_.size();
     for (decltype(num_iters) count = 0; count < num_iters; count++) {
         for (decltype(n) j = 0; j < n; j++) {
-            recover_sequence(i, inv_s);
-            segment_sequence(inv_s, seg_pos_vecs_[j], lrv_exp);
+            recover_sequence(i, s);
+
+            auto fs = segment_sequence(s, seg_pos_vecs_[j], lrv_exp);
+            if (!seg_pos_vecs_[j].empty()) {
+                increase_counts(s, seg_pos_vecs_[j]);
+            }
+
+            generate_seg_pos_vec(seg_pos_vecs_[j], fs);
+            decrease_counts(s, seg_pos_vecs_[j]);
         }
 
         assert(i == 0);
@@ -136,16 +146,13 @@ void with_segments<N>::policy<LCP, T>::optimize(double lrv_exp, size_type num_it
 
 template <std::size_t N>
 template <typename LCP, typename T>
-typename with_segments<N>::template policy<LCP, T>::size_type
-with_segments<N>::policy<LCP, T>::num_segs(size_type i) const {
-    return seg_pos_vecs_[i].size();
-}
-
-template <std::size_t N>
-template <typename LCP, typename T>
-typename with_segments<N>::template policy<LCP, T>::size_type
-with_segments<N>::policy<LCP, T>::seg_pos(size_type i, size_type j) const {
-    return seg_pos_vecs_[i][j];
+template <typename Sequence>
+typename with_segments<N>::template policy<LCP, T>::seg_pos_vec_type
+with_segments<N>::policy<LCP, T>::segment(Sequence const &s, double lrv_exp) const {
+    decltype(segment(s, lrv_exp)) seg_pos_vec;
+    auto fs = segment_sequence(s, seg_pos_vec, lrv_exp);
+    generate_seg_pos_vec(seg_pos_vec, fs);
+    return seg_pos_vec;
 }
 
 template <std::size_t N>
@@ -186,26 +193,29 @@ void with_segments<N>::policy<LCP, T>::update_counts(
 
 template <std::size_t N>
 template <typename LCP, typename T>  // NOLINTNEXTLINE(runtime/references)
-void with_segments<N>::policy<LCP, T>::recover_sequence(size_type &i, seq_type &inv_s) const {
+void with_segments<N>::policy<LCP, T>::recover_sequence(size_type &i, seq_type &s) const {
     using ti_ptr_type = typename host_type::host_type const *;
 
-    inv_s.clear();
+    s.clear();
 
     // recover sequence in reverse order
     i = static_cast<ti_ptr_type>(this)->lf(i);
     auto c = static_cast<ti_ptr_type>(this)->f(i);
     do {
-        inv_s.push_back(c);
+        s.push_back(c);
         i = static_cast<ti_ptr_type>(this)->lf(i);
         c = static_cast<ti_ptr_type>(this)->f(i);
     } while (c != 0);
+
+    std::reverse(s.begin(), s.end());
 }
 
 template <std::size_t N>
 template <typename LCP, typename T>
-void with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runtime/references)
-        seq_type const &inv_s, seg_pos_vec_type &seg_pos_vec, double lrv_exp) {
-    auto n = inv_s.size();
+std::vector<typename with_segments<N>::template policy<LCP, T>::size_type>
+with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runtime/references)
+        seq_type const &s, seg_pos_vec_type &seg_pos_vec, double lrv_exp) const {
+    auto n = s.size();
     std::vector<size_type> fs(n);
     std::vector<double> fv(n);
     std::fill(fs.begin(), fs.end(), 0);
@@ -228,7 +238,7 @@ void with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runt
             assert(seg_pos > i);
         }
 
-        auto s_it = inv_s.rbegin() + i;
+        auto s_it = s.begin() + i;
         auto node = trie_.get_root();
         auto max_m = std::min(n - i, N);
         for (decltype(i) m = 0; m < max_m; ++m) {
@@ -261,32 +271,45 @@ void with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runt
         }
     }
 
-    if (!seg_pos_vec.empty()) {
-        // restore counts recorded in trie
-        auto it = inv_s.rbegin();
-        auto prev_pos = 0;
-        for (auto pos : seg_pos_vec) {
-            trie_.increase(it + prev_pos, it + pos);
-            prev_pos = pos;
-        }
+    return fs;
+}
 
-        seg_pos_vec.clear();
+template <std::size_t N>
+template <typename LCP, typename T>
+void with_segments<N>::policy<LCP, T>::increase_counts(
+        seq_type const &s, seg_pos_vec_type const &seg_pos_vec) {
+    auto it = s.begin();
+    typename seg_pos_vec_type::value_type prev_pos = 0;
+    for (auto pos : seg_pos_vec) {
+        trie_.increase(it + prev_pos, it + pos);
+        prev_pos = pos;
     }
+}
 
+template <std::size_t N>
+template <typename LCP, typename T>
+void with_segments<N>::policy<LCP, T>::decrease_counts(
+        seq_type const &s, seg_pos_vec_type const &seg_pos_vec) {
+    auto it = s.begin();
+    typename seg_pos_vec_type::value_type prev_pos = 0;
+    for (auto pos : seg_pos_vec) {
+        trie_.decrease(it + prev_pos, it + pos);
+        prev_pos = pos;
+    }
+}
+
+template <std::size_t N>
+template <typename LCP, typename T>
+void with_segments<N>::policy<LCP, T>::generate_seg_pos_vec(  // NOLINTNEXTLINE(runtime/references)
+        seg_pos_vec_type &seg_pos_vec, std::vector<size_type> const &fs) const {
+    auto n = fs.size();
+    seg_pos_vec.clear();
     seg_pos_vec.push_back(n);
     for (auto i = fs[n - 1]; i > 0; i = fs[i - 1]) {
         seg_pos_vec.push_back(i);
     }
 
     std::reverse(seg_pos_vec.begin(), seg_pos_vec.end());
-
-    // decrease counts recorded in trie
-    auto it = inv_s.rbegin();
-    decltype(n) prev_pos = 0;
-    for (auto pos : seg_pos_vec) {
-        trie_.decrease(it + prev_pos, it + pos);
-        prev_pos = pos;
-    }
 }
 
 }  // namespace internal

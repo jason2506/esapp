@@ -24,10 +24,15 @@ int main(void) {
         u8"小貓真可愛"
     };
 
-    esapp::segmenter seg(0.1, 10);
+    esapp::segmenter seg(0.1);
 
-    auto words_list = seg.fit_and_segment(sequences);
-    for (auto const &words : words_list) {
+    for (auto const &s : sequences) {
+        seg.fit(s.begin(), s.end());
+    }
+
+    seg.optimize(10);
+    for (auto const &s : sequences) {
+        auto words = seg.segment(s.begin(), s.end());
         copy(words.begin(), words.end(), std::ostream_iterator<std::string>(std::cout, " "));
         std::cout << std::endl;
     }

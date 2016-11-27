@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #################################################
-# esa.pyx
+# esapp.pyx
 # ESA++
 #
 # Copyright (c) 2014-2016, Chi-En Wu
@@ -14,33 +14,23 @@ from libcpp.string cimport string
 from segmenter cimport _Segmenter
 
 
-cdef vector[string] to_string_vector(objs):
-    cdef unicode obj
-    return [obj.encode('utf-8') for obj in objs]
-
-
-cdef list from_string_vector(vector[string] &str_vector):
-    cdef string str
-    return [str.decode('utf-8') for str in str_vector]
-
-
 cdef class Segmenter(object):
     cdef _Segmenter *_segmenter
 
-    def __cinit__(self, lrv_exp, max_iters=10):
-        self._segmenter = new _Segmenter(lrv_exp, max_iters);
+    def __cinit__(self, lrv_exp):
+        self._segmenter = new _Segmenter(lrv_exp);
 
     def __dealloc__(self):
         del self._segmenter
 
-    cpdef list fit_and_segment(self, sequences):
-        cdef vector[string] cpp_sequences, words
-        cdef vector[vector[string]] words_list
-        cpp_sequences = to_string_vector(sequences)
+    cpdef void fit(self, s):
+        cdef string cpp_s = s.encode('utf-8')
+        self._segmenter.fit(cpp_s.begin(), cpp_s.end())
 
-        result = []
-        words_list = self._segmenter.fit_and_segment(cpp_sequences)
-        for words in words_list:
-            result.append(from_string_vector(words))
+    cpdef void optimize(self, n_iters):
+        self._segmenter.optimize(n_iters);
 
-        return result
+    cpdef list segment(self, s):
+        cdef string cpp_s = s.encode('utf-8')
+        cdef vector[string] words = self._segmenter.segment(cpp_s.begin(), cpp_s.end())
+        return [word.decode('utf-8') for word in words]

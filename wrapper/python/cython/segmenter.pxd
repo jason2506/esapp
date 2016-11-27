@@ -1,5 +1,5 @@
 #################################################
-# sed.pxd
+# segmenter.pxd
 # ESA++
 #
 # Copyright (c) 2014-2016, Chi-En Wu
@@ -12,6 +12,8 @@ from libcpp.string cimport string
 
 cdef extern from 'esapp/segmenter.hpp':
     cdef cppclass _Segmenter 'esapp::segmenter':
-        _Segmenter(double, size_t) nogil except +
+        _Segmenter(double) nogil except +
 
-        vector[vector[string]] fit_and_segment(const vector[string] &) nogil
+        void fit[Iterator](Iterator begin, Iterator end) nogil
+        void optimize(size_t) nogil
+        vector[string] segment[Iterator](Iterator begin, Iterator end) nogil

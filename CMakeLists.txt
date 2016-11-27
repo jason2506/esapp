@@ -20,7 +20,18 @@ install(DIRECTORY ${${PROJECT_NAME}_INCLUDE_DIR}/
     PATTERN *.hpp
 )
 
-add_subdirectory(src)
+add_library(${PROJECT_NAME} INTERFACE)
+
+target_include_directories(${PROJECT_NAME}
+    INTERFACE
+        $<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIR}>
+        $<INSTALL_INTERFACE:include>
+)
+
+install(TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}Targets
+)
+
 add_subdirectory(example)
 
 include(CTest)
