@@ -27,13 +27,14 @@ int main(void) {
     esapp::segmenter seg(0.1);
 
     for (auto const &s : sequences) {
-        seg.fit(s.begin(), s.end());
+        seg.fit(s.cbegin(), s.cend());
     }
 
     seg.optimize(10);
     for (auto const &s : sequences) {
-        auto words = seg.segment(s.begin(), s.end());
-        copy(words.begin(), words.end(), std::ostream_iterator<std::string>(std::cout, " "));
+        auto words = seg.segment(s.cbegin(), s.cend());
+        std::copy(words.begin(), words.end(),
+                  std::ostream_iterator<std::string>(std::cout, " "));
         std::cout << std::endl;
     }
 

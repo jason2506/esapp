@@ -38,6 +38,8 @@ class segmenter {
     template <typename ForwardIterator>
     void fit(ForwardIterator begin, ForwardIterator end);
     void optimize(size_type n_iters);
+    template <typename WordType, typename ForwardIterator>
+    std::vector<WordType> segment_into(ForwardIterator begin, ForwardIterator end) const;
     template <typename ForwardIterator>
     std::vector<std::string> segment(ForwardIterator begin, ForwardIterator end) const;
 
@@ -109,11 +111,11 @@ inline void segmenter::optimize(size_type n_iters) {
     index_.optimize(lrv_exp_, n_iters);
 }
 
-template <typename ForwardIterator>
-std::vector<std::string> segmenter::segment(ForwardIterator it, ForwardIterator end) const {
+template <typename WordType, typename ForwardIterator>
+std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterator end) const {
     if (it == end) { return {}; }
 
-    decltype(segment(it, end)) words;
+    decltype(segment_into<WordType>(it, end)) words;
     std::vector<term_id> token;
 
     auto word_begin = it;
@@ -157,6 +159,11 @@ std::vector<std::string> segmenter::segment(ForwardIterator it, ForwardIterator 
 
     words.emplace_back(word_begin, it);
     return words;
+}
+
+template <typename ForwardIterator>
+std::vector<std::string> segmenter::segment(ForwardIterator it, ForwardIterator end) const {
+    return segment_into<std::string>(it, end);
 }
 
 template <typename ForwardIterator, typename Predicate>
