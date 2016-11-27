@@ -13,28 +13,15 @@ class EsappConan(ConanFile):
 
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'cmake'
-    options = {
-        'build_tests': [True, False],
-    }
     default_options = (
-        'desa:build_tests=False',
-        'gtest:shared=False',
-        'build_tests=True',
+        'desa:build_tests=False'
     )
 
     exports = (
         'CMakeLists.txt',
         'cmake/*.cmake',
-        'include/*.hpp',
-        'src/CMakeLists.txt',
-        'src/*.cpp',
-        'test/CMakeLists.txt',
-        'test/*.cpp',
+        'include/*.hpp'
     )
-
-    def requirements(self):
-        if self.options.build_tests:
-            self.requires('gtest/1.8.0@lasote/stable')
 
     def build(self):
         cmake = CMake(self.settings)
@@ -50,6 +37,3 @@ class EsappConan(ConanFile):
             ' '.join(args)
         ))
         self.run('cmake --build . --target install %s' % cmake.build_config)
-
-    def package_info(self):
-        self.cpp_info.libs = ['esapp']

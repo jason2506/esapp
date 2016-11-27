@@ -37,9 +37,4 @@ install(TARGETS ${PROJECT_NAME}
 add_subdirectory(wrapper)
 add_subdirectory(example)
 
-include(CTest)
-if(BUILD_TESTING)
-    add_subdirectory(test)
-endif(BUILD_TESTING)
-
 include(cmake/esappPackage.cmake)
