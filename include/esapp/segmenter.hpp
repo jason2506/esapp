@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_INTERNAL_SEGMENTER_HPP_
-#define ESAPP_INTERNAL_SEGMENTER_HPP_
+#ifndef ESAPP_SEGMENTER_HPP_
+#define ESAPP_SEGMENTER_HPP_
 
 #include <string>
 #include <unordered_map>
@@ -16,12 +16,10 @@
 #include <desa/text_index.hpp>
 #include <desa/with_lcp.hpp>
 
-#include "token_iterator.hpp"
-#include "with_segments.hpp"
+#include "internal/token_iterator.hpp"
+#include "internal/with_segments.hpp"
 
 namespace esapp {
-
-namespace internal {
 
 /************************************************
  * Declaration: class segmenter
@@ -40,11 +38,11 @@ class segmenter {
  private:  // Private Type(s)
     typedef desa::text_index<
         desa::with_lcp<
-            with_segments<30>::policy
+            internal::with_segments<30>::policy
         >::policy
     > text_index;
     typedef text_index::term_type term_id;
-    typedef token_iterator::value_type::value_type term_type;
+    typedef internal::token_iterator::value_type::value_type term_type;
     typedef std::vector<size_type> seg_pos_list;
 
  private:  // Private Property(ies)
@@ -55,8 +53,6 @@ class segmenter {
     text_index index_;
 };  // class segmenter
 
-}  // namespace internal
-
 }  // namespace esapp
 
-#endif  // ESAPP_INTERNAL_SEGMENTER_HPP_
+#endif  // ESAPP_SEGMENTER_HPP_

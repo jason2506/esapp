@@ -6,7 +6,7 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include <esapp/internal/segmenter.hpp>
+#include <esapp/segmenter.hpp>
 
 #include <cmath>
 #include <cwctype>
@@ -15,8 +15,6 @@
 #include <vector>
 
 namespace esapp {
-
-namespace internal {
 
 /************************************************
  * Implementation: class segmenter
@@ -31,12 +29,12 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
         std::vector<std::string> const &sequences) {
     term_id id = 0;
     for (auto const &sequence : sequences) {
-        auto it = token_iterator(sequence.begin(), sequence.end());
-        auto end = token_iterator(sequence.end(), sequence.end());
+        auto it = internal::token_iterator(sequence.begin(), sequence.end());
+        auto end = internal::token_iterator(sequence.end(), sequence.end());
 
         for ( ; it != end; ++it) {
             auto const &token = *it;
-            if (!ischs(token[0])) { continue; }
+            if (!internal::ischs(token[0])) { continue; }
 
             decltype(token.size()) i = 0;
             std::vector<term_id> s(token.size());
@@ -60,8 +58,8 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
     // generate segmented word lists
     size_type i = 0;
     for (auto const &sequence : sequences) {
-        auto it = token_iterator(sequence.begin(), sequence.end());
-        auto end = token_iterator(sequence.end(), sequence.end());
+        auto it = internal::token_iterator(sequence.begin(), sequence.end());
+        auto end = internal::token_iterator(sequence.end(), sequence.end());
 
         typename decltype(words_list)::value_type words;
         auto word_begin = sequence.begin();
@@ -70,7 +68,7 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
             ++word_end;
 
             auto ch = (*it)[0];
-            if (ischs(ch)) {
+            if (internal::ischs(ch)) {
                 auto num_segs = index_.num_segs(i);
                 seg_pos_list::value_type prev_pos = 0;
                 for (decltype(num_segs) j = 0; j < num_segs; j++) {
@@ -92,7 +90,5 @@ std::vector<std::vector<std::string>> segmenter::fit_and_segment(
 
     return words_list;
 }
-
-}  // namespace internal
 
 }  // namespace esapp

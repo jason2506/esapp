@@ -3,7 +3,6 @@ find_package(desa CONFIG REQUIRED)
 
 add_library(${PROJECT_NAME}
     segmenter.cpp
-    esapp.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} literator desa)

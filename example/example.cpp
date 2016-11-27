@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-#include <esapp/esapp.hpp>
+#include <esapp/segmenter.hpp>
 
 int main(void) {
     std::vector<std::string> sequences = {
