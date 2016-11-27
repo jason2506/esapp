@@ -30,7 +30,7 @@ namespace esapp {
 
 class segmenter {
  public:  // Public Type(s)
-    typedef std::size_t size_type;
+    using size_type = std::size_t;
 
  public:  // Public Method(s)
     explicit segmenter(double lrv_exp);
@@ -42,14 +42,13 @@ class segmenter {
     std::vector<std::string> segment(ForwardIterator begin, ForwardIterator end) const;
 
  private:  // Private Type(s)
-    typedef desa::text_index<
+    using text_index = desa::text_index<
         desa::with_lcp<
             internal::with_segments<30>::policy
         >::policy
-    > text_index;
-    typedef text_index::term_type term_id;
-    typedef std::wint_t term_type;
-    typedef std::vector<size_type> seg_pos_list;
+    >;
+    using term_id = text_index::term_type;
+    using term_type = std::wint_t;
 
  private:  // Private Static Method(s)
     template <typename ForwardIterator, typename Predicate>  // NOLINTNEXTLINE(runtime/references)

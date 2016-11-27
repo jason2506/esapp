@@ -21,10 +21,10 @@ namespace esapp {
 class freq_trie {
  public:  // Public Type(s)
     struct node;
-    typedef node *raw_node_ptr;
-    typedef node const *const_raw_node_ptr;
-    typedef std::uint16_t term_type;
-    typedef std::size_t size_type;
+    using raw_node_ptr = node *;
+    using const_raw_node_ptr = node const *;
+    using term_type = std::uint16_t;
+    using size_type = std::size_t;
 
  public:  // Public Method(s)
     freq_trie();
@@ -44,8 +44,8 @@ class freq_trie {
     void clear();
 
  private:  // Private Type(s)
-    typedef std::unique_ptr<node> node_ptr;
-    typedef std::unordered_map<term_type, node_ptr> node_collection;
+    using node_ptr = std::unique_ptr<node>;
+    using node_collection = std::unordered_map<term_type, node_ptr>;
 
  private:  // Private Property(ies)
     node_ptr root_;
