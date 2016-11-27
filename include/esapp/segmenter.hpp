@@ -140,13 +140,13 @@ std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterato
                 words.emplace_back(word_begin + prev_pos * 3, word_begin + pos * 3);
                 prev_pos = pos;
             }
+        } else if (std::iswspace(term)) {
+            term = scan_while(it, word_end, end, std::iswspace);
         } else {
             if (isfwalnum(term)) {
                 term = scan_while(it, word_end, end, isfwalnum);
             } else if (std::iswalnum(term)) {
                 term = scan_while(it, word_end, end, std::iswalnum);
-            } else if (std::iswspace(term)) {
-                term = scan_while(it, word_end, end, std::iswspace);
             } else {
                 term = internal::decode_utf8<term_type>(it, end);
             }
