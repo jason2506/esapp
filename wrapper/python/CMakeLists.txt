@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.1)
+
+project(esapp_python
+    VERSION 0.1.0
+    LANGUAGES CXX
+)
+
+add_subdirectory(pybind11)
+
+pybind11_add_module(${PROJECT_NAME} esapp.cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE esapp)
