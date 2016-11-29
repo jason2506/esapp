@@ -9,6 +9,7 @@
 #ifndef ESAPP_SEGMENTER_HPP_
 #define ESAPP_SEGMENTER_HPP_
 
+#include <cassert>
 #include <cwctype>
 
 #include <limits>
@@ -137,6 +138,7 @@ std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterato
             auto seg_pos_vec = index_.segment(token, lrv_exp_);
             decltype(seg_pos_vec)::value_type prev_pos = 0;
             for (auto pos : seg_pos_vec) {
+                assert(pos > prev_pos);
                 words.emplace_back(word_begin + prev_pos * 3, word_begin + pos * 3);
                 prev_pos = pos;
             }
@@ -151,13 +153,17 @@ std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterato
                 term = internal::decode_utf8<term_type>(it, end);
             }
 
+            assert(word_begin != word_end);
             words.emplace_back(word_begin, word_end);
         }
 
         word_begin = word_end;
     }
 
-    words.emplace_back(word_begin, it);
+    if (word_begin != it) {
+        words.emplace_back(word_begin, it);
+    }
+
     return words;
 }
 
@@ -169,7 +175,7 @@ std::vector<std::string> segmenter::segment(ForwardIterator it, ForwardIterator 
 template <typename ForwardIterator, typename Predicate>
 segmenter::term_type segmenter::scan_while(ForwardIterator &scanned_it, ForwardIterator &it,
                                            ForwardIterator end, Predicate f) {
-    assert(scanned_it == end);
+    assert(scanned_it != end);
 
     term_type term;
     while (f(term = internal::decode_utf8<term_type>(scanned_it, end))
