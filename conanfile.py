@@ -36,4 +36,8 @@ class EsappConan(ConanFile):
             cmake.command_line,
             ' '.join(args)
         ))
+        self.run('cmake --build .')
+
+    def package(self):
+        cmake = CMake(self.settings)
         self.run('cmake --build . --target install %s' % cmake.build_config)
