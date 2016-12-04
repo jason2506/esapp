@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+
 import argparse
+import distutils.spawn
 import os
+import shlex
 import subprocess
 import sys
-import shlex
-import distutils.spawn
 
 
 def parse_args():
