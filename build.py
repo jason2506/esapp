@@ -24,6 +24,9 @@ def check_call(args, **kwargs):
 def main():
     args = parse_args()
 
+    check_call(['git', 'submodule', 'init'])
+    check_call(['git', 'submodule', 'update', '--recursive'])
+
     source_dir = os.path.realpath(args.source_dir)
     build_dir = os.path.realpath(args.build_dir)
 
