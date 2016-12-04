@@ -12,7 +12,13 @@ class EsappConan(ConanFile):
     requires = 'desa/0.1.0@jason2506/testing'
 
     settings = 'os', 'compiler', 'build_type', 'arch'
-    generators = 'cmake'
+    generators = ('cmake', 'txt', 'env')
+    options = {
+        'enable_conan': [True, False],
+    }
+    default_options = (
+        'enable_conan=True',
+    )
 
     exports = (
         'CMakeLists.txt',
@@ -25,7 +31,6 @@ class EsappConan(ConanFile):
 
         args = []
         args.append('-DENABLE_CONAN=%s' % self.options.enable_conan)
-        args.append('-DBUILD_TESTING=%s' % self.options.build_tests)
         args.append('-DCMAKE_INSTALL_PREFIX="%s"' % self.package_folder)
 
         self.run('cmake "%s" %s %s' % (
