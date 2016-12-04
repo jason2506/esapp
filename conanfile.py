@@ -13,9 +13,6 @@ class EsappConan(ConanFile):
 
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'cmake'
-    default_options = (
-        'desa:build_tests=False'
-    )
 
     exports = (
         'CMakeLists.txt',
