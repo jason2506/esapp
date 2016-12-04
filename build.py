@@ -9,7 +9,7 @@ import distutils.spawn
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('source_dir', nargs='?', default='.',
+    parser.add_argument('src_dir', nargs='?', default='.',
                         help='specify source directory (default: ".")')
     parser.add_argument('-o', default='_build', dest='build_dir',
                         help='specify build directory (default: "_build")')
@@ -43,14 +43,14 @@ def main():
     check_call('git submodule init')
     check_call('git submodule update --recursive')
 
-    source_dir = os.path.realpath(args.source_dir)
+    src_dir = os.path.realpath(args.src_dir)
     build_dir = os.path.realpath(args.build_dir)
 
-    check_call('mkdir -p {name}'.format(name=build_dir) )
+    check_call('mkdir -p {build_dir}'.format(build_dir=build_dir))
     os.chdir(build_dir)
 
-    check_call('conan install --build=outdated {src_dir}'.format(src_dir=source_dir))
-    check_call('conan build {src_dir}'.format(src_dir=source_dir))
+    check_call('conan install --build=outdated {src_dir}'.format(src_dir=src_dir))
+    check_call('conan build {src_dir}'.format(src_dir=src_dir))
 
 
 if __name__ == '__main__':
