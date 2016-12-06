@@ -9,9 +9,11 @@ class EsappConan(ConanFile):
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
 
-    requires = 'desa/0.1.0@jason2506/testing'
+    requires = (
+        'desa/0.1.0@jason2506/testing',
+    )
 
-    settings = 'os', 'compiler', 'build_type', 'arch'
+    settings = ('os', 'compiler', 'build_type', 'arch')
     generators = ('cmake', 'txt', 'env')
     options = {
         'enable_conan': [True, False],
@@ -23,23 +25,25 @@ class EsappConan(ConanFile):
     exports = (
         'CMakeLists.txt',
         'cmake/*.cmake',
-        'include/*.hpp'
+        'include/*.hpp',
     )
 
     def build(self):
-        cmake = CMake(self.settings)
-
-        args = []
-        args.append('-DENABLE_CONAN=%s' % self.options.enable_conan)
-        args.append('-DCMAKE_INSTALL_PREFIX="%s"' % self.package_folder)
-
-        self.run('cmake "%s" %s %s' % (
-            self.conanfile_directory,
-            cmake.command_line,
-            ' '.join(args)
+        extra_opts = []
+        extra_opts.append('-DENABLE_CONAN={}'.format(
+            self.options.enable_conan,
         ))
-        self.run('cmake --build .')
+        extra_opts.append('-DCMAKE_INSTALL_PREFIX="{}"'.format(
+            self.package_folder,
+        ))
+
+        cmake = CMake(self.settings)
+        self.run('cmake "{src_dir}" {opts} {extra_opts}'.format(
+            src_dir=self.conanfile_directory,
+            opts=cmake.command_line,
+            extra_opts=' '.join(extra_opts),
+        ))
+        self.run('cmake --build . {}'.format(cmake.build_config))
 
     def package(self):
-        cmake = CMake(self.settings)
-        self.run('cmake --build . --target install %s' % cmake.build_config)
+        self.run('cmake --build . --target install')
