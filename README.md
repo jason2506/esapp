@@ -1,6 +1,59 @@
 # ESA++
 
 
+## Requirements
+
+- [CMake](https://cmake.org) >= 3.1
+- C++ compiler which supports features of C++14
+
+
+## Instructions
+
+### Installing with Conan (and CMake)
+
+The recommended way to use _ESA++_ package in your project is to install the package with [Conan](https://conan.io).
+
+Assume that your project is built with CMake, just run the following command in your __build directory__:
+
+```
+$ conan install esapp/0.4.1@jason2506/testing -b outdated -g cmake
+```
+
+The `install` command will download the package (together with its dependencies) and generate `conanbuildinfo.cmake` file in the current directory.
+
+Then, you need to include the generated file and execute `conan_basic_setup()` command in your `CMakeLists.txt`:
+
+```cmake
+cmake_minimum_required(VERSION 3.1)
+project(myproj)
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+```
+
+which will setup necessary CMake variables for finding installed libraries and related files.
+
+Now, you can use `find_package()` and `target_link_libraries()` commands to locate and link the package. For example,
+
+```cmake
+find_package(esapp)
+
+if(esapp_FOUND)
+    add_executable(myexec mycode.cpp)
+    target_link_libraries(myexec esapp)
+endif()
+```
+
+The final step is to build your project with CMake, like:
+
+```
+$ cmake [SOURCE_DIR] -DCMAKE_BUILD_TYPE=Release
+$ cmake --build .
+```
+
+Please check [conan docs](http://docs.conan.io/en/latest/) for more details about how to use conan packages, generators and much more.
+
+
 ## References
 
 - H. Feng, K. Chen, X. Deng, and W. Zheng, "Accessor variety criteria for Chinese word extraction," _Computational Linguistics_, vol. 30, no. 1, pp. 75–93, 2004.
