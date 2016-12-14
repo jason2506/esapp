@@ -14,7 +14,7 @@ The recommended way to use _ESA++_ package in your project is to install the pac
 
 Assume that your project is built with CMake, just run the following command in your __build directory__:
 
-```
+```sh
 $ conan install esapp/0.4.1@jason2506/testing -b outdated -g cmake
 ```
 
@@ -45,7 +45,7 @@ endif()
 
 The final step is to build your project with CMake, like:
 
-```
+```sh
 $ cmake [SOURCE_DIR] -DCMAKE_BUILD_TYPE=Release
 $ cmake --build .
 ```
@@ -59,7 +59,7 @@ If you do not intend to use Conan in your project, you can just clone this repos
 
 The simplest way is to use our build script:
 
-```
+```sh
 $ ./build.py
 ```
 
@@ -69,7 +69,7 @@ Note that Conan is still needed for downloading dependencies of _ESA++_. Otherwi
 
 For instance,
 
-```
+```sh
 $ cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INCLUDE_PATH=... \
     -DCMAKE_LIBRARY_PATH=... \
@@ -80,7 +80,7 @@ $ cmake --build _build
 
 After compiling the package, resulting files including libraries, tests and examples will be placed in the build directory. You can manually copy necessary files (e.g., header files and libraries) to your project, or automatically install the package with `install` build target:
 
-```
+```sh
 $ cmake --build [BUILD_DIR] --target install
 ```
 
