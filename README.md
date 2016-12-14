@@ -54,6 +54,37 @@ $ cmake --build .
 Please check [conan docs](http://docs.conan.io/en/latest/) for more details about how to use conan packages, generators and much more.
 
 
+### Manually Compiling
+
+If you do not intend to use Conan in your project, you can just clone this repository and manually build the package.
+
+The simplest way is to use our build script:
+
+```
+$ ./build.py
+```
+
+which will create a `_build/` directory and build the package inside it.
+
+Note that Conan is still needed for downloading dependencies of _ESA++_. Otherwise, you must prepare those packages, setup CMake variables for finding them, and execute CMake commands to compile the package.
+
+For instance,
+
+```
+$ cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INCLUDE_PATH=... \
+    -DCMAKE_LIBRARY_PATH=... \
+    -DCMAKE_PREFIX_PATH=... \
+    -DCMAKE_MODULE_PATH=...
+$ cmake --build _build
+```
+
+After compiling the package, resulting files including libraries, tests and examples will be placed in the build directory. You can manually copy necessary files (e.g., header files and libraries) to your project, or automatically install the package with `install` build target:
+
+```
+$ cmake --build [BUILD_DIR] --target install
+```
+
 ## References
 
 - H. Feng, K. Chen, X. Deng, and W. Zheng, "Accessor variety criteria for Chinese word extraction," _Computational Linguistics_, vol. 30, no. 1, pp. 75–93, 2004.
