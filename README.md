@@ -1,13 +1,12 @@
 # ESA++
 
 
-## Requirements
+## Instructions
+
+### Requirements
 
 - [CMake](https://cmake.org) >= 3.1
 - C++ compiler which supports features of C++14
-
-
-## Instructions
 
 ### Installing with Conan (and CMake)
 
