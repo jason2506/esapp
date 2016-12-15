@@ -1,6 +1,11 @@
 # ESA++
 
 
+## Usage Example
+
+See [`example/example.cpp`](example/example.cpp).
+
+
 ## Instructions
 
 ### Requirements
