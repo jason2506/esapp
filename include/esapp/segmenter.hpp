@@ -17,8 +17,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include <desa/text_index.hpp>
-#include <desa/with_lcp.hpp>
+#include <dict/text_index.hpp>
+#include <dict/with_lcp.hpp>
 
 #include "internal/with_segments.hpp"
 #include "internal/decode_utf8.hpp"
@@ -45,8 +45,8 @@ class segmenter {
     std::vector<std::string> segment(ForwardIterator begin, ForwardIterator end) const;
 
  private:  // Private Type(s)
-    using text_index = desa::text_index<
-        desa::with_lcp<
+    using text_index = dict::text_index<
+        dict::with_lcp<
             internal::with_segments<30>::policy
         >::policy
     >;

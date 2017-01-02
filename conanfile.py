@@ -10,7 +10,7 @@ class EsappConan(ConanFile):
     author = 'Chi-En Wu'
 
     requires = (
-        'desa/0.1.0@jason2506/testing',
+        'dict/0.1.0@jason2506/testing',
     )
 
     settings = ('os', 'compiler', 'build_type', 'arch')

@@ -11,7 +11,7 @@ if(ENABLE_CONAN)
     conan_basic_setup()
 endif(ENABLE_CONAN)
 
-find_package(desa CONFIG REQUIRED)
+find_package(DICT CONFIG REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,7 +24,7 @@ install(DIRECTORY ${${PROJECT_NAME}_INCLUDE_DIR}/
 
 add_library(${PROJECT_NAME} INTERFACE)
 
-target_link_libraries(${PROJECT_NAME} INTERFACE desa)
+target_link_libraries(${PROJECT_NAME} INTERFACE DICT::DICT)
 
 target_include_directories(${PROJECT_NAME}
     INTERFACE
