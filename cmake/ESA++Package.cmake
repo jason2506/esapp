@@ -14,6 +14,7 @@ configure_file(cmake/${PROJECT_NAME}Config.cmake
 set(ConfigPackageLocation lib/cmake/${PROJECT_NAME})
 
 install(EXPORT ${PROJECT_NAME}Targets
+    NAMESPACE ESA++::
     DESTINATION ${ConfigPackageLocation}
 )
 
@@ -27,4 +28,5 @@ install(
 
 export(TARGETS ${PROJECT_NAME}
     FILE ${PROJECT_BINARY_DIR}/cmake/${PROJECT_NAME}Targets.cmake
+    NAMESPACE ESA++::
 )

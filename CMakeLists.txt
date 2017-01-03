@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(esapp
+project(ESA++
     VERSION 0.4.1
     LANGUAGES CXX
 )
@@ -39,4 +39,4 @@ install(TARGETS ${PROJECT_NAME}
 add_subdirectory(wrapper)
 add_subdirectory(example)
 
-include(cmake/esappPackage.cmake)
+include(cmake/ESA++Package.cmake)

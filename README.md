@@ -40,11 +40,11 @@ This will setup necessary CMake variables for finding installed libraries and re
 Now, you can use `find_package()` and `target_link_libraries()` commands to locate and link the package. For example,
 
 ```cmake
-find_package(esapp)
+find_package(ESA++)
 
-if(esapp_FOUND)
+if(ESA++_FOUND)
     add_executable(myexec mycode.cpp)
-    target_link_libraries(myexec esapp)
+    target_link_libraries(myexec ESA++::ESA++)
 endif()
 ```
 
