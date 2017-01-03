@@ -26,6 +26,12 @@ class EsappConan(ConanFile):
         'CMakeLists.txt',
         'cmake/*.cmake',
         'include/*.hpp',
+        'example/CMakeLists.txt',
+        'example/example.cpp',
+        'wrapper/CMakeLists.txt',
+        'wrapper/python/CMakeLists.txt',
+        'wrapper/python/esapp.cpp',
+        'wrapper/python/pybind11/*',
     )
 
     def build(self):
