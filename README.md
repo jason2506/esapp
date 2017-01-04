@@ -58,36 +58,10 @@ $ cmake --build .
 Please check [Conan Docs](http://docs.conan.io/en/latest/) for more details about how to use conan packages, generators and much more.
 
 
-### Manually Compiling
+### Installing without Conan
 
-If you do not intend to use Conan in your project, you can just clone this repository and manually build the package.
+You can also install the package without the help of Conan. _ESA++_ is a header-only library. Therefore, all you need to do is to copy header files (contained in the `include/` directory) to your project and manually install all [dependencies](#dependencies) of _ESA++_.
 
-The simplest way is to use our build script:
-
-```sh
-$ ./build.py
-```
-
-which will create a `_build/` directory and then build the package inside it.
-
-Note that Conan is still needed for downloading [dependencies](#dependencies) of _ESA++_. Otherwise, you must prepare those packages, setup CMake variables for finding them, and execute CMake commands to compile the package.
-
-For instance,
-
-```sh
-$ cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INCLUDE_PATH=... \
-    -DCMAKE_LIBRARY_PATH=... \
-    -DCMAKE_PREFIX_PATH=... \
-    -DCMAKE_MODULE_PATH=...
-$ cmake --build _build
-```
-
-After compiling the package, resulting files including libraries and examples will be placed in the `_build` directory. You can manually copy necessary files (e.g., header files and libraries) to your project, or automatically install the package with `install` build target:
-
-```sh
-$ cmake --build _build --target install
-```
 
 ## Dependencies
 
