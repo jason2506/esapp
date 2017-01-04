@@ -3,7 +3,7 @@
 
 ## Usage Example
 
-See [`example/example.cpp`](example/example.cpp).
+See [`test_package/example.cpp`](test_package/example.cpp).
 
 
 ## Instructions

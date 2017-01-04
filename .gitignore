@@ -1,4 +1,5 @@
 .DS_Store
 _build
 _install
+test_package/build
 *.pyc
