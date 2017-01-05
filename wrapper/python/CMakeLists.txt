@@ -5,7 +5,12 @@ project(ESA++Python
     LANGUAGES CXX
 )
 
-add_subdirectory(pybind11)
+find_package(pybind11 CONFIG REQUIRED)
 
 pybind11_add_module(${PROJECT_NAME} esapp.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE ESA++)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        ESA++
+        pybind11::module
+)

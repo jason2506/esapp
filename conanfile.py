@@ -11,6 +11,7 @@ class EsappConan(ConanFile):
 
     requires = (
         'dict/0.1.0@jason2506/testing',
+        'pybind11/0.1.0@jason2506/testing',
     )
 
     settings = ('os', 'compiler', 'build_type', 'arch')
@@ -31,7 +32,6 @@ class EsappConan(ConanFile):
         'wrapper/CMakeLists.txt',
         'wrapper/python/CMakeLists.txt',
         'wrapper/python/esapp.cpp',
-        'wrapper/python/pybind11/*',
     )
 
     def build(self):
