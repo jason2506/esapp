@@ -1,1 +1,11 @@
-add_subdirectory(python)
+function(add_wrapper NAME)
+    string(TOUPPER ${NAME} UPPER_NAME)
+    set(ENABLE_OPTION ESAPP_WRAPPER_${UPPER_NAME})
+    option(${ENABLE_OPTION} "Build ${NAME} wrapper" OFF)
+    if(${${ENABLE_OPTION}})
+        message("Building ${NAME} wrapper...")
+        add_subdirectory(${NAME})
+    endif(${${ENABLE_OPTION}})
+endfunction(add_wrapper)
+
+add_wrapper(python)

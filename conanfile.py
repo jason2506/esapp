@@ -11,7 +11,6 @@ class EsappConan(ConanFile):
 
     requires = (
         'dict/0.1.0@jason2506/testing',
-        'pybind11/0.1.0@jason2506/testing',
     )
 
     settings = ('os', 'compiler', 'build_type', 'arch')
@@ -34,6 +33,24 @@ class EsappConan(ConanFile):
         'wrapper/python/esapp.cpp',
     )
 
+    _available_wrappers = set([
+        'python',
+    ])
+
+    @property
+    def _wrappers(self):
+        wrappers = (self.scope.wrappers or '').split(',')
+        return set(wrapper for wrapper in wrappers if wrapper)
+
+    def requirements(self):
+        wrappers = self._wrappers
+        if 'python' in wrappers:
+            self.requires('pybind11/0.1.0@jason2506/testing', private=True)
+
+        unknown_wrappers = wrappers - self._available_wrappers
+        for wrapper in unknown_wrappers:
+            self.output.warn('Unknown wrapper: {}'.format(wrapper))
+
     def build(self):
         extra_opts = []
         extra_opts.append('-DENABLE_CONAN={}'.format(
@@ -42,6 +59,10 @@ class EsappConan(ConanFile):
         extra_opts.append('-DCMAKE_INSTALL_PREFIX="{}"'.format(
             self.package_folder,
         ))
+
+        wrappers = self._wrappers & self._available_wrappers
+        for wrapper in wrappers:
+            extra_opts.append('-DESAPP_WRAPPER_{}=ON'.format(wrapper.upper()))
 
         cmake = CMake(self.settings)
         self.run('cmake "{src_dir}" {opts} {extra_opts}'.format(
