@@ -63,9 +63,41 @@ Please check [Conan Docs](http://docs.conan.io/en/latest/) for more details abou
 You can also install the package without the help of Conan. _ESA++_ is a header-only library. Therefore, all you need to do is to copy header files (contained in the `include/` directory) to your project and manually install all [dependencies](#dependencies) of _ESA++_.
 
 
+### Building Python Wrapper
+
+There is a Python wrapper for _ESA++_ package. One way of building it is to execute `conan` commands with `--scope wrappers=python` option, like
+
+```sh
+$ mkdir _build && cd _build
+$ conan install .. --build outdated --scope wrappers=python
+$ conan build ..
+```
+
+Conan will install all necessary dependencies and build the wrapper.
+
+Alternatively, you can install [dependencies](#dependencies) yourself, setup CMake variables for finding that, and enable `ESAPP_WRAPPER_PYTHON` option:
+
+```sh
+$ cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release \
+     -DGTEST_ROOT=... \
+     -DESAPP_WRAPPER_PYTHON =ON
+$ cmake --build _build
+```
+
+After compiling, you will get `esapp_python.so` (or `esapp_python.dll`) in `_build/wrapper/python/`. You can directly import this module in your Python code:
+
+```python
+from esapp_python import Segmenter
+```
+
+See [`wrapper/python/example.py`](wrapper/python/example.py).
+
+
 ## Dependencies
 
 - [DICT](https://github.com/jason2506/dict) == 0.1.0
+- [pybind11](https://github.com/pybind/pybind11) >= 2.0.0
+    * only required if you want to build the python wrapper
 
 
 ## References
