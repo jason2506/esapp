@@ -80,7 +80,7 @@ Alternatively, you can install [dependencies](#dependencies) yourself, setup CMa
 ```sh
 $ cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release \
      -DGTEST_ROOT=... \
-     -DESAPP_WRAPPER_PYTHON =ON
+     -DESAPP_WRAPPER_PYTHON=ON
 $ cmake --build _build
 ```
 
