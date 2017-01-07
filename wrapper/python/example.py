@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 #################################################
-# example.px
+# example.py
 # ESA++
 #
-# Copyright (c) 2014-2015, Chi-En Wu
+# Copyright (c) 2014-2017, Chi-En Wu
 # Distributed under The BSD 3-Clause License
 #################################################
 
 from __future__ import print_function, unicode_literals
 
-from esapp import Segmenter
+from esapp_python import Segmenter
 
 
 def main():
@@ -20,10 +20,14 @@ def main():
                  '這是一隻花貓',
                  '小貓真可愛']
 
-    segmenter = Segmenter(0.1, 10, 30, 10e-5)
+    segmenter = Segmenter(0.1)
 
-    words_list = segmenter.fit_and_segment(sequences)
-    for words in words_list:
+    for s in sequences:
+        segmenter.fit(s)
+
+    segmenter.optimize(10)
+    for s in sequences:
+        words = segmenter.segment(s)
         print(' '.join(words))
 
 

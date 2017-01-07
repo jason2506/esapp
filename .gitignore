@@ -1,15 +1,5 @@
 .DS_Store
-
-# binary
-lib/
-include/
-example/example
-
-# cmake
-CMakeCache.txt
-CMakeFiles
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-*.cmake
+_build
+_install
+test_package/build
+*.pyc
