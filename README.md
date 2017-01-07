@@ -20,7 +20,7 @@ The recommended way to use _ESA++_ package in your project is to install the pac
 Assume that your project is built with CMake, you can just execute the following command in your __build directory__:
 
 ```sh
-$ conan install esapp/0.4.1@jason2506/testing -b outdated -g cmake
+$ conan install esapp/0.5.0@jason2506/testing -b outdated -g cmake
 ```
 
 The `install` command will download the package (together with its dependencies) and generate `conanbuildinfo.cmake` file in the current directory.

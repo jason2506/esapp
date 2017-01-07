@@ -4,7 +4,7 @@ from conans import ConanFile, CMake
 class EsappConan(ConanFile):
 
     name = 'esapp'
-    version = '0.4.1'
+    version = '0.5.0'
     url = 'https://github.com/jason2506/esapp'
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
