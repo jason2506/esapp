@@ -51,7 +51,7 @@ class segmenter {
         >::policy
     >;
     using term_id = text_index::term_type;
-    using term_type = std::wint_t;
+    using term_type = char32_t;
 
  private:  // Private Static Method(s)
     template <typename ForwardIterator, typename Predicate>  // NOLINTNEXTLINE(runtime/references)
@@ -68,11 +68,16 @@ class segmenter {
  * Inline Helper Function(s)
  ************************************************/
 
-inline int ischs(std::wint_t c) {
-    return c >= u'\u4E00' && c <= u'\u9FFF';
+inline bool iscjk(char32_t c) {
+    return (c >= U'\U00004E00' && c <= U'\U00009FFF')  // CJK
+        || (c >= U'\U00003400' && c <= U'\U00004DBF')  // CJK Extension A
+        || (c >= U'\U00020000' && c <= U'\U0002A6DF')  // CJK Extension B
+        || (c >= U'\U0002A700' && c <= U'\U0002B73F')  // CJK Extension C
+        || (c >= U'\U0002B740' && c <= U'\U0002B81F')  // CJK Extension D
+        || (c >= U'\U0002B820' && c <= U'\U0002CEAF');  // CJK Extension E
 }
 
-inline int isfwalnum(std::wint_t c) {
+inline bool isfwalnum(char32_t c) {
     return (c >= u'Ａ' && c <= u'Ｚ') ||
            (c >= u'ａ' && c <= u'ｚ') ||
            (c >= u'０' && c <= u'９');
@@ -93,7 +98,7 @@ void segmenter::fit(ForwardIterator it, ForwardIterator end) {
     std::vector<term_id> token;
     while (it != end) {
         auto term = internal::decode_utf8<term_type>(it, end);
-        if (ischs(term)) {
+        if (iscjk(term)) {
             token.clear();
             do {
                 if (term_id_map_.find(term) == term_id_map_.end()) {
@@ -101,7 +106,7 @@ void segmenter::fit(ForwardIterator it, ForwardIterator end) {
                 }
 
                 token.push_back(term_id_map_[term]);
-            } while (it != end && ischs(term = internal::decode_utf8<term_type>(it, end)));
+            } while (it != end && iscjk(term = internal::decode_utf8<term_type>(it, end)));
 
             index_.insert(token);
         }
@@ -123,7 +128,7 @@ std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterato
     auto term = internal::decode_utf8<term_type>(it, end);
     while (it != end) {
         auto word_end = it;
-        if (ischs(term)) {
+        if (iscjk(term)) {
             token.clear();
             do {
                 word_end = it;
@@ -133,7 +138,7 @@ std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterato
                 } else {
                     token.push_back(term_id_it->second);
                 }
-            } while (it != end && ischs(term = internal::decode_utf8<term_type>(it, end)));
+            } while (it != end && iscjk(term = internal::decode_utf8<term_type>(it, end)));
 
             auto seg_pos_vec = index_.segment(token, lrv_exp_);
             decltype(seg_pos_vec)::value_type prev_pos = 0;
