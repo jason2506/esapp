@@ -79,8 +79,11 @@ Alternatively, you can install [dependencies](#dependencies) yourself, setup CMa
 
 ```sh
 $ cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release \
-     -DGTEST_ROOT=... \
-     -DESAPP_WRAPPER_PYTHON=ON
+    -DCMAKE_INCLUDE_PATH=... \
+    -DCMAKE_LIBRARY_PATH=... \
+    -DCMAKE_PREFIX_PATH=... \
+    -DCMAKE_MODULE_PATH=... \
+    -DESAPP_WRAPPER_PYTHON=ON
 $ cmake --build _build
 ```
 
