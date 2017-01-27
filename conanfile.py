@@ -17,9 +17,11 @@ class EsappConan(ConanFile):
     generators = ('cmake', 'txt', 'env')
     options = {
         'enable_conan': [True, False],
+        'python_exec_path': 'ANY',
     }
     default_options = (
         'enable_conan=True',
+        'python_exec_path=None',
     )
 
     exports = (
@@ -51,6 +53,11 @@ class EsappConan(ConanFile):
         for wrapper in unknown_wrappers:
             self.output.warn('Unknown wrapper: {}'.format(wrapper))
 
+    def config_options(self):
+        wrappers = self._wrappers
+        if 'python' not in wrappers:
+            del self.options.python_exec_path
+
     def build(self):
         extra_opts = []
         extra_opts.append('-DENABLE_CONAN={}'.format(
@@ -63,6 +70,12 @@ class EsappConan(ConanFile):
         wrappers = self._wrappers & self._available_wrappers
         for wrapper in wrappers:
             extra_opts.append('-DESAPP_WRAPPER_{}=ON'.format(wrapper.upper()))
+
+        if self.options.python_exec_path:
+            # http://pybind11.readthedocs.io/en/master/faq.html#cmake-doesn-t-detect-the-right-python-version
+            extra_opts.append('-DPYTHON_EXECUTABLE:FILEPATH="{}"'.format(
+                self.options.python_exec_path,
+            ))
 
         cmake = CMake(self.settings)
         self.run('cmake "{src_dir}" {opts} {extra_opts}'.format(
