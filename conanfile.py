@@ -71,7 +71,7 @@ class EsappConan(ConanFile):
         for wrapper in wrappers:
             extra_opts.append('-DESAPP_WRAPPER_{}=ON'.format(wrapper.upper()))
 
-        if self.options.python_exec_path:
+        if 'python' in wrappers and self.options.python_exec_path:
             # http://pybind11.readthedocs.io/en/master/faq.html#cmake-doesn-t-detect-the-right-python-version
             extra_opts.append('-DPYTHON_EXECUTABLE:FILEPATH="{}"'.format(
                 self.options.python_exec_path,
