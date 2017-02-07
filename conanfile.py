@@ -56,7 +56,7 @@ class EsappConan(ConanFile):
     def config_options(self):
         wrappers = self._wrappers
         if 'python' not in wrappers:
-            del self.options.python_exec_path
+            self.options.remove('python_exec_path')
 
     def build(self):
         extra_opts = []
