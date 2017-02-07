@@ -98,7 +98,7 @@ See [`wrapper/python/example.py`](wrapper/python/example.py).
 
 ## Dependencies
 
-- [DICT](https://github.com/jason2506/dict) == 0.1.0
+- [DICT](https://github.com/jason2506/dict) == 0.1.1
 - [pybind11](https://github.com/pybind/pybind11) >= 2.0.0
     * only required if you want to build the python wrapper
 
