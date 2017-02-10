@@ -40,7 +40,7 @@ class with_segments<N>::policy {
  public:  // Public Type(s)
     using host_type = LCP;
     using size_type = typename Trait::size_type;
-    using term_type = freq_trie::term_type;
+    using term_type = std::uint16_t;
     using seg_pos_vec_type = std::vector<size_type>;
 
  public:  // Public Method(s)
@@ -75,7 +75,7 @@ class with_segments<N>::policy {
 
  private:  // Private Property(ies)
     size_type lcp_;
-    freq_trie trie_;
+    freq_trie<term_type> trie_;
     std::array<size_type, N> sum_f_;
     std::array<size_type, N> sum_av_;
     std::array<size_type, N> num_str_;
