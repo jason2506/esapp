@@ -41,8 +41,10 @@ class segmenter {
     void fit(ForwardIterator begin, ForwardIterator end);
     void optimize(size_type n_iters);
     template <typename WordType, typename ForwardIterator>
+    [[deprecated]]
     std::vector<WordType> segment_into(ForwardIterator begin, ForwardIterator end) const;
     template <typename ForwardIterator>
+    [[deprecated]]
     std::vector<std::string> segment(ForwardIterator begin, ForwardIterator end) const;
     template <typename ForwardIterator, typename OutputIterator>
     OutputIterator segment(ForwardIterator it, ForwardIterator end, OutputIterator d_it) const;
