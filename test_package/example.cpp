@@ -38,11 +38,10 @@ int main(void) {
     seg.optimize(10);
     for (auto const &s : sequences) {
         // pass iterator pair of sequence you want to segment into segmenter.
-        // segmentation result is `std::vector<std::string>`.
-        auto words = seg.segment(s.cbegin(), s.cend());
-
-        std::copy(words.begin(), words.end(),
-                  std::ostream_iterator<std::string>(std::cout, " "));
+        // segmentation result will be inserted with third parameter, which
+        // must meet the requirements of OutputIterator.
+        seg.segment(s.cbegin(), s.cend(),
+                    std::ostream_iterator<std::string>(std::cout, " "));
         std::cout << std::endl;
     }
 
