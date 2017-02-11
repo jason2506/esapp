@@ -20,7 +20,7 @@ The recommended way to use _ESA++_ package in your project is to install the pac
 Assume that your project is built with CMake, you can just execute the following command in your __build directory__:
 
 ```sh
-$ conan install esapp/0.5.0@jason2506/testing -b outdated -g cmake
+$ conan install esapp/0.5.1@jason2506/testing -b outdated -g cmake
 ```
 
 The `install` command will download the package (together with its dependencies) and generate `conanbuildinfo.cmake` file in the current directory.
@@ -79,8 +79,11 @@ Alternatively, you can install [dependencies](#dependencies) yourself, setup CMa
 
 ```sh
 $ cmake -H. -B_build -DCMAKE_BUILD_TYPE=Release \
-     -DGTEST_ROOT=... \
-     -DESAPP_WRAPPER_PYTHON=ON
+    -DCMAKE_INCLUDE_PATH=... \
+    -DCMAKE_LIBRARY_PATH=... \
+    -DCMAKE_PREFIX_PATH=... \
+    -DCMAKE_MODULE_PATH=... \
+    -DESAPP_WRAPPER_PYTHON=ON
 $ cmake --build _build
 ```
 
@@ -95,7 +98,7 @@ See [`wrapper/python/example.py`](wrapper/python/example.py).
 
 ## Dependencies
 
-- [DICT](https://github.com/jason2506/dict) == 0.1.0
+- [DICT](https://github.com/jason2506/dict) == 0.1.1
 - [pybind11](https://github.com/pybind/pybind11) >= 2.0.0
     * only required if you want to build the python wrapper
 

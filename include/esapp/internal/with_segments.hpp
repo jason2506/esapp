@@ -56,7 +56,7 @@ class with_segments<N>::policy {
 
  protected:  // Protected Method(s)
     template <typename Sequence>
-    void update(typename event::template after_inserting_lcp<Sequence> info);
+    void update(typename event::template after_inserting_lcp<Sequence> const &info);
 
  private:  // Private Method(s)
     template <typename Sequence>
@@ -99,7 +99,7 @@ template <std::size_t N>
 template <typename LCP, typename T>
 template <typename Sequence>
 void with_segments<N>::policy<LCP, T>::update(
-        typename event::template after_inserting_lcp<Sequence> info) {
+        typename event::template after_inserting_lcp<Sequence> const &info) {
     if (info.num_inserted == 0) {
         assert(info.lcp == 0);
         assert(info.lcp_next == 0);
