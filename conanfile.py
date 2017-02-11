@@ -4,7 +4,7 @@ from conans import ConanFile, CMake
 class EsappConan(ConanFile):
 
     name = 'esapp'
-    version = '0.5.0'
+    version = '0.5.1'
     url = 'https://github.com/jason2506/esapp'
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
@@ -56,7 +56,7 @@ class EsappConan(ConanFile):
     def config_options(self):
         wrappers = self._wrappers
         if 'python' not in wrappers:
-            del self.options.python_exec_path
+            self.options.remove('python_exec_path')
 
     def build(self):
         extra_opts = []
@@ -71,7 +71,7 @@ class EsappConan(ConanFile):
         for wrapper in wrappers:
             extra_opts.append('-DESAPP_WRAPPER_{}=ON'.format(wrapper.upper()))
 
-        if self.options.python_exec_path:
+        if 'python' in wrappers and self.options.python_exec_path:
             # http://pybind11.readthedocs.io/en/master/faq.html#cmake-doesn-t-detect-the-right-python-version
             extra_opts.append('-DPYTHON_EXECUTABLE:FILEPATH="{}"'.format(
                 self.options.python_exec_path,
