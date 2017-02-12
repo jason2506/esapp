@@ -216,10 +216,8 @@ std::vector<typename with_segments<N>::template policy<LCP, T>::size_type>
 with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runtime/references)
         seq_type const &s, seg_pos_vec_type &seg_pos_vec, double lrv_exp) const {
     auto n = s.size();
-    std::vector<size_type> fs(n);
-    std::vector<double> fv(n);
-    std::fill(fs.begin(), fs.end(), 0);
-    std::fill(fv.begin(), fv.end(), -std::numeric_limits<double>::infinity());
+    std::vector<size_type> fs(n, 0);
+    std::vector<double> fv(n, -std::numeric_limits<double>::infinity());
 
     auto seg_pos_it = seg_pos_vec.begin();
     typename decltype(seg_pos_it)::value_type seg_pos = 0;
