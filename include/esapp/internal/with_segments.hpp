@@ -89,10 +89,8 @@ class with_segments<N>::policy {
 template <std::size_t N>
 template <typename LCP, typename T>
 with_segments<N>::policy<LCP, T>::policy()
-    : lcp_(0) {
-    sum_f_.fill(0);
-    sum_av_.fill(0);
-    num_str_.fill(0);
+    : lcp_(0), trie_(), sum_f_(), sum_av_(), num_str_(), seg_pos_vecs_() {
+    // do nothing
 }
 
 template <std::size_t N>
@@ -216,7 +214,7 @@ std::vector<typename with_segments<N>::template policy<LCP, T>::size_type>
 with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runtime/references)
         seq_type const &s, seg_pos_vec_type &seg_pos_vec, double lrv_exp) const {
     auto n = s.size();
-    std::vector<size_type> fs(n, 0);
+    std::vector<size_type> fs(n);
     std::vector<double> fv(n, -std::numeric_limits<double>::infinity());
 
     auto seg_pos_it = seg_pos_vec.begin();
