@@ -26,14 +26,29 @@ class py_list_inserter {
     py::list &list_;
 };
 
+void deprecation_warning(std::string &&msg) {
+    auto exceptions = py::module::import("exceptions");
+    auto warning = py::module::import("warnings");
+    warning.attr("simplefilter")("always");
+    warning.attr("warn")(std::move(msg), exceptions.attr("DeprecationWarning"));
+    warning.attr("simplefilter")("default");
+}
+
 PYBIND11_PLUGIN(esapp_python) {
     py::module m("esapp_python");
     py::class_<esapp::segmenter>(m, "Segmenter")
-        .def(py::init<double>())
+        .def(py::init<>())
+        .def("__init__", [](esapp::segmenter &seg, double lrv_exp) {
+            deprecation_warning("use Segmenter() instead");
+            new (&seg) esapp::segmenter(lrv_exp);
+        })
         .def("fit", [](esapp::segmenter &seg, std::string const &s) {
             seg.fit(s.begin(), s.end());
         })
-        .def("optimize", &esapp::segmenter::optimize)
+        .def("optimize", [](esapp::segmenter &seg, esapp::segmenter::size_type n_iters) {
+            deprecation_warning("its functionality is already deprecated");
+            seg.optimize(n_iters);
+        })
         .def("segment", [](esapp::segmenter const &seg, std::string const &s) {
             py::list list;
             seg.segment(s.begin(), s.end(), py_list_inserter(list));
