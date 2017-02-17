@@ -20,12 +20,10 @@ def main():
                  '這是一隻花貓',
                  '小貓真可愛']
 
-    segmenter = Segmenter(0.1)
-
+    segmenter = Segmenter()
     for s in sequences:
         segmenter.fit(s)
 
-    segmenter.optimize(10)
     for s in sequences:
         words = segmenter.segment(s)
         print(' '.join(words))

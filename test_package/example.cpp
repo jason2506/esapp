@@ -25,17 +25,13 @@ int main(void) {
         u8"小貓真可愛"
     };
 
-    // create a segmenter with parameter lrv_exp = 0.1, which is used to
-    // balance insertion/deletion errors: character sequences will be
-    // segmented into more parts as the value increases, and vice versa.
-    esapp::segmenter seg(0.1);
+    // create a segmenter.
+    esapp::segmenter seg;
     for (auto const &s : sequences) {
         // fit iterator pair of each sequence into segmenter.
         seg.fit(s.cbegin(), s.cend());
     }
 
-    // perform 10 iterations of optimization after fitting sequences.
-    seg.optimize(10);
     for (auto const &s : sequences) {
         // pass iterator pair of sequence you want to segment into segmenter.
         // segmentation result will be inserted with third parameter, which
