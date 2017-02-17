@@ -35,17 +35,25 @@ class segmenter {
     using size_type = std::size_t;
 
  public:  // Public Method(s)
+    segmenter();
+
+    [[deprecated]]
     explicit segmenter(double lrv_exp);
 
     template <typename ForwardIterator>
     void fit(ForwardIterator begin, ForwardIterator end);
+
+    [[deprecated]]
     void optimize(size_type n_iters);
+
     template <typename WordType, typename ForwardIterator>
     [[deprecated]]
     std::vector<WordType> segment_into(ForwardIterator begin, ForwardIterator end) const;
+
     template <typename ForwardIterator>
     [[deprecated]]
     std::vector<std::string> segment(ForwardIterator begin, ForwardIterator end) const;
+
     template <typename ForwardIterator, typename OutputIterator>
     OutputIterator segment(ForwardIterator it, ForwardIterator end, OutputIterator d_it) const;
 
@@ -64,7 +72,6 @@ class segmenter {
                                 ForwardIterator end, Predicate f);
 
  private:  // Private Property(ies)
-    double lrv_exp_;
     std::unordered_map<term_type, term_id> term_id_map_;
     text_index index_;
 };  // class segmenter
@@ -92,8 +99,14 @@ inline bool isfwalnum(char32_t c) {
  * Implementation: class segmenter
  ************************************************/
 
+inline segmenter::segmenter()
+    : term_id_map_({{0, 0}}) {
+    // do nothing
+}
+
+
 inline segmenter::segmenter(double lrv_exp)
-    : lrv_exp_(lrv_exp), term_id_map_({{0, 0}}) {
+    : segmenter() {
     // do nothing
 }
 
@@ -119,7 +132,7 @@ void segmenter::fit(ForwardIterator it, ForwardIterator end) {
 }
 
 inline void segmenter::optimize(size_type n_iters) {
-    index_.optimize(lrv_exp_, n_iters);
+    // do nothing
 }
 
 template <typename WordType, typename ForwardIterator>
@@ -158,7 +171,7 @@ OutputIterator segmenter::segment(ForwardIterator it, ForwardIterator end,
                 }
             } while (it != end && iscjk(term = internal::decode_utf8<term_type>(it, end)));
 
-            auto seg_pos_vec = index_.segment(token, lrv_exp_);
+            auto seg_pos_vec = index_.segment(token);
             decltype(seg_pos_vec)::value_type prev_pos = 0;
             for (auto pos : seg_pos_vec) {
                 assert(pos > prev_pos);

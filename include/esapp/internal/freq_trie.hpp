@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <utility>
 
 namespace esapp {
 
@@ -37,9 +38,6 @@ class freq_trie {
     const_raw_node_ptr find(Iterator const &begin, Iterator const &end) const;
 
     template <typename Iterator>
-    void increase(Iterator const &begin, Iterator const &end);
-
-    template <typename Iterator>
     void decrease(Iterator const &begin, Iterator const &end);
 
     void clear();
@@ -61,7 +59,8 @@ struct freq_trie<T>::node {
     node();
 
     const_raw_node_ptr get(term_type key) const;
-    raw_node_ptr get(term_type key, bool create = false);
+    raw_node_ptr get(term_type key);
+    std::pair<bool, raw_node_ptr> get_or_create(term_type key);
     void clear();
 
     node_collection children;
@@ -90,8 +89,8 @@ inline typename freq_trie<T>::const_raw_node_ptr freq_trie<T>::get_root() const 
 
 template <typename T>
 template <typename Iterator>
-typename freq_trie<T>::const_raw_node_ptr freq_trie<T>::find(Iterator const &begin,
-                                              Iterator const &end) const {
+typename freq_trie<T>::const_raw_node_ptr freq_trie<T>::find(
+        Iterator const &begin, Iterator const &end) const {
     auto node = root_.get();
     for (auto it = begin; it != end; ++it) {
         node = node->get(*it);
@@ -99,22 +98,6 @@ typename freq_trie<T>::const_raw_node_ptr freq_trie<T>::find(Iterator const &beg
     }
 
     return node;
-}
-
-template <typename T>
-template <typename Iterator>
-void freq_trie<T>::increase(Iterator const &begin, Iterator const &end) {
-    for (auto it_begin = begin; it_begin != end; ++it_begin) {
-        auto node = root_.get();
-        for (auto it = it_begin; it != end; ++it) {
-            if (it_begin == begin && it + 1 == end) { break; }
-
-            node = node->get(*it);
-            if (!node) { break; }
-
-            node->f++;
-        }
-    }
 }
 
 template <typename T>
@@ -151,20 +134,25 @@ inline freq_trie<T>::node::node()
 template <typename T>
 inline typename freq_trie<T>::const_raw_node_ptr freq_trie<T>::node::get(term_type key) const {
     auto it = children.find(key);
-    return (it != children.end()) ? it->second.get() : nullptr;
+    return (it == children.end()) ? nullptr : it->second.get();
 }
 
 template <typename T>
-inline typename freq_trie<T>::raw_node_ptr freq_trie<T>::node::get(term_type key, bool create) {
+inline typename freq_trie<T>::raw_node_ptr freq_trie<T>::node::get(term_type key) {
     auto it = children.find(key);
-    if (it != children.end()) {
-        return it->second.get();
-    } else if (!create) {
-        return nullptr;
+    return (it == children.end()) ? nullptr : it->second.get();
+}
+
+template <typename T>
+inline std::pair<bool, typename freq_trie<T>::raw_node_ptr>
+freq_trie<T>::node::get_or_create(term_type key) {
+    auto ptr = get(key);
+    if (ptr) {
+        return {false, ptr};
     }
 
     children.emplace(key, node_ptr(new node()));
-    return children[key].get();
+    return {true, children[key].get()};
 }
 
 template <typename T>
