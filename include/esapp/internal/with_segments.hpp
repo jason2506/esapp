@@ -65,7 +65,6 @@ class with_segments<N>::policy {
 
     double calc_lrv_exp() const;
 
-    void recover_sequence(size_type &i, seq_type &s) const;  // NOLINT(runtime/references)
     std::vector<size_type> segment_sequence(  // NOLINTNEXTLINE(runtime/references)
         seq_type const &s, seg_pos_vec_type &seg_pos_vec) const;
     void generate_seg_pos_vec(seg_pos_vec_type &seg_pos_vec,  // NOLINT(runtime/references)
@@ -182,25 +181,6 @@ double with_segments<N>::policy<LCP, T>::calc_lrv_exp() const {
     using ti_ptr_type = typename host_type::host_type const *;
     auto num_seqs = static_cast<ti_ptr_type>(this)->num_seqs();
     return 0.0005 * num_seqs * std::pow(num_unique_seqs_, -0.5) + 0.079;
-}
-
-template <std::size_t N>
-template <typename LCP, typename T>  // NOLINTNEXTLINE(runtime/references)
-void with_segments<N>::policy<LCP, T>::recover_sequence(size_type &i, seq_type &s) const {
-    using ti_ptr_type = typename host_type::host_type const *;
-
-    s.clear();
-
-    // recover sequence in reverse order
-    i = static_cast<ti_ptr_type>(this)->lf(i);
-    auto c = static_cast<ti_ptr_type>(this)->f(i);
-    do {
-        s.push_back(c);
-        i = static_cast<ti_ptr_type>(this)->lf(i);
-        c = static_cast<ti_ptr_type>(this)->f(i);
-    } while (c != 0);
-
-    std::reverse(s.begin(), s.end());
 }
 
 template <std::size_t N>
