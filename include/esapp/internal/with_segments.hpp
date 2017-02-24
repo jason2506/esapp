@@ -72,7 +72,7 @@ class with_segments<N>::policy {
 
  private:  // Private Property(ies)
     size_type lcp_;
-    size_type num_unique_seqs_;
+    size_type num_dup_seqs_;
     freq_trie<term_type> trie_;
     std::array<size_type, N> sum_f_;
     std::array<size_type, N> sum_av_;
@@ -86,7 +86,7 @@ class with_segments<N>::policy {
 template <std::size_t N>
 template <typename LCP, typename T>
 with_segments<N>::policy<LCP, T>::policy()
-    : lcp_(0), num_unique_seqs_(0), trie_(), sum_f_(), sum_av_(), num_str_() {
+    : lcp_(0), num_dup_seqs_(0), trie_(), sum_f_(), sum_av_(), num_str_() {
     // do nothing
 }
 
@@ -147,8 +147,8 @@ void with_segments<N>::policy<LCP, T>::update_counts(
         auto max_i = std::min(lcp_, N);
         for (decltype(max_i) i = 0; i < max_i; i++) {
             auto result = node->get_or_create(*it);
-            if (result.first) {
-                ++num_unique_seqs_;
+            if (!result.first) {
+                ++num_dup_seqs_;
             }
 
             node = result.second;
@@ -179,8 +179,13 @@ template <std::size_t N>
 template <typename LCP, typename T>
 double with_segments<N>::policy<LCP, T>::calc_lrv_exp() const {
     using ti_ptr_type = typename host_type::host_type const *;
-    auto num_seqs = static_cast<ti_ptr_type>(this)->num_seqs();
-    return 0.0005 * num_seqs * std::pow(num_unique_seqs_, -0.5) + 0.079;
+    auto num_seqs = 0;
+    for (decltype(N) i = 0; i < N; i++) {
+        num_seqs += sum_f_[i];
+    }
+
+    auto num_unique_seqs = num_seqs - num_dup_seqs_;
+    return 0.000005 * (num_seqs / std::pow(num_unique_seqs, 0.35)) + 0.02;
 }
 
 template <std::size_t N>
