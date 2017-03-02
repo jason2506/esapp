@@ -65,7 +65,7 @@ struct freq_trie<T>::node {
     void clear();
 
     node_collection children;
-    size_type f, avl, avr;
+    size_type f;
 };  // struct freq_trie<T>::node
 
 /************************************************
@@ -144,7 +144,7 @@ inline void freq_trie<T>::clear() {
 
 template <typename T>
 inline freq_trie<T>::node::node()
-    : f(1), avl(1), avr(1) {
+    : f(1) {
     // do nothing
 }
 
@@ -170,7 +170,7 @@ inline typename freq_trie<T>::raw_node_ptr freq_trie<T>::node::get(term_type key
 template <typename T>
 inline void freq_trie<T>::node::clear() {
     children.clear();
-    f = avl = avr = 0;
+    f = 0;
 }
 
 }  // namespace esapp

@@ -6,6 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
+#include <cmath>
+
 #include <algorithm>
 #include <array>
 #include <limits>
@@ -43,10 +45,10 @@ class with_segments_impl {
 
  public:  // Public Method(s)
     with_segments_impl();
-    void optimize(double lrv_exp, size_type num_iters);
+    void optimize(size_type num_iters);
 
     template <typename Sequence>
-    seg_pos_vec_type segment(Sequence const &s, double lrv_exp) const;
+    seg_pos_vec_type segment(Sequence const &s) const;
 
  private:  // Private Type(s)
     using event = typename Trait::event;
@@ -63,9 +65,8 @@ class with_segments_impl {
     // NOLINTNEXTLINE(runtime/references)
     void recover_sequence(size_type &i, seq_type &s) const;
     std::vector<size_type> segment_sequence(
-        seq_type const &s,
-        seg_pos_vec_type &seg_pos_vec,  // NOLINT(runtime/references)
-        double lrv_exp) const;
+        seq_type const &s,  // NOLINTNEXTLINE(runtime/references)
+        seg_pos_vec_type &seg_pos_vec) const;
     void increase_counts(seq_type const &s, seg_pos_vec_type const &seg_pos_vec);
     void decrease_counts(seq_type const &s, seg_pos_vec_type const &seg_pos_vec);
     void generate_seg_pos_vec(seg_pos_vec_type &seg_pos_vec,  // NOLINT(runtime/references)
@@ -75,7 +76,6 @@ class with_segments_impl {
     size_type lcp_;
     freq_trie<term_type> trie_;
     std::array<size_type, N> sum_f_;
-    std::array<size_type, N> sum_av_;
     std::array<size_type, N> num_str_;
     std::vector<seg_pos_vec_type> seg_pos_vecs_;
 };  // class with_segments_impl<LCP, T, N>
@@ -86,7 +86,7 @@ class with_segments_impl {
 
 template <typename LCP, typename T, std::size_t N>
 with_segments_impl<LCP, T, N>::with_segments_impl()
-    : lcp_(0), trie_(), sum_f_(), sum_av_(), num_str_(), seg_pos_vecs_() {
+    : lcp_(0), trie_(), sum_f_(), num_str_(), seg_pos_vecs_() {
     // do nothing
 }
 
@@ -115,7 +115,7 @@ void with_segments_impl<LCP, T, N>::update(
 }
 
 template <typename LCP, typename T, std::size_t N>
-void with_segments_impl<LCP, T, N>::optimize(double lrv_exp, size_type num_iters) {
+void with_segments_impl<LCP, T, N>::optimize(size_type num_iters) {
     size_type i = 0;
     seq_type s;
 
@@ -124,10 +124,8 @@ void with_segments_impl<LCP, T, N>::optimize(double lrv_exp, size_type num_iters
         for (decltype(n) j = 0; j < n; j++) {
             recover_sequence(i, s);
 
-            auto fs = segment_sequence(s, seg_pos_vecs_[j], lrv_exp);
-            if (!seg_pos_vecs_[j].empty()) {
-                increase_counts(s, seg_pos_vecs_[j]);
-            }
+            auto fs = segment_sequence(s, seg_pos_vecs_[j]);
+            increase_counts(s, seg_pos_vecs_[j]);
 
             generate_seg_pos_vec(seg_pos_vecs_[j], fs);
             decrease_counts(s, seg_pos_vecs_[j]);
@@ -140,9 +138,9 @@ void with_segments_impl<LCP, T, N>::optimize(double lrv_exp, size_type num_iters
 template <typename LCP, typename T, std::size_t N>
 template <typename Sequence>
 typename with_segments_impl<LCP, T, N>::seg_pos_vec_type
-with_segments_impl<LCP, T, N>::segment(Sequence const &s, double lrv_exp) const {
-    decltype(segment(s, lrv_exp)) seg_pos_vec;
-    auto fs = segment_sequence(s, seg_pos_vec, lrv_exp);
+with_segments_impl<LCP, T, N>::segment(Sequence const &s) const {
+    decltype(segment(s)) seg_pos_vec;
+    auto fs = segment_sequence(s, seg_pos_vec);
     generate_seg_pos_vec(seg_pos_vec, fs);
     return seg_pos_vec;
 }
@@ -161,23 +159,13 @@ void with_segments_impl<LCP, T, N>::update_counts(
             node = node->get(c, true);
             node->f++;
             sum_f_[i]++;
-            if (i + 1 >= lcp_lf) {
-                node->avl++;
-            }
-
             --it;
-        }
-
-        if (lcp_ <= N) {
-            node->avr++;
-            sum_av_[max_i - 1]++;
         }
     }
 
     auto max_i = std::min(n, N);
     for (auto i = lcp_; i < max_i; i++) {
         sum_f_[i]++;
-        sum_av_[i]++;
         num_str_[i]++;
     }
 }
@@ -203,7 +191,7 @@ void with_segments_impl<LCP, T, N>::recover_sequence(size_type &i, seq_type &s) 
 template <typename LCP, typename T, std::size_t N>
 std::vector<typename with_segments_impl<LCP, T, N>::size_type>
 with_segments_impl<LCP, T, N>::segment_sequence(  // NOLINTNEXTLINE(runtime/references)
-        seq_type const &s, seg_pos_vec_type &seg_pos_vec, double lrv_exp) const {
+        seq_type const &s, seg_pos_vec_type &seg_pos_vec) const {
     auto n = s.size();
     std::vector<size_type> fs(n);
     std::vector<double> fv(n, -std::numeric_limits<double>::infinity());
@@ -234,21 +222,17 @@ with_segments_impl<LCP, T, N>::segment_sequence(  // NOLINTNEXTLINE(runtime/refe
                 ++s_it;
             }
 
-            double f, avl, avr;
+            double f;
             if (node) {
                 f = static_cast<double>(node->f);
-                avl = static_cast<double>(node->avl);
-                avr = static_cast<double>(node->avr);
             } else if (m >= min_len) {
-                avl = avr = f = 1.0;
+                f = 1.0;
             } else { continue; }
 
             auto num_str = static_cast<double>(num_str_[m]);
             f *= num_str / static_cast<double>(sum_f_[m]);
-            avl *= num_str / static_cast<double>(sum_av_[m]);
-            avr *= num_str / static_cast<double>(sum_av_[m]);
 
-            auto score = (m + 1) * log(f) + lrv_exp * log(avl * avr);
+            auto score = std::log(f);
             if (i == 0) {
                 fv[m] = score;
             } else if (fv[i - 1] + score > fv[i + m]) {
