@@ -98,8 +98,6 @@ void with_segments_impl<LCP, T, N>::update(
         assert(info.lcp == 0);
         assert(info.lcp_next == 0);
         lcp_ = 0;
-
-        seg_pos_vecs_.emplace_back();
         return;
     }
 
@@ -111,6 +109,13 @@ void with_segments_impl<LCP, T, N>::update(
         // handle last inserted term
         update_counts(info.s, info.num_inserted, 0);
         lcp_ = 0;
+
+        seg_pos_vec_type seg_pos_vec;
+        auto fs = segment_sequence(info.s, seg_pos_vec);
+        generate_seg_pos_vec(seg_pos_vec, fs);
+
+        decrease_counts(info.s, seg_pos_vec);
+        seg_pos_vecs_.emplace_back(std::move(seg_pos_vec));
     }
 }
 
