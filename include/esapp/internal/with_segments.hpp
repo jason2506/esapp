@@ -40,7 +40,7 @@ class with_segments<N>::policy {
  public:  // Public Type(s)
     using host_type = LCP;
     using size_type = typename Trait::size_type;
-    using term_type = freq_trie::term_type;
+    using term_type = std::uint16_t;
     using seg_pos_vec_type = std::vector<size_type>;
 
  public:  // Public Method(s)
@@ -75,7 +75,7 @@ class with_segments<N>::policy {
 
  private:  // Private Property(ies)
     size_type lcp_;
-    freq_trie trie_;
+    freq_trie<term_type> trie_;
     std::array<size_type, N> sum_f_;
     std::array<size_type, N> sum_av_;
     std::array<size_type, N> num_str_;
@@ -89,10 +89,8 @@ class with_segments<N>::policy {
 template <std::size_t N>
 template <typename LCP, typename T>
 with_segments<N>::policy<LCP, T>::policy()
-    : lcp_(0) {
-    sum_f_.fill(0);
-    sum_av_.fill(0);
-    num_str_.fill(0);
+    : lcp_(0), trie_(), sum_f_(), sum_av_(), num_str_(), seg_pos_vecs_() {
+    // do nothing
 }
 
 template <std::size_t N>
@@ -217,9 +215,7 @@ with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runtime/r
         seq_type const &s, seg_pos_vec_type &seg_pos_vec, double lrv_exp) const {
     auto n = s.size();
     std::vector<size_type> fs(n);
-    std::vector<double> fv(n);
-    std::fill(fs.begin(), fs.end(), 0);
-    std::fill(fv.begin(), fv.end(), -std::numeric_limits<double>::infinity());
+    std::vector<double> fv(n, -std::numeric_limits<double>::infinity());
 
     auto seg_pos_it = seg_pos_vec.begin();
     typename decltype(seg_pos_it)::value_type seg_pos = 0;

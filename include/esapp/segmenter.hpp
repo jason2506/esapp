@@ -12,6 +12,7 @@
 #include <cassert>
 #include <cwctype>
 
+#include <iterator>
 #include <limits>
 #include <string>
 #include <unordered_map>
@@ -40,9 +41,13 @@ class segmenter {
     void fit(ForwardIterator begin, ForwardIterator end);
     void optimize(size_type n_iters);
     template <typename WordType, typename ForwardIterator>
+    [[deprecated]]
     std::vector<WordType> segment_into(ForwardIterator begin, ForwardIterator end) const;
     template <typename ForwardIterator>
+    [[deprecated]]
     std::vector<std::string> segment(ForwardIterator begin, ForwardIterator end) const;
+    template <typename ForwardIterator, typename OutputIterator>
+    OutputIterator segment(ForwardIterator it, ForwardIterator end, OutputIterator d_it) const;
 
  private:  // Private Type(s)
     using text_index = dict::text_index<
@@ -118,14 +123,27 @@ inline void segmenter::optimize(size_type n_iters) {
 }
 
 template <typename WordType, typename ForwardIterator>
-std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterator end) const {
-    if (it == end) { return {}; }
+inline std::vector<WordType> segmenter::segment_into(
+        ForwardIterator begin, ForwardIterator end) const {
+    decltype(segment_into<WordType>(begin, end)) words;
+    segment(begin, end, std::inserter(words, words.end()));
+    return words;
+}
 
-    decltype(segment_into<WordType>(it, end)) words;
-    std::vector<term_id> token;
+template <typename ForwardIterator>
+inline std::vector<std::string> segmenter::segment(
+        ForwardIterator begin, ForwardIterator end) const {
+    return segment_into<std::string>(begin, end);
+}
+
+template <typename ForwardIterator, typename OutputIterator>
+OutputIterator segmenter::segment(ForwardIterator it, ForwardIterator end,
+                                  OutputIterator d_it) const {
+    if (it == end) { return d_it; }
 
     auto word_begin = it;
     auto term = internal::decode_utf8<term_type>(it, end);
+    std::vector<term_id> token;
     while (it != end) {
         auto word_end = it;
         if (iscjk(term)) {
@@ -144,7 +162,7 @@ std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterato
             decltype(seg_pos_vec)::value_type prev_pos = 0;
             for (auto pos : seg_pos_vec) {
                 assert(pos > prev_pos);
-                words.emplace_back(word_begin + prev_pos * 3, word_begin + pos * 3);
+                *d_it++ = {word_begin + prev_pos * 3, word_begin + pos * 3};
                 prev_pos = pos;
             }
         } else if (std::iswspace(term)) {
@@ -159,22 +177,17 @@ std::vector<WordType> segmenter::segment_into(ForwardIterator it, ForwardIterato
             }
 
             assert(word_begin != word_end);
-            words.emplace_back(word_begin, word_end);
+            *d_it++ = {word_begin, word_end};
         }
 
         word_begin = word_end;
     }
 
     if (word_begin != it) {
-        words.emplace_back(word_begin, it);
+        *d_it++ = {word_begin, it};
     }
 
-    return words;
-}
-
-template <typename ForwardIterator>
-std::vector<std::string> segmenter::segment(ForwardIterator it, ForwardIterator end) const {
-    return segment_into<std::string>(it, end);
+    return d_it;
 }
 
 template <typename ForwardIterator, typename Predicate>
