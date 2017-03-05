@@ -12,7 +12,7 @@ class TestEsappConan(ConanFile):
     version = '0.1.0'
 
     requires = (
-        'esapp/0.5.1@{username}/{channel}'.format(
+        'esapp/0.5.2@{username}/{channel}'.format(
             username=username,
             channel=channel,
         ),
