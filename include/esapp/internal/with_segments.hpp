@@ -20,23 +20,21 @@ namespace esapp {
 
 namespace internal {
 
-/************************************************
- * Declaration: struct with_segments<N>
- ************************************************/
+template <typename LCP, typename Trait, std::size_t N>
+class with_segments_impl;
 
 template <std::size_t N = 30>
 struct with_segments {
-    template <typename TextIndex, typename Trait>
-    class policy;
-};  // class with_segments<N>
+    template <typename LCP, typename Trait>
+    using policy = with_segments_impl<LCP, Trait, N>;
+};
 
 /************************************************
- * Declaration: class with_segments<N>::policy<LCP, T>
+ * Declaration: class with_segments_impl<LCP, T, N>
  ************************************************/
 
-template <std::size_t N>
-template <typename LCP, typename Trait>
-class with_segments<N>::policy {
+template <typename LCP, typename Trait, std::size_t N>
+class with_segments_impl {
  public:  // Public Type(s)
     using host_type = LCP;
     using size_type = typename Trait::size_type;
@@ -44,7 +42,7 @@ class with_segments<N>::policy {
     using seg_pos_vec_type = std::vector<size_type>;
 
  public:  // Public Method(s)
-    policy();
+    with_segments_impl();
     void optimize(double lrv_exp, size_type num_iters);
 
     template <typename Sequence>
@@ -80,23 +78,21 @@ class with_segments<N>::policy {
     std::array<size_type, N> sum_av_;
     std::array<size_type, N> num_str_;
     std::vector<seg_pos_vec_type> seg_pos_vecs_;
-};  // class with_segments<N>::policy<LCP, T>
+};  // class with_segments_impl<LCP, T, N>
 
 /************************************************
- * Implementation: class with_segments<N>::policy<LCP, T>
+ * Implementation: class with_segments_impl<LCP, T, N>
  ************************************************/
 
-template <std::size_t N>
-template <typename LCP, typename T>
-with_segments<N>::policy<LCP, T>::policy()
+template <typename LCP, typename T, std::size_t N>
+with_segments_impl<LCP, T, N>::with_segments_impl()
     : lcp_(0), trie_(), sum_f_(), sum_av_(), num_str_(), seg_pos_vecs_() {
     // do nothing
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>
+template <typename LCP, typename T, std::size_t N>
 template <typename Sequence>
-void with_segments<N>::policy<LCP, T>::update(
+void with_segments_impl<LCP, T, N>::update(
         typename event::template after_inserting_lcp<Sequence> const &info) {
     if (info.num_inserted == 0) {
         assert(info.lcp == 0);
@@ -118,9 +114,8 @@ void with_segments<N>::policy<LCP, T>::update(
     }
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>
-void with_segments<N>::policy<LCP, T>::optimize(double lrv_exp, size_type num_iters) {
+template <typename LCP, typename T, std::size_t N>
+void with_segments_impl<LCP, T, N>::optimize(double lrv_exp, size_type num_iters) {
     size_type i = 0;
     seq_type s;
 
@@ -142,21 +137,19 @@ void with_segments<N>::policy<LCP, T>::optimize(double lrv_exp, size_type num_it
     }
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>
+template <typename LCP, typename T, std::size_t N>
 template <typename Sequence>
-typename with_segments<N>::template policy<LCP, T>::seg_pos_vec_type
-with_segments<N>::policy<LCP, T>::segment(Sequence const &s, double lrv_exp) const {
+typename with_segments_impl<LCP, T, N>::seg_pos_vec_type
+with_segments_impl<LCP, T, N>::segment(Sequence const &s, double lrv_exp) const {
     decltype(segment(s, lrv_exp)) seg_pos_vec;
     auto fs = segment_sequence(s, seg_pos_vec, lrv_exp);
     generate_seg_pos_vec(seg_pos_vec, fs);
     return seg_pos_vec;
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>
+template <typename LCP, typename T, std::size_t N>
 template <typename Sequence>
-void with_segments<N>::policy<LCP, T>::update_counts(
+void with_segments_impl<LCP, T, N>::update_counts(
         Sequence const &s, size_type n, size_type lcp_lf) {
     assert(lcp_ <= n);
     if (lcp_ > 0) {
@@ -189,9 +182,8 @@ void with_segments<N>::policy<LCP, T>::update_counts(
     }
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>  // NOLINTNEXTLINE(runtime/references)
-void with_segments<N>::policy<LCP, T>::recover_sequence(size_type &i, seq_type &s) const {
+template <typename LCP, typename T, std::size_t N>  // NOLINTNEXTLINE(runtime/references)
+void with_segments_impl<LCP, T, N>::recover_sequence(size_type &i, seq_type &s) const {
     using ti_ptr_type = typename host_type::host_type const *;
 
     s.clear();
@@ -208,10 +200,9 @@ void with_segments<N>::policy<LCP, T>::recover_sequence(size_type &i, seq_type &
     std::reverse(s.begin(), s.end());
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>
-std::vector<typename with_segments<N>::template policy<LCP, T>::size_type>
-with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runtime/references)
+template <typename LCP, typename T, std::size_t N>
+std::vector<typename with_segments_impl<LCP, T, N>::size_type>
+with_segments_impl<LCP, T, N>::segment_sequence(  // NOLINTNEXTLINE(runtime/references)
         seq_type const &s, seg_pos_vec_type &seg_pos_vec, double lrv_exp) const {
     auto n = s.size();
     std::vector<size_type> fs(n);
@@ -270,9 +261,8 @@ with_segments<N>::policy<LCP, T>::segment_sequence(  // NOLINTNEXTLINE(runtime/r
     return fs;
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>
-void with_segments<N>::policy<LCP, T>::increase_counts(
+template <typename LCP, typename T, std::size_t N>
+void with_segments_impl<LCP, T, N>::increase_counts(
         seq_type const &s, seg_pos_vec_type const &seg_pos_vec) {
     auto it = s.begin();
     typename seg_pos_vec_type::value_type prev_pos = 0;
@@ -282,9 +272,8 @@ void with_segments<N>::policy<LCP, T>::increase_counts(
     }
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>
-void with_segments<N>::policy<LCP, T>::decrease_counts(
+template <typename LCP, typename T, std::size_t N>
+void with_segments_impl<LCP, T, N>::decrease_counts(
         seq_type const &s, seg_pos_vec_type const &seg_pos_vec) {
     auto it = s.begin();
     typename seg_pos_vec_type::value_type prev_pos = 0;
@@ -294,9 +283,8 @@ void with_segments<N>::policy<LCP, T>::decrease_counts(
     }
 }
 
-template <std::size_t N>
-template <typename LCP, typename T>
-void with_segments<N>::policy<LCP, T>::generate_seg_pos_vec(  // NOLINTNEXTLINE(runtime/references)
+template <typename LCP, typename T, std::size_t N>
+void with_segments_impl<LCP, T, N>::generate_seg_pos_vec(  // NOLINTNEXTLINE(runtime/references)
         seg_pos_vec_type &seg_pos_vec, std::vector<size_type> const &fs) const {
     auto n = fs.size();
     seg_pos_vec.clear();
