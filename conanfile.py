@@ -20,6 +20,7 @@ class EsappConan(ConanFile):
         'python_exec_path': 'ANY',
     }
     default_options = (
+        'pybind11:version=2.1.1',
         'enable_conan=True',
         'python_exec_path=None',
     )
